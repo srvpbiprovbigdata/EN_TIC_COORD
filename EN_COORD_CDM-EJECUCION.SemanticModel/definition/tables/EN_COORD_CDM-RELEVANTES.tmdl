@@ -1,0 +1,76 @@
+table EN_COORD_CDM-RELEVANTES
+	lineageTag: 51f69df2-d8e6-4d9c-9957-af5c78091217
+
+	column Demanda
+		dataType: string
+		lineageTag: 5f119584-6e5a-4b6c-810b-b21472b8be79
+		summarizeBy: none
+		sourceColumn: Demanda
+
+		annotation SummarizationSetBy = Automatic
+
+	column Asunto
+		dataType: string
+		lineageTag: 366db82c-4a56-4251-97bf-2b97a2ff4779
+		summarizeBy: none
+		sourceColumn: Asunto
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Plan de Anual'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 3d176f9d-5ae1-40a1-8158-7db58267169d
+		summarizeBy: none
+		sourceColumn: Plan de Anual
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Objetivo Plan Anual'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9ecf9484-e38c-45b6-b253-8e0198540afc
+		summarizeBy: sum
+		sourceColumn: Objetivo Plan Anual
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descipcion Corta Objetivo Anual'
+		dataType: string
+		lineageTag: 6b489e29-090d-4434-8cc7-fd0faa00860d
+		summarizeBy: none
+		sourceColumn: Descipcion Corta Objetivo Anual
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Plan Accion'
+		dataType: string
+		lineageTag: 0bc12e12-e2e3-48a0-af0b-cf51ff1ae001
+		summarizeBy: none
+		sourceColumn: Plan Accion
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cod Plan Accion'
+		dataType: string
+		lineageTag: 218d4330-7ce8-4a3a-9cbb-9e8298a42bd3
+		summarizeBy: none
+		sourceColumn: Cod Plan Accion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition EN_COORD_CDM-RELEVANTES = m
+		mode: import
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents("https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRO/Documentos%20compartidos/Demanda/EN_COORD_CDM-RELEVANTES.xlsx"), null, true),
+				    Foco_Sheet = Origen{[Item="Foco",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Foco_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Demanda", type text}, {"Asunto", type text}, {"Plan de Anual", type logical}, {"Objetivo Plan Anual", Int64.Type}, {"Descipcion Corta Objetivo Anual", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

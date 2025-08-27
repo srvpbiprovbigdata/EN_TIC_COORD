@@ -1,0 +1,6282 @@
+table Completa
+	lineageTag: ddd09b57-b149-4f04-8dea-3672acc25f13
+
+	measure ZMD_KPI_Evolutivo_Que_Terminan_En_7_Días =
+			
+			VAR FechaActual = TODAY()
+			VAR FechaLimite = FechaActual + 7
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    'Completa'[schedule_end_date] >= FechaActual,
+			    'Completa'[schedule_end_date] <= FechaLimite
+			)
+		formatString: 0
+		lineageTag: 90816b4e-b904-47fc-bd99-c92c5c23ce4e
+
+	measure ZMD_KPI_Evolutivo_Que_Terminan_En_30_Días =
+			
+			VAR FechaActual = TODAY()
+			VAR FechaLimite = FechaActual + 30
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    'Completa'[schedule_end_date] >= FechaActual,
+			    'Completa'[schedule_end_date] <= FechaLimite
+			)
+		formatString: 0
+		lineageTag: 5ab80628-8497-4d66-8dab-bdef744efc65
+
+	measure ZMD_KPI_Evolutivo_Que_Terminan_En_90_Días =
+			
+			VAR FechaActual = TODAY()
+			VAR FechaLimite = FechaActual + 90
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    'Completa'[schedule_end_date] >= FechaActual,
+			    'Completa'[schedule_end_date] <= FechaLimite
+			)
+		formatString: 0
+		lineageTag: 004896ee-5c81-4d7a-b5dd-5bb9f9333b43
+
+	measure ZMD_KPI_Evolutivo_AbiertosUltimos30Dias =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_start_delDatalake] >= TODAY() - 30 &&
+			        'Completa'[work_start_delDatalake] <= TODAY()
+			    )
+			)
+		formatString: 0
+		lineageTag: 742c2b8d-3de2-480d-a7ab-e5b5435674b7
+
+	measure ZMD_KPI_Evolutivo_Abiertos30a60Dias =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_start_delDatalake] >= TODAY() - 60 &&
+			        'Completa'[work_start_delDatalake] < TODAY() - 30
+			    )
+			)
+		formatString: 0
+		lineageTag: 9e79527e-005c-42b7-88ac-6056fb1e293b
+
+	measure ZMD_KPI_Evolutivo_CerradosUltimos30Dias =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_end] >= TODAY() - 30 &&
+			        'Completa'[work_end] <= TODAY()
+			    )
+			)
+		formatString: 0
+		lineageTag: 51361651-9a47-42a1-a881-22dce5f26210
+
+	measure ZMD_KPI_Evolutivo_Cerrados30a60Dias =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_end] >= TODAY() - 60 &&
+			        'Completa'[work_end] < TODAY() - 30
+			    )
+			)
+		formatString: 0
+		lineageTag: 096e8d92-372c-4acd-8ada-5cbb02306573
+
+	measure ZMD_KPI_Evolutivo_AbiertosUltimos7Dias =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_start_delDatalake] >= TODAY() - 7 &&
+			        'Completa'[work_start_delDatalake] <= TODAY()
+			    )
+			)
+		formatString: 0
+		lineageTag: fcad2cce-4aee-4c94-95b9-bbbe42562180
+
+	measure ZMD_KPI_Evolutivo_AbiertosUltimos7Dias_a14Dias =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_start_delDatalake] >= TODAY() - 14 &&
+			        'Completa'[work_start_delDatalake] < TODAY() - 7
+			    )
+			)
+		formatString: 0
+		lineageTag: 8dab4675-7d54-4ddc-a484-ff2bf8d693fc
+
+	measure ZMD_KPI_Evolutivo_CerradosUltimos7Dias =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_end] >= TODAY() - 7 &&
+			        'Completa'[work_end] <= TODAY()
+			    )
+			)
+		formatString: 0
+		lineageTag: 3c3b9a32-2005-4837-8eb4-a973e1b3ed9c
+
+	measure ZMD_KPI_Evolutivo_CerradosUltimos7a14Dias =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_end] >= TODAY() - 14 &&
+			        'Completa'[work_end] < TODAY() - 7
+			    )
+			)
+		formatString: 0
+		lineageTag: 83db8e03-b915-452b-906a-ce45c365295f
+
+	measure ZMD_KPI_Coste_Evolutivo_AbiertosUltimos30Dias = ```
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_start_delDatalake] >= TODAY() - 30 &&
+			        'Completa'[work_start_delDatalake] <= TODAY()
+			    )
+			)
+			
+			```
+		lineageTag: 8b8f0d3b-e34a-4825-9c95-bb80ea98c1d5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Coste_Evolutivo_Abiertos30a60Dias =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_start_delDatalake] >= TODAY() - 60 &&
+			        'Completa'[work_start_delDatalake] < TODAY() - 30
+			    )
+			)
+		lineageTag: 1053421f-ed45-45e7-8ea1-451b62a3a3dc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Coste_Evolutivo_AbiertosUltimos7Dias =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_start_delDatalake] >= TODAY() - 7 &&
+			        'Completa'[work_start_delDatalake] <= TODAY()
+			    )
+			)
+		lineageTag: f5892815-67de-4931-9cf4-ed90d53e550d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Coste_Evolutivo_AbiertosUltimos7Dias_a14Dias =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_start_delDatalake] >= TODAY() - 14 &&
+			        'Completa'[work_start_delDatalake] < TODAY() - 7
+			    )
+			)
+		lineageTag: 70900371-9120-4f8d-8113-277180e7c43c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Coste_Evolutivo_CerradosUltimos30Dias =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_end] >= TODAY() - 30 &&
+			        'Completa'[work_end] <= TODAY()
+			    )
+			)
+		lineageTag: b362e763-2746-4381-aa06-21f13cd422d9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Coste_Evolutivo_Cerrados30a60Dias =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_end_delDatalake] >= TODAY() - 60 &&
+			        'Completa'[work_end_delDatalake] < TODAY() - 30
+			    )
+			)
+		lineageTag: 6f70efe9-7a6b-44ac-9d55-4947ef66fe3e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Coste_Evolutivo_CerradosUltimos7Dias =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_end_delDatalake] >= TODAY() - 7 &&
+			        'Completa'[work_end_delDatalake] <= TODAY()
+			    )
+			)
+		lineageTag: 1245d689-6061-4155-a235-c4695e2f09f6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Coste_Evolutivo_CerradosUltimos7a14Dias =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        'Completa'[work_end_delDatalake] >= TODAY() - 14 &&
+			        'Completa'[work_end_delDatalake] < TODAY() - 7
+			    )
+			)
+		lineageTag: cad8abbd-2990-4dc7-84b0-0ee41bc9da08
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure GraficaBacklogElementosAbiertos = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			 
+			VAR _abiertas =
+			    CALCULATE(
+			        COUNT('Completa'[number]),
+			        'Completa'[work_start_delDatalake] <= _Current_EOM,
+			        'Completa'[work_start_delDatalake] > _Past_EOM
+			    )
+			 
+			RETURN
+			    _abiertas
+			```
+		formatString: 0
+		lineageTag: e56bd456-32ba-4318-8569-c6d6e096c7fc
+
+	measure GraficaBacklogElementosCerradas = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			 
+			VAR _abiertas =
+			    CALCULATE(
+			        COUNT('Completa'[number]),
+			        'Completa'[work_end] <= _Current_EOM,
+			        'Completa'[work_end] > _Past_EOM
+			    )
+			 
+			RETURN
+			   - _abiertas
+			```
+		formatString: 0
+		lineageTag: 47fd723e-88fe-45c9-b7b3-97d98a909770
+
+	measure ZMD_KPI_Evolutivo_Termina_Semana_Actual =
+			
+			VAR FechaActual = TODAY()
+			VAR SemanaActual = WEEKNUM(FechaActual, 2)  // El segundo parámetro indica que la semana comienza en lunes
+			VAR AnoActual = YEAR(FechaActual)
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    WEEKNUM('Completa'[schedule_end_date], 2) = SemanaActual,
+			    YEAR('Completa'[schedule_end_date]) = AnoActual
+			)
+		formatString: 0
+		lineageTag: 4f4fc236-45b3-437b-9ec8-a2345c5a614d
+
+	measure ZMD_KPI_Evolutivo_Termina_Mes_Actual =
+			
+			VAR FechaActual = TODAY()
+			VAR MesActual = MONTH(FechaActual)
+			VAR AnoActual = YEAR(FechaActual)
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    MONTH('Completa'[schedule_end_date]) = MesActual,
+			    YEAR('Completa'[schedule_end_date]) = AnoActual
+			)
+		formatString: 0
+		lineageTag: 8ae7ae03-dd44-4315-80b3-be0d3772ed64
+
+	measure ZMD_KPI_Evolutivo_Termina_Trimestre_Actual = ```
+			
+			VAR FechaActual = TODAY()
+			VAR TrimestreActual = QUARTER(FechaActual)
+			VAR AnoActual = YEAR(FechaActual)
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    QUARTER('Completa'[schedule_end_date]) = TrimestreActual,
+			    YEAR('Completa'[schedule_end_date]) = AnoActual
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 2f3249f1-74bd-41b1-b3e6-d8a2ec7ab4b7
+
+	measure Filtro_Visual = ```
+			
+			VAR PeriodoSeleccionado = SELECTEDVALUE('TablaPeriodo'[Periodo])
+			RETURN
+			IF(
+			    PeriodoSeleccionado = "Última Semana" && 'Completa'[ZMD_KPI_Evolutivo_CerradosUltimos7Dias] = 1,
+			    1,
+			    IF(
+			        PeriodoSeleccionado = "Último Mes" && 'Completa'[ZMD_KPI_Evolutivo_CerradosUltimos30Dias] = 1,
+			        1,
+			        BLANK()
+			    )
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 747d2dde-7057-4744-82b9-dfec07bde5f8
+
+	measure ZMD_KPI_Evolutivo_euros_Termina_Semana_Actual =
+			
+			VAR FechaActual = TODAY()
+			VAR SemanaActual = WEEKNUM(FechaActual, 2)  // El segundo parámetro indica que la semana comienza en lunes
+			VAR AnoActual = YEAR(FechaActual)
+			RETURN
+			SUMX(
+			    FILTER(
+			        'Completa',
+			        WEEKNUM('Completa'[schedule_end_date], 2) = SemanaActual &&
+			        YEAR('Completa'[schedule_end_date]) = AnoActual
+			    ),
+			    'Completa'[cost]
+			)
+		lineageTag: 1e179290-823e-4f7a-b7d9-03000fa6da26
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Evolutivo_Euro_Termina_Trimestre_Actual = ```
+			
+			VAR FechaActual = TODAY()
+			VAR TrimestreActual = QUARTER(FechaActual)
+			VAR AnoActual = YEAR(FechaActual)
+			RETURN
+			SUMX(
+			    FILTER(
+			        'Completa',
+			        QUARTER('Completa'[schedule_end_date]) = TrimestreActual &&
+			        YEAR('Completa'[schedule_end_date]) = AnoActual
+			    ),
+			    'Completa'[cost]
+			)
+			
+			```
+		lineageTag: 8c07a6af-c7e8-4767-8981-abb647342be1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Evolutivo_Euros_Termina_Mes_Actual = ```
+			
+			VAR FechaActual = TODAY()
+			VAR MesActual = MONTH(FechaActual)
+			VAR AnoActual = YEAR(FechaActual)
+			RETURN
+			SUMX(
+			    FILTER(
+			        'Completa',
+			        MONTH('Completa'[schedule_end_date]) = MesActual &&
+			        YEAR('Completa'[schedule_end_date]) = AnoActual
+			    ),
+			    'Completa'[cost]
+			)
+			
+			```
+		lineageTag: fa1c2292-e9a4-41f1-b201-952de25bd0c9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Diferencia_Costes = ```
+			
+			VAR EvolutivoCost = SUM('Completa'[cost])
+			VAR DemandaCost = SUM('Demandas'[total_costs])
+			RETURN
+			IF(
+			ISBLANK(EvolutivoCost) || (EvolutivoCost)= 0 || (DemandaCost)= 0 || ISBLANK(DemandaCost),
+			    BLANK(),
+			    EvolutivoCost - DemandaCost
+			)
+			
+			```
+		lineageTag: 11e6c48a-cb16-4403-8855-4b5e46bebe81
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Diferencia_Costes_% = ```
+			
+			VAR EvolutivoCost = SUM('Completa'[cost])
+			VAR DemandaCost = SUM('Demandas'[total_costs])
+			RETURN
+			IF(
+			    ISBLANK(EvolutivoCost) || (EvolutivoCost)= 0 || (DemandaCost)= 0 || ISBLANK(DemandaCost),
+			    BLANK(),
+			    (EvolutivoCost / DemandaCost) -1
+			)
+			
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 54483775-1d43-409e-bf0f-7825f26c1e7e
+
+	measure ZMD_KPIPrincipal_%_Inicio_Retrasado =
+			
+			Completa[ZMD_Suma_KPIPrincipal_Inicio_Retrasado] / Completa[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma]
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 5e3a771a-96af-4a81-932f-f01bce98c505
+
+	measure 'Medida 6'
+		lineageTag: 3cb18846-4d42-4a53-8679-cf670bba923d
+
+	measure ZMD_KPI_Evolutivo_CerradosEsteAno = ```
+			
+			--CALCULATE(
+			--    COUNT('Completa'[number]),
+			--    FILTER(
+			--        'Completa',
+			--        YEAR('Completa'[work_end_delDatalake]) = YEAR(TODAY()) 
+			--    )
+			--)
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        YEAR('Completa'[work_end]) = YEAR(TODAY()) ))
+			```
+		formatString: 0
+		lineageTag: 4f0603fc-f111-4716-a33f-dc775fa97863
+
+	measure ZMD_KPI_Evolutivo_CerradosUltimoAnoNatural =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        YEAR('Completa'[work_end]) = YEAR(TODAY()) - 1
+			    )
+			)
+		formatString: 0
+		lineageTag: 308a7d95-083c-47bd-b274-eb4048a09b66
+
+	measure ZMD_KPI_Evolutivo_CerradosEsteMes =
+			
+			CALCULATE(
+			    COUNT('Completa'[number]),
+			    FILTER(
+			        'Completa',
+			        YEAR('Completa'[work_end]) = YEAR(TODAY()) &&
+			        MONTH('Completa'[work_end]) = MONTH(TODAY()) -- &&
+			        --('Completa'[ZCC_Estado_Evolutivo] = "Cerrado")
+			    )
+			)
+		formatString: 0
+		lineageTag: 42a4bc8c-5f82-44f2-9ee0-48d8357cd808
+
+	measure ZMD_Suma_Diferencia_Estimado_fin_inicio_demanda =
+			
+			SUMX(
+			    FILTER(
+			        Completa,
+			        NOT(ISBLANK(Completa[ZCC_ Estimado inicio demanda])) &&
+			        NOT(ISBLANK(Completa[ZCC_ Estimado fin demanda]))
+			    ),
+			    DATEDIFF(
+			        Completa[ZCC_ Estimado inicio demanda],
+			        Completa[ZCC_ Estimado fin demanda],
+			        DAY
+			    )
+			)
+		formatString: 0
+		lineageTag: 8a6e5822-2c3c-4837-8006-e38e3a243270
+
+	measure ZMD_Suma_Duracion_del_proyecto_Planificada_Suma =
+			
+			SUMX(
+			    FILTER(
+			        Completa,
+			        NOT(ISBLANK(Completa[schedule_start_date])) &&
+			        NOT(ISBLANK(Completa[schedule_end_date])) &&
+			        Completa[schedule_start_date] <> 0 &&
+			        Completa[schedule_end_date] <> 0
+			    ),
+			    DATEDIFF(
+			        Completa[schedule_start_date],
+			        Completa[schedule_end_date],
+			        DAY
+			    )
+			)
+		formatString: 0
+		lineageTag: 9b9e1b04-0f8e-42f4-8dda-1b6d6d7cbbf3
+
+	measure ZMD_KPIPrincipal_Evolutivos_Duracion_DemandavsEjecucion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Diferencia_Estimado_fin_inicio_demanda])) && 
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma])),
+			    ('Completa'[ZMD_Suma_Diferencia_Estimado_fin_inicio_demanda] - 'Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma]) / COUNTROWS('Completa'),
+			    BLANK()
+			)
+			```
+		lineageTag: b4d6e7ad-4413-40a6-b975-c708d4558619
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Suma_Duracion_linea_base_inicial =
+			
+			SUMX(
+			    FILTER(
+			        Completa,
+			        NOT(ISBLANK(Completa[ZCC_línea_base_start])) &&
+			        NOT(ISBLANK(Completa[ZCC_línea_base_finish])) &&
+			        Completa[ZCC_línea_base_start] <> 0 &&
+			        Completa[ZCC_línea_base_finish] <> 0
+			    ),
+			    DATEDIFF(
+			        Completa[ZCC_línea_base_start],
+			        Completa[ZCC_línea_base_finish],
+			        DAY
+			    )
+			)
+		formatString: 0
+		lineageTag: 0d11a47f-f7d5-4c80-a581-349d35ff4a0f
+
+	measure 'Medida 7'
+		lineageTag: f399de15-15eb-4e96-9b9e-f34cd6944f65
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure ZMD_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Diferencia_Estimado_fin_inicio_demanda])) && 
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Duracion_linea_base_inicial])),
+			    ('Completa'[ZMD_Suma_Diferencia_Estimado_fin_inicio_demanda] - 'Completa'[ZMD_Suma_Duracion_linea_base_inicial]) /
+			    CALCULATE(
+			        COUNTROWS('Completa'),
+			        FILTER(
+			            'Completa',
+			            NOT(ISBLANK(Completa[schedule_start_date])) &&
+			            NOT(ISBLANK(Completa[schedule_end_date])) &&
+			            Completa[schedule_start_date] <> 0 &&
+			            Completa[schedule_end_date] <> 0 &&
+			            NOT(ISBLANK(Completa[ZCC_línea_base_start])) &&
+			            NOT(ISBLANK(Completa[ZCC_línea_base_finish])) &&
+			            Completa[ZCC_línea_base_start] <> 0 &&
+			            Completa[ZCC_línea_base_finish] <> 0
+			        )
+			    ),
+			    BLANK()
+			)
+			```
+		lineageTag: 49253b56-a839-4f32-a419-ce33e20d7468
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPIPrincipal_Proyectos%_Duracion_DemandavsEjecucion = AVERAGE(Completa[ZCC_KPIPrincipal_Proyectos_%_Duracion_DemandavsEjecucion])
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 56b96ce2-80cd-406c-8bd9-6b89d4f5f794
+
+	measure ZMD_KPIPrincipal_Evolutivos%_Duracion_DemandavsEjecucion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Diferencia_Estimado_fin_inicio_demanda])) && 
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma])),
+			    ('Completa'[ZMD_Suma_Diferencia_Estimado_fin_inicio_demanda] - 'Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma]) / 'Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma],
+			    BLANK()
+			)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 846ce78d-5dbc-4f13-a55f-3a0c282c8090
+
+	measure ZMD_Suma_KPIPrincipal_Inicio_Retrasado =
+			
+			SUM(Completa[ZCC_KPIPrincipal_Inicio_Retrasado])
+		formatString: 0
+		lineageTag: 86b8474e-7c04-4463-8ab4-3c89fbfb7e7a
+
+	measure ZMD_Suma_KPIPrincipal_Fin_Retrasado =
+			
+			SUM(Completa[ZCC_KPIPrincipal_Fin_Retrasado])
+		lineageTag: 7053f0c6-689a-4862-b0e7-f47b78936ec0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPIPrincipal_%_Fin_Retrasado =
+			
+			Completa[ZMD_Suma_KPIPrincipal_Fin_Retrasado] / Completa[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma]
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 5c2228e7-70d1-4de8-ba3c-3abf88386ae2
+
+	measure ZMD_Suma_Duracion_del_proyecto_Real_Suma =
+			
+			SUMX(
+			    FILTER(
+			        Completa,
+			        NOT(ISBLANK(Completa[work_start])) &&
+			        NOT(ISBLANK(Completa[work_end])) &&
+			        Completa[work_start] <> 0 &&
+			        Completa[work_end] <> 0
+			    ),
+			    DATEDIFF(
+			        Completa[work_start],
+			        Completa[work_end],
+			        DAY
+			    )
+			)
+		formatString: 0
+		lineageTag: 1d600a67-9d90-482f-89ac-6d0c08e1eb52
+
+	measure ZMD_KPIPrincipal_Proyectos_Duracion_Ejecucion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Duracion_del_proyecto_Real_Suma])) && 
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma])),
+			    ('Completa'[ZMD_Suma_Duracion_del_proyecto_Real_Suma] - 'Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma]) /
+			    CALCULATE(
+			        COUNTROWS('Completa'),
+			        FILTER(
+			            'Completa',
+			            NOT(ISBLANK(Completa[schedule_start_date])) &&
+			            NOT(ISBLANK(Completa[schedule_end_date])) &&
+			            Completa[schedule_start_date] <> 0 &&
+			            Completa[schedule_end_date] <> 0 &&
+			            NOT(ISBLANK(Completa[work_start_delDatalake])) &&
+			            NOT(ISBLANK(Completa[work_end_delDatalake])) &&
+			            Completa[work_start_delDatalake] <> 0 &&
+			            Completa[work_end_delDatalake] <> 0
+			        )
+			    ),
+			    BLANK()
+				)
+			
+			```
+		lineageTag: 4b07eb9c-0a34-46cb-9892-24966fee66db
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPIPrincipal_Proyectos_%_Duracion_Ejecucion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Duracion_del_proyecto_Real_Suma])) && 
+			    NOT(ISBLANK('Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma])),
+			    ('Completa'[ZMD_Suma_Duracion_del_proyecto_Real_Suma] - 'Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma]) / 'Completa'[ZMD_Suma_Duracion_del_proyecto_Planificada_Suma],
+			    BLANK()
+			)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 078ab534-dc66-4811-86cc-82ee49f31097
+
+	measure ZMD_Conteo_ProyectosyEvolutivos_porencimade_Duracion_Ejecucion_Media =
+			
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    FILTER(
+			        'Completa',
+			        NOT(ISBLANK('Completa'[ZCC_KPI_Evolutivo_Duracion_Ejecucion])) &&
+			        'Completa'[ZCC_KPI_Evolutivo_Duracion_Ejecucion] > [ZMD_KPIPrincipal_Proyectos_Duracion_Ejecucion]
+			    )
+			)
+		formatString: 0
+		lineageTag: 77bc0140-94bc-49a6-b4ff-f4775991abb8
+
+	measure ZMD_Conteo_Proyectos_porencimade_Duracion_DemandavsEjecucion_Media =
+			
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    FILTER(
+			        'Completa',
+			        NOT(ISBLANK('Completa'[ZCC_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion])) &&
+			        'Completa'[ZCC_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion] > [ZMD_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion]
+			    )
+			)
+		formatString: 0
+		lineageTag: a6296353-bac1-41ae-8037-c1b86d578db0
+
+	measure ZMD_Conteo_Evolutivos_porencimade_Duracion_DemandavsEjecucion_Media =
+			
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    FILTER(
+			        'Completa',
+			        NOT(ISBLANK('Completa'[ZCC_KPIPrincipal_Evolutivos_Duracion_DemandavsEjecucion])) &&
+			        'Completa'[ZCC_KPIPrincipal_Evolutivos_Duracion_DemandavsEjecucion] > [ZMD_KPIPrincipal_Evolutivos_Duracion_DemandavsEjecucion]
+			    )
+			)
+		formatString: 0
+		lineageTag: 9b48d858-14fd-4afb-81be-ea5c95c71d1c
+
+	measure ZMD_KPIPrincipal_Inicio_Retrasado = AVERAGE('Completa'[ZCC_KPIPrincipal_Inicio_Retrasado])
+		lineageTag: 2b2bee09-7c61-401a-a499-439f5ca230d2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPIPrincipal_Fin_Retrasado = AVERAGE('Completa'[ZCC_KPIPrincipal_Fin_Retrasado])
+		lineageTag: cc3f2fd1-fcd4-49c0-aebc-ffbc656e04ea
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Conteo_ProyectosyEvolutivos_porencimade_RetrasoFin_Medio =
+			
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    FILTER(
+			        'Completa',
+			        NOT(ISBLANK('Completa'[ZCC_KPIPrincipal_Fin_Retrasado])) &&
+			        'Completa'[ZCC_KPIPrincipal_Fin_Retrasado] > [ZMD_KPIPrincipal_Fin_Retrasado]
+			    )
+			)
+		formatString: 0
+		lineageTag: 62302744-3175-4bf1-9f69-bbe865cc6fba
+
+	measure ZMD_KPI_Coste_Evolutivo_CerradosEsteAno =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        YEAR('Completa'[work_end_delDatalake]) = YEAR(TODAY())
+			    )
+			)
+		lineageTag: 43007c35-c96c-436b-93ce-52b6f254d6d6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Coste_Evolutivo_CerradosAnoPasado =
+			
+			CALCULATE(
+			    SUM('Completa'[cost]),
+			    FILTER(
+			        'Completa',
+			        YEAR('Completa'[work_end_delDatalake]) = YEAR(TODAY()) - 1
+			    )
+			)
+		lineageTag: 89ed959b-9219-4cb5-93f5-7e0c3ce46807
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Backlog_Proyecto_Mensualacumulado = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			 
+			VAR _tareasAbiertas =
+			    CALCULATE(
+			        COUNT('completa'[number]),
+			        (
+			            'completa'[opened_at] <= _Current_EOM
+			            && 'completa'[opened_at] > DATE(2019, 1, 1) 
+			            ),
+			        'completa'[ZCC_Proyecto- Evol] = "Proyecto"
+			    )
+			 
+			VAR _tareasCerradas =
+			    CALCULATE(
+			        COUNT('completa'[number]),
+			        (
+			            'Completa'[ZCC_GraficaBacklog_New_Closed_at] <= _Current_EOM
+			            && 'completa'[ZCC_GraficaBacklog_New_Closed_at] > DATE(2019, 1, 1)
+			        )
+			        --|| (
+			        --    ISBLANK('completa'[closed_at])
+			        --    && 'completa'[ZCC_Estado_Evolutivo] = "Cerrado"
+			        --)
+			        ,
+			        'completa'[ZCC_Proyecto- Evol] = "Proyecto"
+			    )
+			 
+			RETURN
+			    _tareasAbiertas - _tareasCerradas
+			
+			```
+		formatString: 0
+		lineageTag: a2a0ca62-95c8-480b-8e57-099dd934dc91
+
+	measure Backlog_Evolutivo_Mensualacumulado = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			 
+			VAR _tareasAbiertas =
+			    CALCULATE(
+			        COUNT('completa'[number]),
+			        (
+			            'completa'[opened_at] <= _Current_EOM
+			            && 'completa'[opened_at] > DATE(2019, 1, 1)  
+			            ),
+			        'completa'[ZCC_Proyecto- Evol] = "Evolutivo"
+			    )
+			VAR _tareasAbiertas2 =
+			    CALCULATE(
+			        COUNT('completa'[number]),
+			        (
+			            'completa'[opened_at] <= _Current_EOM
+			            && 'completa'[opened_at] > DATE(2019, 1, 1)  
+			            ),
+			        'Completa'[ZCC_Elemento_Activo] = "Abierto",
+			        ('Completa'[ZCC_Estado_Demanda] = "Completed" || 'Completa'[ZCC_Estado_Demanda] = "Rejected" || 'Completa'[ZCC_Estado_Demanda] = "Canceled"),
+			        'completa'[ZCC_Proyecto- Evol] = "Evolutivo"
+			    )
+			 
+			VAR _tareasCerradas =
+			    CALCULATE(
+			        COUNT('completa'[number]),
+			        (
+			            'Completa'[ZCC_GraficaBacklog_New_Closed_at] <= _Current_EOM
+			            && 'completa'[ZCC_GraficaBacklog_New_Closed_at] > DATE(2019, 1, 1)
+			        )
+			        ,
+			        'completa'[ZCC_Proyecto- Evol] = "Evolutivo" 
+			    )
+			 
+			RETURN
+			    (_tareasAbiertas - _tareasAbiertas2) - _tareasCerradas
+			
+			```
+		formatString: 0
+		lineageTag: 50e95d66-3932-4476-8c44-0ba8ad54db5c
+
+	measure GraficaBacklogProyectosCerrados = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			 
+			VAR _abiertas =
+			    CALCULATE(
+			        COUNT('Completa'[number]),
+			        'Completa'[work_end] <= _Current_EOM,
+			        'Completa'[work_end] > _Past_EOM,Completa[ZCC_Proyecto- Evol] =
+			"Proyecto",Completa[dv_phase] = "Closing"
+			    )
+			 
+			RETURN
+			   - _abiertas
+			```
+		formatString: 0
+		lineageTag: eac2d092-ea6d-4d1b-ae14-e6f314f23a20
+
+	measure GraficaBacklog_Evolutivos_Cerrados = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			VAR _abiertas =
+			    CALCULATE(
+			        COUNT('Completa'[number]),
+			        'Completa'[work_end] <= _Current_EOM,
+			        'Completa'[work_end] > _Past_EOM, Completa[ZCC_Proyecto- Evol] = "Evolutivo"
+			    )
+			 
+			RETURN
+			   - _abiertas
+			```
+		formatString: 0
+		lineageTag: f40fa961-dab2-4be8-97d8-5dd09d3cceda
+
+	measure GraficaBacklogEvolutivosAbiertos = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			VAR _abiertas =
+			    CALCULATE(
+			        COUNT('Completa'[number]),
+			        'Completa'[work_start_delDatalake] <= _Current_EOM,
+			        'Completa'[work_start_delDatalake] > _Past_EOM, Completa[ZCC_Proyecto- Evol] =
+			"Evolutivo"
+			    )
+			 
+			RETURN
+			    _abiertas
+			```
+		formatString: 0
+		lineageTag: fb5441dc-9375-4d75-a758-9d5e643853d8
+
+	measure GraficaBacklogProyectosAbiertos = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			VAR _abiertas =
+			    CALCULATE(
+			        COUNT('Completa'[number]),
+			        'Completa'[work_start_delDatalake] <= _Current_EOM,
+			        'Completa'[work_start_delDatalake] > _Past_EOM, Completa[ZCC_Proyecto- Evol] =
+			"Proyecto"
+			    )
+			 
+			RETURN
+			    _abiertas
+			```
+		formatString: 0
+		lineageTag: b5add6b3-f190-45ab-84c5-603ce222c6cd
+
+	measure ZMD_Recuento_Proy_Evol_FFP_Caducada = ```
+			
+			CALCULATE(
+			    COUNTROWS('Completa'),
+			    FILTER(
+			        'Completa',
+			        ISBLANK('Completa'[work_end_delDatalake]) && 
+			        NOT(ISBLANK('Completa'[schedule_end_date])) && 
+			        'Completa'[schedule_end_date] < TODAY() &&
+			        'Completa'[ZCC_Estado_Evolutivo] <> "Cerrado"
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: 399f1ad0-e564-4804-be09-22371db51182
+
+	measure ZMD_Proyectos_Recuento_JP_Diferente_DemandayEjecucion =
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        'Completa'[dv_project_manager] <> RELATED('Demandas'[dv_u_project_manager])
+			    )
+			)
+		formatString: 0
+		lineageTag: ffb05732-fad5-42b6-b1cb-c0f97b28f427
+
+	measure ZMD_Proyecto_Abierto_conFechadeCierre = ```
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        'Completa'[ZCC_Estado_Evolutivo] <> "Cerrado" && NOT ISBLANK('Completa'[work_end])
+			    )
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 462d7eb9-fa6b-450a-9d67-54f8336f5c60
+
+	measure ZMD_Proyecto_Cerrado_sinFechadeCierre =
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        'Completa'[ZCC_Estado_Evolutivo] == "Cerrado" && ISBLANK('Completa'[work_end])
+			    )
+			)
+		formatString: 0
+		lineageTag: 01c7af0f-8e1c-466f-af86-229fe972aa69
+
+	measure ZMD_ProyectoEvolutivoAbierto_DemandaCerrada = ```
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        'Completa'[ZCC_Estado_Evolutivo] <> "Cerrado" &&
+			        (
+			            RELATED('Demandas'[dv_state]) == "Closed Complete" || 
+			            RELATED('Demandas'[dv_state]) == "Closed Incomplete" || 
+			            RELATED('Demandas'[dv_state]) == "Closed Skipped" || 
+			            RELATED('Demandas'[dv_state]) == "Cancelled"
+			        )
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: ab1d5deb-6928-4b12-bbee-90ece7c5a9fb
+
+	measure ZMD_FechaFin_diferente_DemandayEjecucion = ```
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        NOT ISBLANK('Completa'[schedule_end_date]) &&
+			        NOT ISBLANK('Completa'[ZCC_ Estimado fin demanda]) &&
+			        FORMAT('Completa'[schedule_end_date], "YYYY-MM-DD") <> FORMAT('Completa'[ZCC_ Estimado fin demanda], "YYYY-MM-DD")
+			    )
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 694f149a-53b1-46e8-81a9-9612c5081ec6
+
+	measure ZMD_FechaInicio_Sin_Planificar =
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        ISBLANK('Completa'[schedule_start_date])
+			    )
+			)
+		formatString: 0
+		lineageTag: d1924298-7bbb-4a0b-bb56-cc0269155cc7
+
+	measure ZMD_FechaFin_Sin_Planificar =
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        ISBLANK('Completa'[schedule_end_date])
+			    )
+			)
+		formatString: 0
+		lineageTag: cf2c958e-b239-4d3d-adfa-2a1b7d841cae
+
+	measure ZMD_FechaFinMenorAFechaInicio_Planificada =
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        NOT ISBLANK('Completa'[schedule_start_date]) &&
+			        NOT ISBLANK('Completa'[schedule_end_date]) &&
+			        'Completa'[schedule_end_date] < 'Completa'[schedule_start_date]
+			    )
+			)
+		formatString: 0
+		lineageTag: edb30c70-0e29-4be9-acb1-73b40263f71c
+
+	measure ZMD_EstadoAbierto_FaseCerrada = ```
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			         'Completa'[dv_state] <> "Closed Complete" && 'Completa'[dv_state] <> "Cancelled" && 'Completa'[dv_state] <> "Closed Incomplete" && 'Completa'[dv_state] <> "Closed Skipped"  && 'Completa'[dv_phase] = "Closing" 
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: 1773cbd1-1d6c-4e5c-a107-a53e65641b1c
+
+	measure ZMD_EstadoCerrado_FaseDistintaDeCerrado =
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        LEFT('Completa'[number], 4) <> "ENHC" && LEFT('Completa'[number], 7) <> "PRJTASK" && // Excluir registros donde 'number' empieza con "ENH" y "PRJTASK"
+			        ('Completa'[dv_state] = "Closed Complete" ||
+			         'Completa'[dv_state] = "Cancelled" ||
+			         'Completa'[dv_state] = "Closed Incomplete" ||
+			         'Completa'[dv_state] = "Closed Skipped") &&
+			        'Completa'[dv_phase] <> "Closing"
+			    )
+			)
+		formatString: 0
+		lineageTag: 0efcf0f8-5512-4b57-b636-1fb77625f304
+
+	measure ZMD_Proyectos_Sin_negocio =
+			
+			COUNTROWS(
+			    FILTER(
+			        'Completa',
+			        ISBLANK('Completa'[ZCC_Negocio_Asociado])
+			    )
+			)
+		formatString: 0
+		lineageTag: 7654c6a8-b275-462b-af93-4f67d7898e07
+
+	measure ZMD_AvisoSeleccionProyecto = ```
+			
+			IF(
+			    OR(
+			        ISFILTERED('Completa'[number]),
+			        ISFILTERED('Completa'[short_description])
+			    ),
+			    BLANK(),
+			    "Por favor, seleccione un proyecto en el filtro."
+			)
+			
+			```
+		lineageTag: 210539d2-4ca1-4e50-8f33-aa128a16d2a8
+
+	measure ZMD_KPIDuracion_Demanda_Proyecto = AVERAGE('Completa'[ZCC_KPIDuracion_Demanda_Proyecto])
+		lineageTag: b1568573-5b47-4a49-80e5-ea77b0bea778
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto = ```
+			AVERAGE('Completa'[ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto])
+			
+			```
+		lineageTag: e0583df0-a634-490a-9b6d-51377a94266c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPIDuracion_Ejecucion_Real_Proyecto = AVERAGE('Completa'[ZCC_KPIDuracion_Ejecucion_Real_Proyecto])
+		lineageTag: 5ea24354-9deb-482e-85b7-3b760b28045a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPIDuracion%_Demanda_a_Ejecucion_Planificado_Proyecto = AVERAGE(Completa[ZCC_KPIDuracion%_Demanda_a_Ejecucion_Planificado_Proyecto])
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 42bc058c-674e-4cb0-bc41-0384b8739eb7
+
+	measure ZMD_KPIDuracion%_Demanda_a_Ejecucion_Real_Proyecto = AVERAGE(Completa[ZCC_KPIDuracion%_Demanda_a_Ejecucion_Real_Proyecto])
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 7bd8cd5d-dc61-4d80-924a-9ceaa6c95706
+
+	measure ZMD_KPIDuracion%_Ejecucion_Planificado_a_Real_Proyecto = AVERAGE(Completa[ZCC_KPIDuracion_Ejecucion_Real_Proyecto])
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 9f9c1d2c-ab4c-4f9f-bd6f-7bd00fbdb0a7
+
+	measure ZMD_KPIDuracion_Ejecucion_maxreplanificacion = ```
+			
+			    AVERAGE('Completa'[ZCC_KPIDuracion_Ejecucion_maxreplanificacion])
+			
+			```
+		formatString: 0
+		lineageTag: cbeda1ef-3652-48da-97b8-d017e9bab535
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure ZMD_Duracion_linea_base_inicial = AVERAGE('Completa'[ZCC_Duracion_linea_base_inicial])
+		lineageTag: 1047201e-afe9-4eeb-8b44-b4e05447d52d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI_Proyectos_%_Duracion_LineaBaseUltimaReplanificacion = AVERAGE(Completa[ZCC_KPI_Proyectos_%_Duracion_LineaBaseUltimaReplanificacion])
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 0a63e37b-50b5-4bb1-8310-0f07ec146632
+
+	measure ZMD_KPI_ProyectosyEvolutivos_%_Duracion_UltimaReplanificacionvsReal = AVERAGE(Completa[ZCC_KPI_ProyectosyEvolutivos_%_Duracion_UltimaReplanificacionvsReal])
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 538f3b72-fb00-44ea-bbd7-8af5efe84287
+
+	measure 'Medida 8'
+		lineageTag: 30f7b80b-e378-47e7-a355-6c787f6e2fea
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure ZMD_KPI%_EstimacionDemandaALineaBase = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Demanda_Proyecto])) && 
+			        NOT(ISBLANK(Completa[ZMD_Duracion_linea_base_inicial])) && 
+			        Completa[ZMD_KPIDuracion_Demanda_Proyecto] <> 0 && 
+			        Completa[ZMD_Duracion_linea_base_inicial] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_Duracion_linea_base_inicial] - Completa[ZMD_KPIDuracion_Demanda_Proyecto]) / Completa[ZMD_KPIDuracion_Demanda_Proyecto],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: d9f0bc12-ae6c-40a5-ad2a-627ab2e100dc
+
+	measure ZMD_KPI%_LineaBaseAUltimaReplanificacion = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_Duracion_linea_base_inicial])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto])) && 
+			        Completa[ZMD_Duracion_linea_base_inicial] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto] - Completa[ZMD_Duracion_linea_base_inicial]) / Completa[ZMD_Duracion_linea_base_inicial],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: d200300f-21f0-4c2f-bec4-7bded6e643e6
+
+	measure ZMD_KPI%_UltimaReplanificacionAReal = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto])) && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto] - Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto]) / Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 4ec6adae-47f7-4aa6-ad2b-7d21c401606f
+
+	measure ZCC_KPI%_EstimacionDemandaAReal = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Demanda_Proyecto])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto])) && 
+			        Completa[ZMD_KPIDuracion_Demanda_Proyecto] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto] - Completa[ZMD_KPIDuracion_Demanda_Proyecto]) / Completa[ZMD_KPIDuracion_Demanda_Proyecto],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: c319e686-f45f-450c-ac82-5b7e451c705c
+
+	measure ZMD_KPI%_EstimacionDemandaAUltimaReplanificacion = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Demanda_Proyecto])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto])) && 
+			        Completa[ZMD_KPIDuracion_Demanda_Proyecto] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto] - Completa[ZMD_KPIDuracion_Demanda_Proyecto]) / Completa[ZMD_KPIDuracion_Demanda_Proyecto],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 9762ef45-7a7c-4bea-b593-f4ec3aaba9c8
+
+	measure ZMD_KPI%_LineaBaseAReal = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_Duracion_linea_base_inicial])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto])) && 
+			        Completa[ZMD_Duracion_linea_base_inicial] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto] - Completa[ZMD_Duracion_linea_base_inicial]) / Completa[ZMD_Duracion_linea_base_inicial],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: fadd1e74-fcc2-4d16-ad19-79ee512c0508
+
+	measure ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO = AVERAGE(Completa[ZCC_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO])
+		lineageTag: 0e756c61-8924-4472-8421-0505625b84bb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO = AVERAGE(Completa[ZCC_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO])
+		lineageTag: ff18d4ce-b6fa-4896-830c-b63d2e65184f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_KPI%_LineaBaseARealMODIFICADAPROYECTO = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_Duracion_linea_base_inicial])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO])) && 
+			        Completa[ZMD_Duracion_linea_base_inicial] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO] - Completa[ZMD_Duracion_linea_base_inicial]) / Completa[ZMD_Duracion_linea_base_inicial],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 6224ced2-2141-48c5-945b-2c5ddf075f76
+
+	measure ZMD_KPI%_UltimaReplanificacionARealMODIFICADAEVOLUTIVO = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO])) && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO] - Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto]) / Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: e41227a7-8bc9-47d6-8651-86379a5bccdc
+
+	measure ZMD_KPI%_EstimacionDemandaARealMODIFICADAPROYECTO = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Demanda_Proyecto])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO])) && 
+			        Completa[ZMD_KPIDuracion_Demanda_Proyecto] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO] - Completa[ZMD_KPIDuracion_Demanda_Proyecto]) / Completa[ZMD_KPIDuracion_Demanda_Proyecto],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 9883afbe-6e3b-4943-8915-817be35eeba6
+
+	measure ZMD_KPI%_EstimacionDemandaARealMODIFICADAEVOLUTIVO = ```
+			
+			    IF(
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Demanda_Proyecto])) && 
+			        NOT(ISBLANK(Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO])) && 
+			        Completa[ZMD_KPIDuracion_Demanda_Proyecto] <> 0 && 
+			        Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO] <> 0,
+			        IFERROR(
+			            (Completa[ZMD_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO] - Completa[ZMD_KPIDuracion_Demanda_Proyecto]) / Completa[ZMD_KPIDuracion_Demanda_Proyecto],
+			            BLANK()
+			        ),
+			        BLANK()
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: dcb18069-e2bf-4da4-92e5-c2615dd11286
+
+	measure AA_Backlog_Evolutivo_Mensualacumulado = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _Past_EOM = EOMONTH(MAX(CalendarTable[Date]), -1)
+			 
+			VAR _tareasAbiertas =
+			    CALCULATE(
+			        COUNT('completa'[number]),
+			        (
+			            --'completa'[opened_at] <= _Current_EOM
+			            --&& 'completa'[opened_at] > DATE(2019, 1, 1)
+			            'completa'[opened_at] <= DATE(2023, 12, 31)
+			            && 'completa'[opened_at] > DATE(2019, 1, 1)  
+			            ),
+			        'completa'[ZCC_Proyecto- Evol] = "Evolutivo"
+			    )
+			VAR _tareasAbiertas2 =
+			    CALCULATE(
+			        COUNT('completa'[number]),
+			        (
+			            --'completa'[opened_at] <= _Current_EOM
+			            --&& 'completa'[opened_at] > DATE(2019, 1, 1)  
+			            'completa'[opened_at] <= DATE(2023, 12, 31)
+			            && 'completa'[opened_at] > DATE(2019, 1, 1)  
+			            ),
+			        'Completa'[ZCC_Elemento_Activo] = "Abierto",
+			        ('Completa'[ZCC_Estado_Demanda] = "Completed" || 'Completa'[ZCC_Estado_Demanda] = "Rejected" || 'Completa'[ZCC_Estado_Demanda] = "Canceled"),
+			        'completa'[ZCC_Proyecto- Evol] = "Evolutivo"
+			    )
+			 
+			VAR _tareasCerradas =
+			    CALCULATE(
+			        COUNT('completa'[number]),
+			        (
+			            --'Completa'[ZCC_GraficaBacklog_New_Closed_at] <= _Current_EOM
+			            'Completa'[ZCC_GraficaBacklog_New_Closed_at] <= DATE(2023, 12, 31)
+			            && 'completa'[ZCC_GraficaBacklog_New_Closed_at] > DATE(2019, 1, 1)
+			        )
+			        ,
+			        'completa'[ZCC_Proyecto- Evol] = "Evolutivo" 
+			    )
+			 
+			RETURN
+			    (_tareasAbiertas - _tareasAbiertas2) - _tareasCerradas
+			
+			```
+		formatString: 0
+		lineageTag: 89f55ddb-3109-444b-95b8-a7b9143ba1eb
+
+	column active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 51c0f92d-0f9d-4722-9495-4f600eb1dc81
+		summarizeBy: none
+		sourceColumn: active
+
+		annotation SummarizationSetBy = Automatic
+
+	column activity_due
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2d04dafb-6cc8-4323-96ff-2a22e9f75173
+		summarizeBy: none
+		sourceColumn: activity_due
+
+		variation Variación
+			isDefault
+			relationship: 7d00d81b-f8c1-46e8-ab18-324e2d038ea8
+			defaultHierarchy: LocalDateTable_e16861ff-6b58-44b2-b1eb-f567b521d18b.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column actual_benefits
+		dataType: double
+		lineageTag: b69deff0-91ba-4f43-a40c-c6e6e354e834
+		summarizeBy: sum
+		sourceColumn: actual_benefits
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column additional_assignee_list
+		dataType: string
+		lineageTag: 8c7a4dc9-2881-4522-9c16-e4e3725faa7b
+		summarizeBy: none
+		sourceColumn: additional_assignee_list
+
+		annotation SummarizationSetBy = Automatic
+
+	column allow_dates_outside_schedule
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a009eddc-2941-4a64-be90-ac2a29429405
+		summarizeBy: none
+		sourceColumn: allow_dates_outside_schedule
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval
+		dataType: string
+		lineageTag: c22917a1-6c8b-4bb7-bcb7-4365d843b593
+		summarizeBy: none
+		sourceColumn: approval
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_approval
+		dataType: string
+		lineageTag: 7be82c33-6b87-4d4b-9822-70d74d78e0de
+		summarizeBy: none
+		sourceColumn: dv_approval
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval_history
+		dataType: string
+		lineageTag: 1d38499a-fb99-4bf0-a713-da0f9d0aae32
+		summarizeBy: none
+		sourceColumn: approval_history
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval_set
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a5afebab-96e9-4618-9b3d-857119e0032c
+		summarizeBy: none
+		sourceColumn: approval_set
+
+		variation Variación
+			isDefault
+			relationship: bcefcf5f-8ef3-41a2-9a8c-71090fef000c
+			defaultHierarchy: LocalDateTable_708c7004-c65b-455d-b978-17e38998c2d0.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column assigned_to
+		dataType: string
+		lineageTag: 3a138296-3ac7-4766-a829-b7f59738af4e
+		summarizeBy: none
+		sourceColumn: assigned_to
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_assigned_to
+		dataType: string
+		lineageTag: bf2d886c-f905-4c23-902c-509738785a89
+		summarizeBy: none
+		sourceColumn: dv_assigned_to
+
+		annotation SummarizationSetBy = Automatic
+
+	column assignment_group
+		dataType: string
+		lineageTag: 5833e0d4-72e7-48a6-a566-111212c5f579
+		summarizeBy: none
+		sourceColumn: assignment_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_assignment_group
+		dataType: string
+		lineageTag: 5a5a7698-bfef-4448-9c22-9f7c0525e01d
+		summarizeBy: none
+		sourceColumn: dv_assignment_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column benefits
+		dataType: double
+		lineageTag: a9d8c164-f383-4200-857f-54f231bd7a2a
+		summarizeBy: sum
+		sourceColumn: benefits
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column budget_cost
+		dataType: double
+		lineageTag: aaf50244-c219-4f75-a532-a7e726fc76de
+		summarizeBy: sum
+		sourceColumn: budget_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column business_duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d8a849fd-1357-4345-80ba-cc85093d5ac8
+		summarizeBy: none
+		sourceColumn: business_duration
+
+		variation Variación
+			isDefault
+			relationship: 740a1f31-3ee7-4158-b058-70aba195a927
+			defaultHierarchy: LocalDateTable_e5e53a94-770b-4333-aea4-0134658974da.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_business_duration
+		dataType: string
+		lineageTag: 4f3e22e7-45aa-4d2f-9fd1-e3150db8fc6c
+		summarizeBy: none
+		sourceColumn: dv_business_duration
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_service
+		dataType: string
+		lineageTag: 8d771af0-d97f-492b-9580-8afade6515e7
+		summarizeBy: none
+		sourceColumn: business_service
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_business_service
+		dataType: string
+		lineageTag: 5b008520-2071-4c3c-9f39-6495093ec2b1
+		summarizeBy: none
+		sourceColumn: dv_business_service
+
+		annotation SummarizationSetBy = Automatic
+
+	column calculation_type
+		dataType: string
+		lineageTag: d10e8315-dc30-422d-87e7-1879c301c4b2
+		summarizeBy: none
+		sourceColumn: calculation_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_calculation_type
+		dataType: string
+		lineageTag: ea61ea57-3a08-4f10-a877-0a4418d168b7
+		summarizeBy: none
+		sourceColumn: dv_calculation_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column calendar_duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 726f0012-2970-4213-a116-a86a5165d673
+		summarizeBy: none
+		sourceColumn: calendar_duration
+
+		variation Variación
+			isDefault
+			relationship: d68bd5c2-eb55-42e9-8344-a452248cf328
+			defaultHierarchy: LocalDateTable_6149f91d-118c-4aaa-90f0-10230b13f07f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_calendar_duration
+		dataType: string
+		lineageTag: 71c1aa40-1133-4855-89bb-e8606963aaa4
+		summarizeBy: none
+		sourceColumn: dv_calendar_duration
+
+		annotation SummarizationSetBy = Automatic
+
+	column capex_cost
+		dataType: double
+		lineageTag: 880a7441-b61b-4fc0-ada7-2293e86a44b8
+		summarizeBy: sum
+		sourceColumn: capex_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column close_notes
+		dataType: string
+		lineageTag: 745739d6-57d0-4002-b131-d96f66f3ac7b
+		summarizeBy: none
+		sourceColumn: close_notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column closed_at
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 27c85527-cc82-47b8-ad57-cb152378e1ad
+		summarizeBy: none
+		sourceColumn: closed_at
+
+		variation Variación
+			isDefault
+			relationship: 9b36eaf2-66fe-4b5e-a388-450833fb8f80
+			defaultHierarchy: LocalDateTable_77c343b9-540d-45ca-99dd-f3220a0be735.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column closed_by
+		dataType: string
+		lineageTag: 2d4e56b0-94a3-40ab-a5ac-51ae7471a691
+		summarizeBy: none
+		sourceColumn: closed_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_closed_by
+		dataType: string
+		lineageTag: 2060b663-d199-4343-bf85-f205bd5d74f2
+		summarizeBy: none
+		sourceColumn: dv_closed_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmdb_ci
+		dataType: string
+		lineageTag: fd9c51ca-9976-441e-bbc7-c7399a105fa3
+		summarizeBy: none
+		sourceColumn: cmdb_ci
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_cmdb_ci
+		dataType: string
+		lineageTag: aec779c1-ad67-43bf-a4b9-d4d20e035e6e
+		summarizeBy: none
+		sourceColumn: dv_cmdb_ci
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmdb_ci_business_app
+		dataType: string
+		lineageTag: a3b5f3e9-ee64-46b5-9a15-e546ce870f7c
+		summarizeBy: none
+		sourceColumn: cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_cmdb_ci_business_app
+		dataType: string
+		lineageTag: 41d8af0b-9a44-4615-a7b1-10a628fd0be2
+		summarizeBy: none
+		sourceColumn: dv_cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column comments
+		dataType: string
+		lineageTag: 2d35c035-a84f-4d18-a885-004c88d53b5c
+		summarizeBy: none
+		sourceColumn: comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column comments_and_work_notes
+		dataType: string
+		lineageTag: 37b6ada3-fd2d-4f9b-bebe-7373d78813d4
+		summarizeBy: none
+		sourceColumn: comments_and_work_notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column company
+		dataType: string
+		lineageTag: 8cd6b3de-97e4-41b0-9e77-4ed2f14e5499
+		summarizeBy: none
+		sourceColumn: company
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_company
+		dataType: string
+		lineageTag: d8713908-788f-48e9-8304-4b5bd1d6df21
+		summarizeBy: none
+		sourceColumn: dv_company
+
+		annotation SummarizationSetBy = Automatic
+
+	column constraint_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0a490c6d-86cf-4d79-9acb-4e2ee141613d
+		summarizeBy: none
+		sourceColumn: constraint_date
+
+		variation Variación
+			isDefault
+			relationship: 3464132a-db79-499d-83b4-fa1f18739bc0
+			defaultHierarchy: LocalDateTable_b466a24d-7add-46e9-8fd8-a44b8ed2b9d0.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column contact_type
+		dataType: string
+		lineageTag: dc8e44d7-c3c5-4b41-9fbb-cc9342ac2a7f
+		summarizeBy: none
+		sourceColumn: contact_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_contact_type
+		dataType: string
+		lineageTag: 7a5d2ca2-d5f2-417d-9b89-ae28bcb2d996
+		summarizeBy: none
+		sourceColumn: dv_contact_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column correlation_display
+		dataType: string
+		lineageTag: e3a1a26b-08d7-4b69-ba42-d06dd267ad36
+		summarizeBy: none
+		sourceColumn: correlation_display
+
+		annotation SummarizationSetBy = Automatic
+
+	column correlation_id
+		dataType: string
+		lineageTag: 20cdd601-0e39-4515-af78-08932ee4d587
+		summarizeBy: none
+		sourceColumn: correlation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column cost
+		dataType: double
+		lineageTag: 2f51c023-2c36-47ad-a626-c5da4d44a646
+		summarizeBy: sum
+		sourceColumn: cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column critical_path
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f184eac5-5922-43e9-a8e2-6b521a6fc2d6
+		summarizeBy: none
+		sourceColumn: critical_path
+
+		annotation SummarizationSetBy = Automatic
+
+	column delivery_plan
+		dataType: string
+		lineageTag: 3ff698f2-1505-4b8e-ad87-21effae59fab
+		summarizeBy: none
+		sourceColumn: delivery_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_delivery_plan
+		dataType: string
+		lineageTag: a44f9a91-e639-4f71-91b5-4cc58c9d7243
+		summarizeBy: none
+		sourceColumn: dv_delivery_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column delivery_task
+		dataType: string
+		lineageTag: 45402823-d7a7-4c9d-a516-e906da832f55
+		summarizeBy: none
+		sourceColumn: delivery_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_delivery_task
+		dataType: string
+		lineageTag: 70aa6041-f669-4e8c-85a2-dbf8871c8c07
+		summarizeBy: none
+		sourceColumn: dv_delivery_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column dependency
+		dataType: string
+		lineageTag: 29d22c6e-bae0-444f-80e2-c949513ef7c3
+		summarizeBy: none
+		sourceColumn: dependency
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: 7638c9eb-a02c-4ac3-9ed6-acd7db676930
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column due_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2513c5be-ad98-4790-be13-92530292a5b1
+		summarizeBy: none
+		sourceColumn: due_date
+
+		variation Variación
+			isDefault
+			relationship: 5b8a0056-348f-4816-9642-c8c4366d4286
+			defaultHierarchy: LocalDateTable_f607f510-9a16-4d37-9ef4-b01c3e79323a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a6b04f89-d6fa-47dc-ac28-b58b4e1cedb0
+		summarizeBy: none
+		sourceColumn: duration
+
+		variation Variación
+			isDefault
+			relationship: 34237b31-8a1d-496e-a901-1d98b5c9cc7d
+			defaultHierarchy: LocalDateTable_fec29712-e7d2-4ac6-830c-74f120b3dccb.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_duration
+		dataType: string
+		lineageTag: f79619ee-2343-4164-9ed1-bb8ce1a2ebe4
+		summarizeBy: none
+		sourceColumn: dv_duration
+
+		annotation SummarizationSetBy = Automatic
+
+	column effort
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: aac0257c-3050-4194-8e3b-312d8773975f
+		summarizeBy: none
+		sourceColumn: effort
+
+		variation Variación
+			isDefault
+			relationship: b5b496a0-7db6-46bf-9d56-71b6a18313d0
+			defaultHierarchy: LocalDateTable_8f33f146-e7fd-46ae-8e1c-4a58bd9f0a08.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_effort
+		dataType: string
+		lineageTag: eac91169-fd6d-4474-a1b2-af5238f2b9ca
+		summarizeBy: none
+		sourceColumn: dv_effort
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 562b4cec-1915-48e7-927c-f8fc2bf5b7f1
+		summarizeBy: none
+		sourceColumn: end_date
+
+		variation Variación
+			isDefault
+			relationship: 59fd56d3-dba2-41b6-9350-dba823071446
+			defaultHierarchy: LocalDateTable_b7dd7ecd-a6af-4dd4-a83a-a0b7b0a95d67.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_date_derived_from
+		dataType: string
+		lineageTag: 731978d2-7a1d-4dab-a0e3-7ea5ebc39dde
+		summarizeBy: none
+		sourceColumn: end_date_derived_from
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_end_date_derived_from
+		dataType: string
+		lineageTag: 4de79c3e-c017-48bf-b39f-604be06c4dff
+		summarizeBy: none
+		sourceColumn: dv_end_date_derived_from
+
+		annotation SummarizationSetBy = Automatic
+
+	column escalation
+		dataType: int64
+		formatString: 0
+		lineageTag: c484913d-1ece-4504-909b-6a95d0c80b7a
+		summarizeBy: sum
+		sourceColumn: escalation
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_escalation
+		dataType: string
+		lineageTag: 4c5f589a-448c-4c1d-8a48-3c1dc780c9a2
+		summarizeBy: none
+		sourceColumn: dv_escalation
+
+		annotation SummarizationSetBy = Automatic
+
+	column expected_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c74d2a43-0e66-4581-acd5-1296f0f0f60a
+		summarizeBy: none
+		sourceColumn: expected_start
+
+		variation Variación
+			isDefault
+			relationship: a9c757d3-839c-424f-b24c-c5c99919510b
+			defaultHierarchy: LocalDateTable_143c9f08-78e9-4ae6-890f-1ac5ab947e24.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column follow_up
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0b85724f-8e69-47d1-b05e-68acb2a6ab53
+		summarizeBy: none
+		sourceColumn: follow_up
+
+		variation Variación
+			isDefault
+			relationship: 0b7e477a-238f-40c0-a0d5-11ecda6485a1
+			defaultHierarchy: LocalDateTable_6052a3bb-5a9e-4281-8b9a-c4e5948e78dc.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column group_list
+		dataType: string
+		lineageTag: d3d1c8a7-5b44-40fb-bcf6-7d1cc7efb833
+		summarizeBy: none
+		sourceColumn: group_list
+
+		annotation SummarizationSetBy = Automatic
+
+	column has_conflict
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 32bb27fb-dc90-4681-b356-c5788c1f6629
+		summarizeBy: none
+		sourceColumn: has_conflict
+
+		annotation SummarizationSetBy = Automatic
+
+	column html_description
+		dataType: string
+		lineageTag: 261326f6-02ba-4ee6-b17c-3616ddabd3a7
+		summarizeBy: none
+		sourceColumn: html_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column impact
+		dataType: int64
+		formatString: 0
+		lineageTag: 99e8e50d-9d88-486a-ba69-584bc52f6b11
+		summarizeBy: sum
+		sourceColumn: impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_impact
+		dataType: string
+		lineageTag: 65284f6b-4db6-4e0a-b8cc-4a3a935fbdaa
+		summarizeBy: none
+		sourceColumn: dv_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column key_milestone
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 40dab3b1-d51d-41a7-bfad-786d546b6497
+		summarizeBy: none
+		sourceColumn: key_milestone
+
+		annotation SummarizationSetBy = Automatic
+
+	column knowledge
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 195a3145-920c-47e7-bf06-cb1703228435
+		summarizeBy: none
+		sourceColumn: knowledge
+
+		annotation SummarizationSetBy = Automatic
+
+	column level
+		dataType: int64
+		formatString: 0
+		lineageTag: aa84aff9-5459-4fdd-85af-ad365970b047
+		summarizeBy: sum
+		sourceColumn: level
+
+		annotation SummarizationSetBy = Automatic
+
+	column location
+		dataType: string
+		lineageTag: 4c718db8-bdaa-49d2-8c34-25089d16abd7
+		summarizeBy: none
+		sourceColumn: location
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_location
+		dataType: string
+		lineageTag: 896dd6a5-ad0c-48c4-badc-33f9f3e51eb1
+		summarizeBy: none
+		sourceColumn: dv_location
+
+		annotation SummarizationSetBy = Automatic
+
+	column made_sla
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8509e1df-0440-4bfa-a742-b0a50cf27427
+		summarizeBy: none
+		sourceColumn: made_sla
+
+		annotation SummarizationSetBy = Automatic
+
+	column milestone
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8849437b-1210-44c9-abfb-74a6d82ae10e
+		summarizeBy: none
+		sourceColumn: milestone
+
+		annotation SummarizationSetBy = Automatic
+
+	column mpp_task_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 1b5b1f55-e95b-4395-8037-39a85a47cda0
+		summarizeBy: sum
+		sourceColumn: mpp_task_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column number
+		dataType: string
+		lineageTag: d6001278-0a7d-4972-b015-e365e00ec5e7
+		summarizeBy: none
+		sourceColumn: number
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_at
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 1128e808-a118-4799-80c0-ed54713a68af
+		summarizeBy: none
+		sourceColumn: opened_at
+
+		variation Variación
+			isDefault
+			relationship: b7c88c18-230d-432c-b2ee-f6142f50c863
+			defaultHierarchy: LocalDateTable_654f38a6-6ffd-4719-81c1-d4618dae3174.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_by
+		dataType: string
+		lineageTag: f1b42c6c-1fbc-4e0f-a858-8711117a161e
+		summarizeBy: none
+		sourceColumn: opened_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_opened_by
+		dataType: string
+		lineageTag: e84f9524-0124-4c63-ae58-18c3dad7bb9e
+		summarizeBy: none
+		sourceColumn: dv_opened_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column opex_cost
+		dataType: double
+		lineageTag: 4aff4d39-b116-4292-9b9c-c6e48be4cc89
+		summarizeBy: sum
+		sourceColumn: opex_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column order
+		dataType: int64
+		formatString: 0
+		lineageTag: 15bd6791-f3d4-48a0-8d66-730ba97087cd
+		summarizeBy: sum
+		sourceColumn: order
+
+		annotation SummarizationSetBy = Automatic
+
+	column orig_sys_id
+		dataType: string
+		lineageTag: 99310300-4bc4-4588-8c6e-7b5880557ddb
+		summarizeBy: none
+		sourceColumn: orig_sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_orig_sys_id
+		dataType: string
+		lineageTag: afa2b925-be5f-4697-9c5b-636852e6be6e
+		summarizeBy: none
+		sourceColumn: dv_orig_sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column orig_top_task_id
+		dataType: string
+		lineageTag: 24273f3b-f2a4-47d1-923d-dcdf57cbee8c
+		summarizeBy: none
+		sourceColumn: orig_top_task_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_orig_top_task_id
+		dataType: string
+		lineageTag: c82c6ccc-fb35-4b13-805d-4a6bb0603077
+		summarizeBy: none
+		sourceColumn: dv_orig_top_task_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column parent
+		dataType: string
+		lineageTag: c178a877-fd0e-498b-b8a2-dab82d4694a8
+		summarizeBy: none
+		sourceColumn: parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_parent
+		dataType: string
+		lineageTag: c0fe888f-e587-4083-8867-f8f03763bbb9
+		summarizeBy: none
+		sourceColumn: dv_parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column percent_complete
+		dataType: double
+		lineageTag: c502c7a6-1093-44c9-ba73-3abb80472dbd
+		summarizeBy: sum
+		sourceColumn: percent_complete
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column phase_type
+		dataType: string
+		lineageTag: 9e078957-fbe7-4b18-9522-782e5f9ef307
+		summarizeBy: none
+		sourceColumn: phase_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_phase_type
+		dataType: string
+		lineageTag: ade02c28-8eea-4a60-a87f-00df52b3d5b8
+		summarizeBy: none
+		sourceColumn: dv_phase_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column priority
+		dataType: int64
+		formatString: 0
+		lineageTag: df401645-1ce1-4c7a-bc8f-c2861e819e15
+		summarizeBy: sum
+		sourceColumn: priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_priority
+		dataType: string
+		lineageTag: 50d2db5a-c517-4078-b393-5cdfb36a87f7
+		summarizeBy: none
+		sourceColumn: dv_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column product
+		dataType: string
+		lineageTag: 80a85177-7e0c-4776-a2c4-10ac425202db
+		summarizeBy: none
+		sourceColumn: product
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_product
+		dataType: string
+		lineageTag: 618d0fd8-7b8c-42a2-a5ab-6a3f0689d459
+		summarizeBy: none
+		sourceColumn: dv_product
+
+		annotation SummarizationSetBy = Automatic
+
+	column reassignment_count
+		dataType: int64
+		formatString: 0
+		lineageTag: fd26eb63-b800-4747-937f-87e4603b8a04
+		summarizeBy: sum
+		sourceColumn: reassignment_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column rejection_goto
+		dataType: string
+		lineageTag: e8248cb7-1bc4-4ba3-92da-53aed7e7170f
+		summarizeBy: none
+		sourceColumn: rejection_goto
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_rejection_goto
+		dataType: string
+		lineageTag: 276e530a-276a-4ea3-9892-a1e22b6c212b
+		summarizeBy: none
+		sourceColumn: dv_rejection_goto
+
+		annotation SummarizationSetBy = Automatic
+
+	column relation_applied
+		dataType: string
+		lineageTag: ad22389c-2439-43c2-820b-c5e7c38d11ac
+		summarizeBy: none
+		sourceColumn: relation_applied
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_relation_applied
+		dataType: string
+		lineageTag: 9d7f61d5-51ec-4691-8d97-d21199aacfc9
+		summarizeBy: none
+		sourceColumn: dv_relation_applied
+
+		annotation SummarizationSetBy = Automatic
+
+	column remaining_duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: faa81c3e-77c1-4ff0-ac10-c58bf3137ad7
+		summarizeBy: none
+		sourceColumn: remaining_duration
+
+		variation Variación
+			isDefault
+			relationship: a3a1640e-9649-4c97-8603-8505aa1b9e84
+			defaultHierarchy: LocalDateTable_ee8bc6c6-1d87-469f-b775-74e2166b2340.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_remaining_duration
+		dataType: string
+		lineageTag: 8ba7402e-e3a0-4285-9943-1bdbeb7c29a3
+		summarizeBy: none
+		sourceColumn: dv_remaining_duration
+
+		annotation SummarizationSetBy = Automatic
+
+	column remaining_effort
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c5c0c6f8-cd98-4a4b-9d76-70e62a9d39f7
+		summarizeBy: none
+		sourceColumn: remaining_effort
+
+		variation Variación
+			isDefault
+			relationship: 75ad2ebb-9baa-433d-9aa4-b003231e68d5
+			defaultHierarchy: LocalDateTable_2e2c71a3-0d00-4ec5-91c3-d9b4fdb41a4a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_remaining_effort
+		dataType: string
+		lineageTag: 8f204a12-2cd0-48f7-89cb-23a6f4b44c62
+		summarizeBy: none
+		sourceColumn: dv_remaining_effort
+
+		annotation SummarizationSetBy = Automatic
+
+	column resource_allocated_cost
+		dataType: double
+		lineageTag: 2af747ed-1c68-433d-9d9c-93c10c87297e
+		summarizeBy: sum
+		sourceColumn: resource_allocated_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column resource_planned_cost
+		dataType: double
+		lineageTag: 33dd398d-3c18-4cbd-a236-c81e6f615567
+		summarizeBy: sum
+		sourceColumn: resource_planned_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column rollup
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ef18ac33-ec3b-4305-8c46-9124dc0ee2ce
+		summarizeBy: none
+		sourceColumn: rollup
+
+		annotation SummarizationSetBy = Automatic
+
+	column route_reason
+		dataType: int64
+		formatString: 0
+		lineageTag: 6ad37753-896a-4dca-9322-cfc0eb7b43c3
+		summarizeBy: sum
+		sourceColumn: route_reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_route_reason
+		dataType: string
+		lineageTag: eb8ff835-7199-490c-9f12-abaf84baea28
+		summarizeBy: none
+		sourceColumn: dv_route_reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column schedule_end_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: f9714711-09f2-48c1-8ffc-dc41a96a2453
+		summarizeBy: none
+		sourceColumn: schedule_end_date
+
+		variation Variación
+			isDefault
+			relationship: a34467ea-7d52-4f78-9e45-90bd69f5fb25
+			defaultHierarchy: LocalDateTable_2e27d28b-81a0-4c6a-b80b-37db9aed61e7.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column schedule_start_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 7c560132-9abd-4989-b6ac-f2fcf0977de1
+		summarizeBy: none
+		sourceColumn: schedule_start_date
+
+		variation Variación
+			isDefault
+			relationship: 080982c9-05bd-486d-8751-1a2e3d41c635
+			defaultHierarchy: LocalDateTable_858282b8-153c-4e67-ae74-48643ded97ac.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column service_offering
+		dataType: string
+		lineageTag: bcbfdaf6-83ce-4179-b39c-ad1bda3d8945
+		summarizeBy: none
+		sourceColumn: service_offering
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_service_offering
+		dataType: string
+		lineageTag: 0c416dd0-66cf-499d-96f4-64e5bbf6f155
+		summarizeBy: none
+		sourceColumn: dv_service_offering
+
+		annotation SummarizationSetBy = Automatic
+
+	column shadow
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: fe7363cd-8acd-4082-ad76-f376744b2f40
+		summarizeBy: none
+		sourceColumn: shadow
+
+		annotation SummarizationSetBy = Automatic
+
+	column short_description
+		dataType: string
+		lineageTag: 0b2c544f-ad2c-43b2-93de-c9eb40e37c82
+		summarizeBy: none
+		sourceColumn: short_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column skills
+		dataType: string
+		lineageTag: 15b4b383-6918-4c6c-b718-e07b826c3ba8
+		summarizeBy: none
+		sourceColumn: skills
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_due
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a3364fcc-6f84-4b66-8b43-4d6ebe6a0be7
+		summarizeBy: none
+		sourceColumn: sla_due
+
+		variation Variación
+			isDefault
+			relationship: 82f57ccd-d7af-4249-b745-0b6038d44a6b
+			defaultHierarchy: LocalDateTable_06972b5a-4568-4a5e-8d4c-4738bf723a2d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e87d8f19-e8c7-4693-bd2d-186bf47a7715
+		summarizeBy: none
+		sourceColumn: start_date
+
+		variation Variación
+			isDefault
+			relationship: 38935067-2b2b-4e2c-98f0-f5e790bf3128
+			defaultHierarchy: LocalDateTable_ffb7c5fc-a694-49ce-a34c-d086b451fd68.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_date_derived_from
+		dataType: string
+		lineageTag: a8fa1c6c-1d32-4a7c-8d01-58c47cf4d8f8
+		summarizeBy: none
+		sourceColumn: start_date_derived_from
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_start_date_derived_from
+		dataType: string
+		lineageTag: c17e12e1-b4bc-4216-84c8-01b3e7690387
+		summarizeBy: none
+		sourceColumn: dv_start_date_derived_from
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: int64
+		formatString: 0
+		lineageTag: 84a74e02-1d7d-45f7-b060-d9e66113c4e1
+		summarizeBy: sum
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_state
+		dataType: string
+		lineageTag: c48d9aa9-36f2-4baf-801b-a010818b8193
+		summarizeBy: none
+		sourceColumn: dv_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: e1b1f324-dfec-42ce-9370-58bafe03faf1
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_status
+		dataType: string
+		lineageTag: add0f8cc-6585-4945-805c-9a82a71a2968
+		summarizeBy: none
+		sourceColumn: dv_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column sub_tree_root
+		dataType: string
+		lineageTag: 5ae1a78c-80e3-458c-97b4-fd536194daf6
+		summarizeBy: none
+		sourceColumn: sub_tree_root
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_sub_tree_root
+		dataType: string
+		lineageTag: 39da4d0b-f789-461b-a3e6-f18c7d70831d
+		summarizeBy: none
+		sourceColumn: dv_sub_tree_root
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_class_name
+		dataType: string
+		lineageTag: fede2aa5-4351-494b-9bb4-75e51a251676
+		summarizeBy: none
+		sourceColumn: sys_class_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_sys_class_name
+		dataType: string
+		lineageTag: 053cd25d-5293-4289-a21d-866cd34cd0de
+		summarizeBy: none
+		sourceColumn: dv_sys_class_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_by
+		dataType: string
+		lineageTag: d01d0710-7d76-455f-ba01-bc0a3276e06d
+		summarizeBy: none
+		sourceColumn: sys_created_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 77f3c072-2901-4d26-ab95-6898fdf97044
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: c2c30b91-d6aa-417a-aab3-db619fd4bcb4
+			defaultHierarchy: LocalDateTable_8c11dca1-b3ce-4249-8991-52336483b7db.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_domain
+		dataType: string
+		lineageTag: 2f69b3aa-fb49-416d-ac02-c8c3c28656ca
+		summarizeBy: none
+		sourceColumn: sys_domain
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_domain_path
+		dataType: string
+		lineageTag: a1ab86d9-cca8-44cc-a735-4be64ecb5263
+		summarizeBy: none
+		sourceColumn: sys_domain_path
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'mejora.sys_id'
+		dataType: string
+		lineageTag: b6dbb34b-b971-430d-85a5-28d6c73666d9
+		summarizeBy: none
+		sourceColumn: mejora.sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_mod_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 521f6d08-0b04-49e3-8599-85ba0258ddfd
+		summarizeBy: sum
+		sourceColumn: sys_mod_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_tags
+		dataType: string
+		lineageTag: 0f5ab0b5-5ff8-47e3-8820-6dce93989a44
+		summarizeBy: none
+		sourceColumn: sys_tags
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_updated_by
+		dataType: string
+		lineageTag: 0f13a579-386e-44ec-b954-97edc4c8c1d5
+		summarizeBy: none
+		sourceColumn: sys_updated_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_updated_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b64c18d4-75f0-4687-8c91-99ab446e6f89
+		summarizeBy: none
+		sourceColumn: sys_updated_on
+
+		variation Variación
+			isDefault
+			relationship: 6dffd1ed-0734-4a95-87ef-dfeacfb0b8d0
+			defaultHierarchy: LocalDateTable_8221f70e-c8da-4748-8132-a1b091ff47dd.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column task
+		dataType: string
+		lineageTag: bfe8ec09-5fec-4449-b28e-0a92dbcb118a
+		summarizeBy: none
+		sourceColumn: task
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_effective_number
+		dataType: string
+		lineageTag: d50e4072-ddc8-47ce-b025-32906fc0ebaf
+		summarizeBy: none
+		sourceColumn: task_effective_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_for
+		dataType: string
+		lineageTag: 22a13a84-7904-480c-8595-a48dc69a2774
+		summarizeBy: none
+		sourceColumn: task_for
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_task_for
+		dataType: string
+		lineageTag: d7f718f6-0c3a-41be-9549-4d87ed99e5a8
+		summarizeBy: none
+		sourceColumn: dv_task_for
+
+		annotation SummarizationSetBy = Automatic
+
+	column time_card_at_top_task
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 89105621-faf1-4777-807e-bbc2362ce227
+		summarizeBy: none
+		sourceColumn: time_card_at_top_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column time_constraint
+		dataType: string
+		lineageTag: 7256801c-08e6-4a69-a0ed-98b5f6b79e59
+		summarizeBy: none
+		sourceColumn: time_constraint
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_time_constraint
+		dataType: string
+		lineageTag: ccdf899d-a89c-4e51-b4d4-09ea8afe1412
+		summarizeBy: none
+		sourceColumn: dv_time_constraint
+
+		annotation SummarizationSetBy = Automatic
+
+	column time_worked
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 04d0b2ca-5a11-4287-ae33-86bde812b907
+		summarizeBy: none
+		sourceColumn: time_worked
+
+		variation Variación
+			isDefault
+			relationship: 22a56cfe-fee1-4ada-b88d-61bee78b2b5d
+			defaultHierarchy: LocalDateTable_f1e0f034-6947-44dc-8137-164d203af22a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_time_worked
+		dataType: string
+		lineageTag: 986e204a-af99-46fd-9ada-736cb2c0b79a
+		summarizeBy: none
+		sourceColumn: dv_time_worked
+
+		annotation SummarizationSetBy = Automatic
+
+	column top_portfolio
+		dataType: string
+		lineageTag: c23d0fa1-1a2e-46fb-8ddf-80f667f8dc06
+		summarizeBy: none
+		sourceColumn: top_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_top_portfolio
+		dataType: string
+		lineageTag: 1862b299-d522-4589-b95f-78bc827dcf7f
+		summarizeBy: none
+		sourceColumn: dv_top_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column top_program
+		dataType: string
+		lineageTag: 8de60657-614e-4cb0-a14d-9cca9a124835
+		summarizeBy: none
+		sourceColumn: top_program
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_top_program
+		dataType: string
+		lineageTag: 1c457790-6c92-4072-8e4c-35d3f73067b9
+		summarizeBy: none
+		sourceColumn: dv_top_program
+
+		annotation SummarizationSetBy = Automatic
+
+	column top_task
+		dataType: string
+		lineageTag: 6520dce7-16d3-471c-81de-a16333220555
+		summarizeBy: none
+		sourceColumn: top_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_top_task
+		dataType: string
+		lineageTag: c1e9f9cb-be08-4b14-a056-9e4ec008f57a
+		summarizeBy: none
+		sourceColumn: dv_top_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_acciona_priority
+		dataType: int64
+		formatString: 0
+		lineageTag: 64a558c7-f5b3-4833-a544-8e4c9022139c
+		summarizeBy: sum
+		sourceColumn: u_acciona_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_business_application
+		dataType: string
+		lineageTag: 946e78e9-7931-4ff7-b6cb-cbe8b006a647
+		summarizeBy: none
+		sourceColumn: u_business_application
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_business_application
+		dataType: string
+		lineageTag: 8e80ab51-d780-46a6-98e9-18bbb09145f9
+		summarizeBy: none
+		sourceColumn: dv_u_business_application
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_business_line
+		dataType: string
+		lineageTag: 44806e61-30fc-476b-8d1f-7e30c1e36ec5
+		summarizeBy: none
+		sourceColumn: u_business_line
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_business_line
+		dataType: string
+		lineageTag: 0ec43843-cdfc-455f-9b8b-37152a8234e4
+		summarizeBy: none
+		sourceColumn: dv_u_business_line
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_catalog
+		dataType: string
+		lineageTag: 72d0daf1-d13a-426e-85bd-6c72317acbce
+		summarizeBy: none
+		sourceColumn: u_catalog
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_catalog
+		dataType: string
+		lineageTag: 9b1058ba-65b7-40ed-b474-0b38a7b2a8cb
+		summarizeBy: none
+		sourceColumn: dv_u_catalog
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_department
+		dataType: string
+		lineageTag: bfd68c4f-40b9-49e9-a50c-48bd5b303872
+		summarizeBy: none
+		sourceColumn: u_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_department
+		dataType: string
+		lineageTag: 041efd69-fa39-4f11-936f-5ab2f11cf866
+		summarizeBy: none
+		sourceColumn: dv_u_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_execution_type
+		dataType: string
+		lineageTag: 60f57ad3-2034-4d2d-ae61-97be7d564430
+		summarizeBy: none
+		sourceColumn: u_execution_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_execution_type
+		dataType: string
+		lineageTag: bc0735b8-b09a-4315-8aae-fb25f2a541ad
+		summarizeBy: none
+		sourceColumn: dv_u_execution_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_external_vendor
+		dataType: string
+		lineageTag: 1fca1f27-2f60-4a7d-89cb-5de4ad814148
+		summarizeBy: none
+		sourceColumn: u_external_vendor
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_external_vendor
+		dataType: string
+		lineageTag: d535c78d-9d8c-4a27-8b91-cbce1bdd3a33
+		summarizeBy: none
+		sourceColumn: dv_u_external_vendor
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_metal
+		dataType: string
+		lineageTag: 54498cd3-0715-4a6b-8bbc-f3f54894387b
+		summarizeBy: none
+		sourceColumn: u_metal
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_metal
+		dataType: string
+		lineageTag: 69f38e57-3679-41cc-b903-d84ecef6bb3d
+		summarizeBy: none
+		sourceColumn: dv_u_metal
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_phone
+		dataType: string
+		lineageTag: e215dfaa-4974-471d-94bc-330bece9e230
+		summarizeBy: none
+		sourceColumn: u_phone
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_previous_groups
+		dataType: string
+		lineageTag: 14598dc1-5133-45ed-be5e-d116b2b2f823
+		summarizeBy: none
+		sourceColumn: u_previous_groups
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_progress
+		dataType: double
+		lineageTag: 86531878-7cb2-461b-ae9d-8ca7ae255cc5
+		summarizeBy: sum
+		sourceColumn: u_progress
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_ref_country
+		dataType: string
+		lineageTag: a51ff424-4aad-4285-93cb-7c162d189f7c
+		summarizeBy: none
+		sourceColumn: u_ref_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_ref_country
+		dataType: string
+		lineageTag: 42180b3c-1d8f-48e1-bcac-1c36f5a503b4
+		summarizeBy: none
+		sourceColumn: dv_u_ref_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_responded
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 80236d64-3838-4126-8e58-a17eb755290a
+		summarizeBy: none
+		sourceColumn: u_responded
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_size
+		dataType: string
+		lineageTag: 58f1cf05-369b-4718-812b-7096f1323797
+		summarizeBy: none
+		sourceColumn: u_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_size
+		dataType: string
+		lineageTag: 202a3927-63ee-4336-b7c5-a73b98becb37
+		summarizeBy: none
+		sourceColumn: dv_u_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_state_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8a3bb420-4f4c-4278-b9c1-b4fe42d1bd0e
+		summarizeBy: none
+		sourceColumn: u_state_date
+
+		variation Variación
+			isDefault
+			relationship: f75f61b7-e602-41cf-b49b-a6363886dc84
+			defaultHierarchy: LocalDateTable_cea44ba5-8f86-47b9-9acf-0cba0a4f622b.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column universal_request
+		dataType: string
+		lineageTag: a99e3626-b31e-4bbf-a91e-3ea4e1c40fb3
+		summarizeBy: none
+		sourceColumn: universal_request
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_universal_request
+		dataType: string
+		lineageTag: 78e8f0b4-c99e-4535-943a-96ce389cd69e
+		summarizeBy: none
+		sourceColumn: dv_universal_request
+
+		annotation SummarizationSetBy = Automatic
+
+	column upon_approval
+		dataType: string
+		lineageTag: c13bc06c-ff31-4214-821c-52054cf7add1
+		summarizeBy: none
+		sourceColumn: upon_approval
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_upon_approval
+		dataType: string
+		lineageTag: 2e63325a-6152-4a97-9026-f2bfcc55ad56
+		summarizeBy: none
+		sourceColumn: dv_upon_approval
+
+		annotation SummarizationSetBy = Automatic
+
+	column upon_reject
+		dataType: string
+		lineageTag: 8e0f9709-b72d-477a-9974-e8224b6603d7
+		summarizeBy: none
+		sourceColumn: upon_reject
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_upon_reject
+		dataType: string
+		lineageTag: f8e8bd20-224c-4ab0-84b8-274150b5b1c4
+		summarizeBy: none
+		sourceColumn: dv_upon_reject
+
+		annotation SummarizationSetBy = Automatic
+
+	column urgency
+		dataType: int64
+		formatString: 0
+		lineageTag: ce6fe379-ae49-4625-ae3f-ea6f1b987720
+		summarizeBy: sum
+		sourceColumn: urgency
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_urgency
+		dataType: string
+		lineageTag: 7098a0b0-a629-4150-b6d8-932c23231ceb
+		summarizeBy: none
+		sourceColumn: dv_urgency
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_input
+		dataType: string
+		lineageTag: b2c3ef6a-0b11-437b-9250-1e072b0ce245
+		summarizeBy: none
+		sourceColumn: user_input
+
+		annotation SummarizationSetBy = Automatic
+
+	column variables
+		dataType: string
+		lineageTag: 50dd7e57-6fce-4075-85c8-66f47a9cf855
+		summarizeBy: none
+		sourceColumn: variables
+
+		annotation SummarizationSetBy = Automatic
+
+	column version
+		dataType: int64
+		formatString: 0
+		lineageTag: bad2c82c-262e-4a43-9431-d5c7e85e87e5
+		summarizeBy: sum
+		sourceColumn: version
+
+		annotation SummarizationSetBy = Automatic
+
+	column watch_list
+		dataType: string
+		lineageTag: e2cf2181-24c9-4228-b49d-7905f74beadb
+		summarizeBy: none
+		sourceColumn: watch_list
+
+		annotation SummarizationSetBy = Automatic
+
+	column wbs
+		dataType: string
+		lineageTag: 8a07b662-8c6e-4717-bdae-5878f328e9fa
+		summarizeBy: none
+		sourceColumn: wbs
+
+		annotation SummarizationSetBy = Automatic
+
+	column wbs_order
+		dataType: int64
+		formatString: 0
+		lineageTag: 46997384-47d5-4eb4-b4be-087fc71dd394
+		summarizeBy: sum
+		sourceColumn: wbs_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column wf_activity
+		dataType: string
+		lineageTag: b652fc0a-1d5c-4de3-a083-5446b7e324ff
+		summarizeBy: none
+		sourceColumn: wf_activity
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_wf_activity
+		dataType: string
+		lineageTag: 05c7b4d5-a6aa-4065-8236-5c88b8a0fd83
+		summarizeBy: none
+		sourceColumn: dv_wf_activity
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_cost
+		dataType: double
+		lineageTag: 50cdfd45-4392-44c2-b97c-852496c37fe2
+		summarizeBy: sum
+		sourceColumn: work_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column work_duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 008bf07e-ed5b-47c5-a154-9d2079841222
+		summarizeBy: none
+		sourceColumn: work_duration
+
+		variation Variación
+			isDefault
+			relationship: ccb8b6f9-9c77-4d2c-b6b0-e775cb3a1664
+			defaultHierarchy: LocalDateTable_94ee6e69-d375-4fae-b6f6-7bd687c25473.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_work_duration
+		dataType: string
+		lineageTag: a08ead08-7fc1-41b9-974f-498d46ac73de
+		summarizeBy: none
+		sourceColumn: dv_work_duration
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_effort
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f6e82eb1-634c-4cf8-80f2-06dbe5420f24
+		summarizeBy: none
+		sourceColumn: work_effort
+
+		variation Variación
+			isDefault
+			relationship: cb897bd5-3fa7-4fc9-be8c-c78b970728a4
+			defaultHierarchy: LocalDateTable_9053b6c3-8e30-41de-8776-3d989d84278a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_work_effort
+		dataType: string
+		lineageTag: ce555598-fb73-467a-9aa1-87216d38a137
+		summarizeBy: none
+		sourceColumn: dv_work_effort
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_end_delDatalake
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 53a93286-7b36-4e3f-a239-a851b6f818ae
+		summarizeBy: none
+		sourceColumn: work_end_delDatalake
+
+		variation Variación
+			isDefault
+			relationship: d5d5a560-6a86-4709-aad1-d6ab70135179
+			defaultHierarchy: LocalDateTable_1c8862ca-823a-44a3-85c3-7fa14e439ba4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column work_notes
+		dataType: string
+		lineageTag: d43309f4-2e63-4e8f-9af3-ccb72213ff98
+		summarizeBy: none
+		sourceColumn: work_notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_notes_list
+		dataType: string
+		lineageTag: 939c92ae-2bdd-4ac0-855e-f6e5a18e96d1
+		summarizeBy: none
+		sourceColumn: work_notes_list
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_start_delDatalake
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 43f0e3a4-60d3-4764-ad71-910f4a30c1b6
+		summarizeBy: none
+		sourceColumn: work_start_delDatalake
+
+		variation Variación
+			isDefault
+			relationship: 02788432-ad47-43f6-b375-76788c471ac1
+			defaultHierarchy: LocalDateTable_724eeba0-6cae-4f0d-a51d-1fc9a0b42313.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column sys_id
+		dataType: string
+		lineageTag: 98a1607d-f0cb-43f6-bc5f-60ea1f451884
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column approved_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d829ba70-0674-4965-a4bb-e3a878161afe
+		summarizeBy: none
+		sourceColumn: approved_end_date
+
+		variation Variación
+			isDefault
+			relationship: ba6a6d1c-4e83-411f-b901-c93e46b72d38
+			defaultHierarchy: LocalDateTable_66b5d6f4-96e0-4ca2-bd8c-7b62ba1cf21a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column approved_start_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 0f9b672d-1ad0-478a-bde8-6d62f9df5c8e
+		summarizeBy: none
+		sourceColumn: approved_start_date
+
+		variation Variación
+			isDefault
+			relationship: e7a3311e-6c35-4835-8e6f-d435b2199d61
+			defaultHierarchy: LocalDateTable_b9b8bc43-344c-4010-aec8-9ff34fc23322.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column assumptions
+		dataType: string
+		lineageTag: 2db55364-af32-485b-8d54-f55f80ec1817
+		summarizeBy: none
+		sourceColumn: assumptions
+
+		annotation SummarizationSetBy = Automatic
+
+	column backlog_definition
+		dataType: string
+		lineageTag: 42f529f2-83fa-4a6e-be62-c2efb16cc2bc
+		summarizeBy: none
+		sourceColumn: backlog_definition
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_backlog_definition
+		dataType: string
+		lineageTag: 3b4014aa-42ec-4a21-96a2-b488038bd970
+		summarizeBy: none
+		sourceColumn: dv_backlog_definition
+
+		annotation SummarizationSetBy = Automatic
+
+	column barriers
+		dataType: string
+		lineageTag: 13b0c9c3-1468-4752-a22f-489e57350237
+		summarizeBy: none
+		sourceColumn: barriers
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_applications
+		dataType: string
+		lineageTag: c6e5321f-55fa-4e43-b215-94c2bb7071ce
+		summarizeBy: none
+		sourceColumn: business_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_capabilities
+		dataType: string
+		lineageTag: fd166ac6-ded1-4604-86f3-be1a7ca6c0d2
+		summarizeBy: none
+		sourceColumn: business_capabilities
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_case
+		dataType: string
+		lineageTag: b09681b4-b375-48f7-8d9f-7ef4c52f9deb
+		summarizeBy: none
+		sourceColumn: business_case
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_unit
+		dataType: string
+		lineageTag: 8fdfd0d2-691d-4107-87b0-86f6866ad358
+		summarizeBy: none
+		sourceColumn: business_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_business_unit
+		dataType: string
+		lineageTag: 34bfc0f3-cd8c-454b-af56-6217245506a1
+		summarizeBy: none
+		sourceColumn: dv_business_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column capex_estimate_to_completion
+		dataType: double
+		lineageTag: 1cf210f2-f84b-4eed-a187-70c5be8ae302
+		summarizeBy: sum
+		sourceColumn: capex_estimate_to_completion
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column capex_forecast_cost
+		dataType: double
+		lineageTag: b8e7ae2a-61e4-44ad-9f26-68b5c5c477e7
+		summarizeBy: sum
+		sourceColumn: capex_forecast_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dv_demand
+		dataType: string
+		lineageTag: d722b533-4ed6-4197-820c-2a2c423fc3bf
+		summarizeBy: none
+		sourceColumn: dv_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column department
+		dataType: string
+		lineageTag: 14d41379-fe1f-4f7e-a439-b55720d9ad22
+		summarizeBy: none
+		sourceColumn: department
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_department
+		dataType: string
+		lineageTag: d676860d-477c-4395-b8e1-301e6bbc51d2
+		summarizeBy: none
+		sourceColumn: dv_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column discount_rate
+		dataType: double
+		lineageTag: ac612386-c45c-4733-a0c4-e9ef00373317
+		summarizeBy: sum
+		sourceColumn: discount_rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column enablers
+		dataType: string
+		lineageTag: a705d410-89ff-4125-be72-fd6d3e4a014c
+		summarizeBy: none
+		sourceColumn: enablers
+
+		annotation SummarizationSetBy = Automatic
+
+	column end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 15996075-cb3b-47e7-afc6-6247e6ce8958
+		summarizeBy: none
+		sourceColumn: end
+
+		variation Variación
+			isDefault
+			relationship: aa281c8a-5cdc-434f-81de-f3f2f41d0970
+			defaultHierarchy: LocalDateTable_f357cf85-5085-46c7-af5c-407107b9f50e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column estimate_to_completion
+		dataType: double
+		lineageTag: e180402f-8967-4bbc-bd1d-3d39cc357ecd
+		summarizeBy: sum
+		sourceColumn: estimate_to_completion
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column execution_type
+		dataType: string
+		lineageTag: 08edd6bc-57b2-4276-a7e4-b70f3bb86463
+		summarizeBy: none
+		sourceColumn: execution_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_execution_type
+		dataType: string
+		lineageTag: 78d29c0b-0b78-4514-b3d2-d0875efea588
+		summarizeBy: none
+		sourceColumn: dv_execution_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column forecast_cost
+		dataType: double
+		lineageTag: a5b2d5bd-0560-4b3d-992c-8b26954ee648
+		summarizeBy: sum
+		sourceColumn: forecast_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column goal
+		dataType: string
+		lineageTag: c17a777a-b30d-4e91-b72a-da0b68962944
+		summarizeBy: none
+		sourceColumn: goal
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_goal
+		dataType: string
+		lineageTag: c20bc29a-c106-4e76-aed5-ee6ee92ea459
+		summarizeBy: none
+		sourceColumn: dv_goal
+
+		annotation SummarizationSetBy = Automatic
+
+	column goals
+		dataType: string
+		lineageTag: 581c47b1-18b8-4514-98db-a4d79d7d50d2
+		summarizeBy: none
+		sourceColumn: goals
+
+		annotation SummarizationSetBy = Automatic
+
+	column impacted_business_units
+		dataType: string
+		lineageTag: 2df102b6-5dc6-44ad-85e4-35550922eb1b
+		summarizeBy: none
+		sourceColumn: impacted_business_units
+
+		annotation SummarizationSetBy = Automatic
+
+	column in_scope
+		dataType: string
+		lineageTag: 926df6c1-0579-4428-98d0-7eb7e157d338
+		summarizeBy: none
+		sourceColumn: in_scope
+
+		annotation SummarizationSetBy = Automatic
+
+	column investment_class
+		dataType: string
+		lineageTag: d6e6869e-dcfd-41e0-9f38-d31f914d0c00
+		summarizeBy: none
+		sourceColumn: investment_class
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_investment_class
+		dataType: string
+		lineageTag: 7d927dc2-47b2-4b20-a63b-1697efe895dd
+		summarizeBy: none
+		sourceColumn: dv_investment_class
+
+		annotation SummarizationSetBy = Automatic
+
+	column investment_type
+		dataType: string
+		lineageTag: c405da25-ec1a-4b7e-805d-cd35897c3d7a
+		summarizeBy: none
+		sourceColumn: investment_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_investment_type
+		dataType: string
+		lineageTag: 7a3210e4-ada7-40f9-920a-95361a25a7dd
+		summarizeBy: none
+		sourceColumn: dv_investment_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column irr_value
+		dataType: double
+		lineageTag: c4db10b3-7396-4c3c-beaf-002b08d3dac0
+		summarizeBy: sum
+		sourceColumn: irr_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column marked_for_delete
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1790fae6-78d7-4536-b363-db7439deb922
+		summarizeBy: none
+		sourceColumn: marked_for_delete
+
+		annotation SummarizationSetBy = Automatic
+
+	column npv_value
+		dataType: double
+		lineageTag: 525d0071-8afe-4d9e-9377-6e1896d1f115
+		summarizeBy: sum
+		sourceColumn: npv_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column opex_estimate_to_completion
+		dataType: double
+		lineageTag: f83cbe27-2bf3-45c2-a61b-6d3476e45b34
+		summarizeBy: sum
+		sourceColumn: opex_estimate_to_completion
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column opex_forecast_cost
+		dataType: double
+		lineageTag: 26db5073-efdc-4ad4-b051-9014a748369a
+		summarizeBy: sum
+		sourceColumn: opex_forecast_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column out_of_scope
+		dataType: string
+		lineageTag: 61d6b113-185b-4d9c-b1bb-b5576af280d6
+		summarizeBy: none
+		sourceColumn: out_of_scope
+
+		annotation SummarizationSetBy = Automatic
+
+	column override_status
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: df0dacc5-39c6-4bf4-adec-8cc14737adc2
+		summarizeBy: none
+		sourceColumn: override_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column phase
+		dataType: string
+		lineageTag: 9c35ac0f-8ae6-4e89-9770-b918d4b6e47e
+		summarizeBy: none
+		sourceColumn: phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_phase
+		dataType: string
+		lineageTag: d40d630d-d9e1-49ef-b7ee-6f6b367b6729
+		summarizeBy: none
+		sourceColumn: dv_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column primary_portfolio
+		dataType: string
+		lineageTag: 3a79e320-6868-4bc2-b08d-4ae016e019e8
+		summarizeBy: none
+		sourceColumn: primary_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_primary_portfolio
+		dataType: string
+		lineageTag: e6ff51ec-0d3d-4ea7-af21-799087fb8807
+		summarizeBy: none
+		sourceColumn: dv_primary_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column primary_program
+		dataType: string
+		lineageTag: 3a60f3e6-b799-4c56-bd80-b9d61cfb5714
+		summarizeBy: none
+		sourceColumn: primary_program
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_primary_program
+		dataType: string
+		lineageTag: 94ad1517-f28b-423a-86b2-80581cfaba57
+		summarizeBy: none
+		sourceColumn: dv_primary_program
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_manager
+		dataType: string
+		lineageTag: f93a044b-3942-486c-b5d3-a03acf00f321
+		summarizeBy: none
+		sourceColumn: project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_project_manager
+		dataType: string
+		lineageTag: 74415ab4-ed37-4db5-9368-172b55d94c85
+		summarizeBy: none
+		sourceColumn: dv_project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_schedule_date_format
+		dataType: string
+		lineageTag: 991e4462-3cf3-4475-b3bb-912d678663d5
+		summarizeBy: none
+		sourceColumn: project_schedule_date_format
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_project_schedule_date_format
+		dataType: string
+		lineageTag: ecf538cf-96b8-4cea-91eb-4fba3822a85e
+		summarizeBy: none
+		sourceColumn: dv_project_schedule_date_format
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_type
+		dataType: string
+		lineageTag: f1a8f909-a84f-48ab-93d0-c33fa7338f51
+		summarizeBy: none
+		sourceColumn: project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_project_type
+		dataType: string
+		lineageTag: 268a6caa-0ce0-43f0-98fe-5c233159129d
+		summarizeBy: none
+		sourceColumn: dv_project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column rate_model
+		dataType: string
+		lineageTag: c088962b-a542-4908-a39c-5d3dad9ab4b6
+		summarizeBy: none
+		sourceColumn: rate_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_rate_model
+		dataType: string
+		lineageTag: e2863174-e81d-4e8b-bbf8-05bf7593ac05
+		summarizeBy: none
+		sourceColumn: dv_rate_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column resources_from_resource_plan
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1f414831-d116-4982-9bed-0b28d0741cbd
+		summarizeBy: none
+		sourceColumn: resources_from_resource_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column risk
+		dataType: string
+		lineageTag: 91e3cd97-ef5a-481d-8294-3e35734c4ce9
+		summarizeBy: none
+		sourceColumn: risk
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_risk
+		dataType: string
+		lineageTag: 3e7082a2-ab26-4d67-ad86-86e553f8e60a
+		summarizeBy: none
+		sourceColumn: dv_risk
+
+		annotation SummarizationSetBy = Automatic
+
+	column risk_cost
+		dataType: double
+		lineageTag: 784cb37d-00ec-46b7-be85-8a41b883200b
+		summarizeBy: sum
+		sourceColumn: risk_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column risk_of_not_performing
+		dataType: string
+		lineageTag: de414547-19ee-45e5-bb22-3a7096f945a6
+		summarizeBy: none
+		sourceColumn: risk_of_not_performing
+
+		annotation SummarizationSetBy = Automatic
+
+	column risk_of_performing
+		dataType: string
+		lineageTag: 6cc3768e-0b29-4ec1-a66a-4aa0812e798c
+		summarizeBy: none
+		sourceColumn: risk_of_performing
+
+		annotation SummarizationSetBy = Automatic
+
+	column roi
+		dataType: double
+		lineageTag: 9c4b98a9-e705-4bdf-8f03-3be9ab8d917c
+		summarizeBy: sum
+		sourceColumn: roi
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column run_calc_brs
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ba202489-5088-43c1-9b9f-c0950a9261d1
+		summarizeBy: none
+		sourceColumn: run_calc_brs
+
+		annotation SummarizationSetBy = Automatic
+
+	column schedule
+		dataType: string
+		lineageTag: 60e1e4ea-7e00-4ce0-8537-60a87a9a54b4
+		summarizeBy: none
+		sourceColumn: schedule
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_schedule
+		dataType: string
+		lineageTag: 46631dda-4543-44cb-ac1c-c92476930ccc
+		summarizeBy: none
+		sourceColumn: dv_schedule
+
+		annotation SummarizationSetBy = Automatic
+
+	column score
+		dataType: double
+		lineageTag: 59f62b4c-5708-4499-89fe-ea124a4e22e0
+		summarizeBy: sum
+		sourceColumn: score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column score_risk
+		dataType: double
+		lineageTag: 5a542f7d-6a45-4555-8c08-3adc8018dde2
+		summarizeBy: sum
+		sourceColumn: score_risk
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dv_score_risk
+		dataType: string
+		lineageTag: 426136bf-50ca-4d24-8ec8-7136674bb359
+		summarizeBy: none
+		sourceColumn: dv_score_risk
+
+		annotation SummarizationSetBy = Automatic
+
+	column score_size
+		dataType: double
+		lineageTag: ed332afd-b870-4352-9bbb-5b31abd00b2a
+		summarizeBy: sum
+		sourceColumn: score_size
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dv_score_size
+		dataType: string
+		lineageTag: 0656ced9-57d8-4afc-b0aa-7f0094dfa598
+		summarizeBy: none
+		sourceColumn: dv_score_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column score_value
+		dataType: double
+		lineageTag: 832abd81-17d7-4709-a966-3fe6e855fdf2
+		summarizeBy: sum
+		sourceColumn: score_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dv_score_value
+		dataType: string
+		lineageTag: 13640b21-eb8f-4cb0-9fda-f7fdaf0fda7b
+		summarizeBy: none
+		sourceColumn: dv_score_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column show_on_program_status_report
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a889be31-fb77-4557-bdb1-999d25b13bce
+		summarizeBy: none
+		sourceColumn: show_on_program_status_report
+
+		annotation SummarizationSetBy = Automatic
+
+	column start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 742144d1-8e8a-4740-ba1e-b86f8b82b425
+		summarizeBy: none
+		sourceColumn: start
+
+		variation Variación
+			isDefault
+			relationship: 55b65162-529a-409a-8b77-0c05c2aaf3f3
+			defaultHierarchy: LocalDateTable_4f581939-4697-4226-8c1b-5787b988cacb.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column strategic_objectives
+		dataType: string
+		lineageTag: e5aea61d-9105-41bb-99d7-9f52f481c0e3
+		summarizeBy: none
+		sourceColumn: strategic_objectives
+
+		annotation SummarizationSetBy = Automatic
+
+	column time_card_preference
+		dataType: string
+		lineageTag: a1e1d9a7-f00b-4be8-9a41-d5dc75e63331
+		summarizeBy: none
+		sourceColumn: time_card_preference
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_time_card_preference
+		dataType: string
+		lineageTag: 3bdc377a-5a43-4e3f-a23d-c6538b5a76ed
+		summarizeBy: none
+		sourceColumn: dv_time_card_preference
+
+		annotation SummarizationSetBy = Automatic
+
+	column time_component_from_planned
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1e97bce8-c306-4c0e-bf2b-47cb5e97810d
+		summarizeBy: none
+		sourceColumn: time_component_from_planned
+
+		annotation SummarizationSetBy = Automatic
+
+	column time_zone
+		dataType: string
+		lineageTag: 03afdd0f-0f39-411d-8f87-931b590de0bb
+		summarizeBy: none
+		sourceColumn: time_zone
+
+		annotation SummarizationSetBy = Automatic
+
+	column title
+		dataType: string
+		lineageTag: 06653344-1c2a-4dae-a08b-8972ba753f77
+		summarizeBy: none
+		sourceColumn: title
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_affected_portfolios
+		dataType: string
+		lineageTag: bde34c14-6849-4ecf-a4c1-ccf8f8675097
+		summarizeBy: none
+		sourceColumn: u_affected_portfolios
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_ambito_global
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 4c588fba-17fb-4827-b571-55bef2db3107
+		summarizeBy: none
+		sourceColumn: u_ambito_global
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_benefit_check
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: dfdbac76-39d9-41fa-ad34-95354c7b7c7c
+		summarizeBy: none
+		sourceColumn: u_benefit_check
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_benefits
+		dataType: string
+		lineageTag: 4270adbb-df0b-415b-971f-22a76c98d112
+		summarizeBy: none
+		sourceColumn: u_benefits
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_changes
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d162a1e2-15e2-47f1-837d-ba50a04f9c43
+		summarizeBy: none
+		sourceColumn: u_changes
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_changes_comments
+		dataType: string
+		lineageTag: b217b6ce-f39b-4f9b-81ab-e61984045ad7
+		summarizeBy: none
+		sourceColumn: u_changes_comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_conditions_restrictions
+		dataType: string
+		lineageTag: d088e688-f9e4-401a-9968-a7f2808b4217
+		summarizeBy: none
+		sourceColumn: u_conditions_restrictions
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_cost_comments
+		dataType: string
+		lineageTag: f323e65d-e819-4d85-820b-8fadf8e145b5
+		summarizeBy: none
+		sourceColumn: u_cost_comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_costs
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5c3baea8-af8f-41de-85c3-39e9ee9fda5c
+		summarizeBy: none
+		sourceColumn: u_costs
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_current_situation
+		dataType: string
+		lineageTag: 91d7969d-4f21-45af-bed4-813d8c1ce30f
+		summarizeBy: none
+		sourceColumn: u_current_situation
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_deliverables
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 94988f1f-d4a1-4389-a1ad-519bb8c93bf1
+		summarizeBy: none
+		sourceColumn: u_deliverables
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_deliverables_comments
+		dataType: string
+		lineageTag: 8c3b3aab-d2c4-4f91-925a-81d0f8fb2f8a
+		summarizeBy: none
+		sourceColumn: u_deliverables_comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_demand_type_description
+		dataType: string
+		lineageTag: 45e9df26-d430-45d3-98ed-2065e9d9d97e
+		summarizeBy: none
+		sourceColumn: u_demand_type_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_dependencies
+		dataType: string
+		lineageTag: d8518a40-b270-4a10-b8d0-0586efe6afbf
+		summarizeBy: none
+		sourceColumn: u_dependencies
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_deviation_in_costs
+		dataType: double
+		lineageTag: 77dc72c2-ba86-454e-897f-dc30d1215a85
+		summarizeBy: sum
+		sourceColumn: u_deviation_in_costs
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_deviation_in_duration
+		dataType: double
+		lineageTag: 82a9a3de-6b0c-4912-ad76-1ab5ec306c27
+		summarizeBy: sum
+		sourceColumn: u_deviation_in_duration
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_digital_transformation
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6c5a8284-8075-430a-a5f4-8b5ca13dc3d7
+		summarizeBy: none
+		sourceColumn: u_digital_transformation
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_eficiency_using_rrhh
+		dataType: double
+		lineageTag: 84ef4a79-d71d-4e0b-9207-f2071ec220fe
+		summarizeBy: sum
+		sourceColumn: u_eficiency_using_rrhh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_end_date_deviation
+		dataType: double
+		lineageTag: aef860a7-51f2-4d84-8ba6-7ea125b18026
+		summarizeBy: sum
+		sourceColumn: u_end_date_deviation
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_id_plan
+		dataType: string
+		lineageTag: 6c5a3e22-f935-49ff-aee2-c2523510126c
+		summarizeBy: none
+		sourceColumn: u_id_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impacted_companies
+		dataType: string
+		lineageTag: 8a9782af-a61e-467e-a377-529c3edbccba
+		summarizeBy: none
+		sourceColumn: u_impacted_companies
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impacted_countries
+		dataType: string
+		lineageTag: 6df82de3-17ef-4e0f-ba74-49d1371fc55f
+		summarizeBy: none
+		sourceColumn: u_impacted_countries
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_incidents
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 44dfd42e-41ba-4446-9434-dea63bd71f7c
+		summarizeBy: none
+		sourceColumn: u_incidents
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_incidents_comments
+		dataType: string
+		lineageTag: 0c49e2b9-60da-4102-b60b-a74d8f375a87
+		summarizeBy: none
+		sourceColumn: u_incidents_comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_indicator_1
+		dataType: double
+		lineageTag: b6ddee25-f095-44f0-9d33-8b7f14427d4d
+		summarizeBy: sum
+		sourceColumn: u_indicator_1
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_lessons_learned
+		dataType: string
+		lineageTag: e573a10b-e69d-4784-b2f8-cc5636f62bc8
+		summarizeBy: none
+		sourceColumn: u_lessons_learned
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_live_changes
+		dataType: string
+		lineageTag: 352cfb9a-cfff-474f-8e80-80b124fd11ca
+		summarizeBy: none
+		sourceColumn: u_live_changes
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_live_risks
+		dataType: string
+		lineageTag: 5f074ac6-78c5-4c42-8344-a9f9448c3d8f
+		summarizeBy: none
+		sourceColumn: u_live_risks
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_monitoring_indicators
+		dataType: string
+		lineageTag: 626e07af-2164-4715-9233-84fdf1614771
+		summarizeBy: none
+		sourceColumn: u_monitoring_indicators
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_outsourcing
+		dataType: string
+		lineageTag: b9b50bea-fc9b-474e-8be7-2968d531266a
+		summarizeBy: none
+		sourceColumn: u_outsourcing
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_payroll_area
+		dataType: string
+		lineageTag: 447d76b5-522c-4f97-876a-562450e9353d
+		summarizeBy: none
+		sourceColumn: u_payroll_area
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_payroll_area
+		dataType: string
+		lineageTag: 89dd2220-f3ea-4289-8038-146446689627
+		summarizeBy: none
+		sourceColumn: dv_u_payroll_area
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_planned_demand
+		dataType: string
+		lineageTag: 8e5e7850-192a-4c41-999c-5355197a4fed
+		summarizeBy: none
+		sourceColumn: u_planned_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_planned_demand
+		dataType: string
+		lineageTag: bb2b40e1-c05c-4c1d-96cc-240c4e541446
+		summarizeBy: none
+		sourceColumn: dv_u_planned_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_planned_resource_plan_effort
+		dataType: string
+		lineageTag: 737e96a5-ce55-496b-9005-d7846b1fc4dd
+		summarizeBy: none
+		sourceColumn: u_planned_resource_plan_effort
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_problems
+		dataType: string
+		lineageTag: da419247-9dc6-4742-95e3-7eba41edc2ef
+		summarizeBy: none
+		sourceColumn: u_problems
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_project_impact
+		dataType: string
+		lineageTag: 0df5ca96-4555-4f92-8f2e-ca81f8362cdb
+		summarizeBy: none
+		sourceColumn: u_project_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_project_monitoring
+		dataType: string
+		lineageTag: f6262d76-31d0-406a-b16a-d69cdc102b03
+		summarizeBy: none
+		sourceColumn: u_project_monitoring
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_project_phase
+		dataType: string
+		lineageTag: cc68b1ce-7a5b-458e-bfd7-f1c4ef57b259
+		summarizeBy: none
+		sourceColumn: u_project_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_project_phase
+		dataType: string
+		lineageTag: adf78eeb-966d-4c5d-bfef-3728def56635
+		summarizeBy: none
+		sourceColumn: dv_u_project_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_project_type
+		dataType: string
+		lineageTag: f9311777-692d-4cff-9028-6478af391e59
+		summarizeBy: none
+		sourceColumn: u_project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_project_type
+		dataType: string
+		lineageTag: 693b985f-c7ec-48b4-a955-4cb94f495de3
+		summarizeBy: none
+		sourceColumn: dv_u_project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_reasons_for_delay_reject
+		dataType: string
+		lineageTag: eb38ed08-142f-4314-8976-88f168b2b08a
+		summarizeBy: none
+		sourceColumn: u_reasons_for_delay_reject
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_reasons_for_delay_reject
+		dataType: string
+		lineageTag: da3a02b6-6416-449d-8330-645882a46095
+		summarizeBy: none
+		sourceColumn: dv_u_reasons_for_delay_reject
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_relevant
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 08e1d755-c2cd-4179-a54e-be4b1a6fd414
+		summarizeBy: none
+		sourceColumn: u_relevant
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_risks
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2f174537-d1aa-4636-afea-951593979d32
+		summarizeBy: none
+		sourceColumn: u_risks
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_risks_comments
+		dataType: string
+		lineageTag: 06f3e2ba-0d35-471f-bb3b-8e19e668d24e
+		summarizeBy: none
+		sourceColumn: u_risks_comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_run
+		dataType: double
+		lineageTag: aea7f98a-701f-4a46-b2b7-21e67678c7b2
+		summarizeBy: sum
+		sourceColumn: u_run
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_run_description
+		dataType: string
+		lineageTag: 2c13ea32-8556-4434-87a4-baeadbca4075
+		summarizeBy: none
+		sourceColumn: u_run_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_schedule
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7b563600-2eec-49ee-9228-09fc174c8e83
+		summarizeBy: none
+		sourceColumn: u_schedule
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_schedule_comments
+		dataType: string
+		lineageTag: 8acbb707-5144-449a-a4d5-cf917e010775
+		summarizeBy: none
+		sourceColumn: u_schedule_comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_suggestions_to_improve
+		dataType: string
+		lineageTag: cac2f928-6815-4bbd-b244-d5d82d19d1e8
+		summarizeBy: none
+		sourceColumn: u_suggestions_to_improve
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_sum_planned_hours
+		dataType: int64
+		formatString: 0
+		lineageTag: e4b40d06-a074-4ab5-b8e7-e494c5ce78df
+		summarizeBy: sum
+		sourceColumn: u_sum_planned_hours
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_sum_time_cards
+		dataType: int64
+		formatString: 0
+		lineageTag: 25542262-cdce-4c81-bee8-31fa74548098
+		summarizeBy: sum
+		sourceColumn: u_sum_time_cards
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_targets
+		dataType: string
+		lineageTag: e6ae3d53-4433-4b10-a075-016208a14f08
+		summarizeBy: none
+		sourceColumn: u_targets
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_tic_unit
+		dataType: string
+		lineageTag: 3210e509-7029-44d4-b37c-9bb69a804310
+		summarizeBy: none
+		sourceColumn: u_tic_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_tic_unit
+		dataType: string
+		lineageTag: 3794284b-a7f9-4daf-9837-e294b761ef75
+		summarizeBy: none
+		sourceColumn: dv_u_tic_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_url
+		dataType: string
+		lineageTag: ff15611a-12a0-492f-b5eb-75ffd9d52513
+		summarizeBy: none
+		sourceColumn: u_url
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_version
+		dataType: string
+		lineageTag: ec87724b-38f0-4fe3-a0fa-c583ceea151a
+		summarizeBy: none
+		sourceColumn: u_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_volume_of_impacted_users
+		dataType: int64
+		formatString: 0
+		lineageTag: 4381f0b1-9419-4346-a05c-a53fbc8f1302
+		summarizeBy: sum
+		sourceColumn: u_volume_of_impacted_users
+
+		annotation SummarizationSetBy = Automatic
+
+	column update_actual_effort_from_time_card
+		dataType: string
+		lineageTag: 8ef3c36e-e764-4d1d-8b9e-f581acd9dee0
+		summarizeBy: none
+		sourceColumn: update_actual_effort_from_time_card
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_update_actual_effort_from_time_card
+		dataType: string
+		lineageTag: 47ad5a0b-7eee-49d7-b5f9-30756b213c38
+		summarizeBy: none
+		sourceColumn: dv_update_actual_effort_from_time_card
+
+		annotation SummarizationSetBy = Automatic
+
+	column update_score_on_value_change
+		dataType: string
+		lineageTag: f7875efb-d811-4528-9c42-80a0c0cc443d
+		summarizeBy: none
+		sourceColumn: update_score_on_value_change
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_update_score_on_value_change
+		dataType: string
+		lineageTag: fb284279-a4ad-4dd0-8755-fd691c275917
+		summarizeBy: none
+		sourceColumn: dv_update_score_on_value_change
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: double
+		lineageTag: e0a4f121-3398-4e15-9e8f-3f0927822a71
+		summarizeBy: sum
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column x_29185_external_f_total_financed
+		dataType: double
+		lineageTag: 791c3856-8649-4b80-9c82-c1dbab41679c
+		summarizeBy: sum
+		sourceColumn: x_29185_external_f_total_financed
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dv_u_project_typology
+		dataType: string
+		lineageTag: 3d2ecfb3-e489-45d7-8afa-30eec24b5bbb
+		summarizeBy: none
+		sourceColumn: dv_u_project_typology
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_restrictions
+		dataType: string
+		lineageTag: eeda0173-1cd7-4bee-8e22-bbab22e422d6
+		summarizeBy: none
+		sourceColumn: u_restrictions
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_completion_criteria
+		dataType: string
+		lineageTag: 273521db-b86e-48ca-9a8f-e489e4f581bd
+		summarizeBy: none
+		sourceColumn: u_completion_criteria
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_pmo_manager
+		dataType: string
+		lineageTag: 8cde8cbc-f7c5-42c7-a8c4-f2de7abf399e
+		summarizeBy: none
+		sourceColumn: u_pmo_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column agile_rollup_dates
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: aa2c040b-7d92-40a7-bbce-a589aa57ebe7
+		summarizeBy: none
+		sourceColumn: agile_rollup_dates
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_sprint
+		dataType: string
+		lineageTag: d7de4486-12a8-46f8-a4b3-e9c474b05cf6
+		summarizeBy: none
+		sourceColumn: end_sprint
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_end_sprint
+		dataType: string
+		lineageTag: f005a426-96b6-4fb6-acab-6ef8093635f6
+		summarizeBy: none
+		sourceColumn: dv_end_sprint
+
+		annotation SummarizationSetBy = Automatic
+
+	column link
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 4d8838da-69d5-454f-a171-cb3b40185a2f
+		summarizeBy: none
+		sourceColumn: link
+
+		annotation SummarizationSetBy = Automatic
+
+	column project
+		dataType: string
+		lineageTag: 58363b6a-9a46-4e43-a423-63a74f495995
+		summarizeBy: none
+		sourceColumn: project
+
+		annotation SummarizationSetBy = Automatic
+
+	column scrum_team
+		dataType: string
+		lineageTag: f0986564-1b8e-46df-b3e6-3db1838ed6d9
+		summarizeBy: none
+		sourceColumn: scrum_team
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_scrum_team
+		dataType: string
+		lineageTag: 1e70910e-0bc5-4aa2-ba50-75353ddbe59c
+		summarizeBy: none
+		sourceColumn: dv_scrum_team
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_sprint
+		dataType: string
+		lineageTag: df09393c-5dd4-4ee3-a646-fa6726fb0261
+		summarizeBy: none
+		sourceColumn: start_sprint
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_start_sprint
+		dataType: string
+		lineageTag: efbe6867-bd0b-4370-a6a8-af566f79c50a
+		summarizeBy: none
+		sourceColumn: dv_start_sprint
+
+		annotation SummarizationSetBy = Automatic
+
+	column test_plan
+		dataType: string
+		lineageTag: 4159740f-34ec-42eb-bad2-eed8a7381b56
+		summarizeBy: none
+		sourceColumn: test_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_test_plan
+		dataType: string
+		lineageTag: 7bb071e0-da74-4853-b1cb-c0c5b6e81658
+		summarizeBy: none
+		sourceColumn: dv_test_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_demand
+		dataType: string
+		lineageTag: 4b663a5b-deba-4bfd-ba85-c8713eaf434a
+		summarizeBy: none
+		sourceColumn: dv_u_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_estado_evolutivo
+		dataType: string
+		lineageTag: 1074a462-9456-4d66-9ff6-2cb58a4c7816
+		summarizeBy: none
+		sourceColumn: u_estado_evolutivo
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_estado_evolutivo
+		dataType: string
+		lineageTag: 397ab36b-d77c-4779-be50-963eec2ed057
+		summarizeBy: none
+		sourceColumn: dv_u_estado_evolutivo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ZCC_Proyecto- Evol' = if(Completa[u_project_type]= "Project","Proyecto","Evolutivo")
+		lineageTag: 55e289f4-848c-49ca-84de-81795014358c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPI_Evolutivo_No_Iniciado = ```
+			
+			IF(
+			    NOT ISBLANK('Completa'[work_start]),
+			    DATEDIFF('Completa'[schedule_start_date], 'Completa'[work_start], DAY),
+			    IF(
+			        (
+			--            ('Evolutivo'[dv_state] = "Open" || 
+			--             'Evolutivo'[dv_state] = "Pending" || 
+			--             'Evolutivo'[dv_state] = "Work in Progress"
+			--            ) &&
+			            'Completa'[schedule_start_date] < TODAY()
+			        ),
+			        DATEDIFF('Completa'[schedule_start_date], TODAY(), DAY),
+			        BLANK()  
+			    )
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 62ae420f-fec7-4aa1-b0ec-1b4e40a5fc15
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPI_%_Evolutivo_No_Iniciad = ```
+			
+			    IF(
+			        DATEDIFF('Completa'[schedule_start_date], 'Completa'[schedule_end_date], DAY) = 0,
+			        BLANK(),
+			        (('Completa'[ZCC_KPI_Evolutivo_No_Iniciado] / DATEDIFF('Completa'[schedule_start_date], 'Completa'[schedule_end_date], DAY))-1)*100 
+			    )
+			```
+		lineageTag: cdc84f28-35c1-408c-82d3-b46444020118
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPI_Evolutivo_Retrasado_Fin_Planificacion = ```
+			
+			IF(
+			    NOT ISBLANK('Completa'[work_end]) && NOT ISBLANK('Completa'[schedule_end_date]),
+			    DATEDIFF('Completa'[schedule_end_date], 'Completa'[work_end], DAY),
+			    IF(
+			        NOT ISBLANK('Completa'[schedule_end_date]) && 'Completa'[schedule_end_date] < TODAY(),
+			        DATEDIFF('Completa'[schedule_end_date], TODAY(), DAY),
+			        BLANK()
+			    )
+			)
+			
+			```
+		dataType: int64
+		formatString: 0
+		lineageTag: c371c2b7-8340-4ebf-b105-d3dbfe9a24ed
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPI_%_Evolutivo_Retrasado_Fin_Planificacion = ```
+			
+			    DIVIDE(
+			        'Completa'[ZCC_KPI_Evolutivo_Retrasado_Fin_Planificacion],
+			        (DATEDIFF('Completa'[schedule_start_date], 'Completa'[schedule_end_date], DAY)-1) * 100,
+			        BLANK()
+			    )
+			```
+		lineageTag: fb753a29-a839-434d-a69d-4261e773ac02
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPI_Evolutivo_Duracion_Ejecucion =
+			
+			IF(
+			    NOT(ISBLANK('Completa'[work_start])) && NOT(ISBLANK('Completa'[work_end])) &&
+			    NOT(ISBLANK('Completa'[schedule_start_date])) && NOT(ISBLANK('Completa'[schedule_end_date])),
+			    DATEDIFF('Completa'[work_start], 'Completa'[work_end], DAY) - DATEDIFF('Completa'[schedule_start_date], 'Completa'[schedule_end_date], DAY),
+			    BLANK()
+			)
+		formatString: 0
+		lineageTag: 18a548fa-302f-4fca-8b6f-cb8d4bbd7cf4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPI_%_Evolutivo_Duracion_Ejecucion =
+			
+			IF(
+			    NOT(ISBLANK('Completa'[work_start])) && NOT(ISBLANK('Completa'[work_end])) &&
+			    NOT(ISBLANK('Completa'[schedule_start_date])) && NOT(ISBLANK('Completa'[schedule_end_date])) &&
+			    DATEDIFF('Completa'[schedule_start_date], 'Completa'[schedule_end_date], DAY) <> 0,
+			    ((DATEDIFF('Completa'[work_start], 'Completa'[work_end], DAY) / DATEDIFF('Completa'[schedule_start_date], 'Completa'[schedule_end_date], DAY)) ),
+			    BLANK()
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: f6e9c750-9ddb-4575-b54b-9e71ed88657a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Elemento_Activo = ```
+			
+			IF(
+			    Completa[ZCC_Estado_Evolutivo] = "Cerrado", 
+			    "Cerrado", 
+			    "Abierto"
+			)
+			```
+		lineageTag: 6d6410ae-1143-4650-bce1-de0dece9f950
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column zcc_indice_status = if('Completa'[dv_status]="Green", "3 - Green",if('Completa'[dv_status]="Red", "1 - Red", if('Completa'[dv_status]="Yellow" , "2 - Yellow")))
+		lineageTag: 1c5d77de-a7fd-4044-a90f-8eabcee74368
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnionConDemanda
+		dataType: string
+		lineageTag: 9ded6e4d-b60f-489d-8491-1c50d144d763
+		summarizeBy: none
+		sourceColumn: UnionConDemanda
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Estado_Evolutivo = ```
+			
+			SWITCH(
+			    TRUE(),
+			    LEFT('Completa'[Number], 7) = "PRJTASK" && 'Completa'[dv_state] = "Open", "Iniciacion",
+			    LEFT('Completa'[Number], 7) = "PRJTASK" && 'Completa'[dv_state] = "Pending", "Planificacion",
+			    LEFT('Completa'[Number], 7) = "PRJTASK" && ('Completa'[dv_state] = "Work in Progress" || 'Completa'[dv_state] = "Deploy/Launch" || 'Completa'[dv_state] = "In Development" || 'Completa'[dv_state] = "Testing/QA" || 'Completa'[dv_state] = "In Analysis"), "Ejecucion",
+			    LEFT('Completa'[Number], 7) = "PRJTASK" && ('Completa'[dv_state] = "Closed Complete" || 'Completa'[dv_state] = "Closed Incomplete" || 'Completa'[dv_state] = "Closed Skipped"), "Cerrado",
+			    
+			    LEFT('Completa'[Number], 4) = "ENHC" && 'Completa'[dv_state] = "Draft", "Planificacion",
+			    LEFT('Completa'[Number], 4) = "ENHC" && ('Completa'[dv_state] = "Deploy/Launch" || 'Completa'[dv_state] = "In Development" || 'Completa'[dv_state] = "Testing/QA" || 'Completa'[dv_state] = "In Analysis"), "Ejecucion",
+			    LEFT('Completa'[Number], 4) = "ENHC" && ('Completa'[dv_state] = "Closed Complete" || 'Completa'[dv_state] = "Cancelled"), "Cerrado",
+			    LEFT('Completa'[Number], 4) = "ENHC" && 'Completa'[dv_state] = "On Hold", "Pausados",
+			    
+			    LEFT('Completa'[Number], 3) = "PRJ" && 'Completa'[dv_phase] = "Planning", "Planificacion",
+			    LEFT('Completa'[Number], 3) = "PRJ" && 'Completa'[dv_phase] = "Initiating", "Iniciacion",
+			    LEFT('Completa'[Number], 3) = "PRJ" && 'Completa'[dv_phase] = "Executing", "Ejecucion",
+			    LEFT('Completa'[Number], 3) = "PRJ" && 'Completa'[dv_phase] = "In Pause", "Pausados",
+			    LEFT('Completa'[Number], 3) = "PRJ" && 'Completa'[dv_phase] = "Closing",
+			        IF(
+			            'Completa'[dv_state] <> "Closed Complete" && 
+			            'Completa'[dv_state] <> "Closed Incomplete" && 
+			            'Completa'[dv_state] <> "Closed Skipped", 
+			            "Cierre", 
+			            "Cerrado"
+			        ),
+			    BLANK()
+			)
+			
+			```
+		lineageTag: 8c4058cd-81df-4583-9286-93ee83b1b6dd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_línea_base_start = ```
+			
+			CALCULATE(
+			    MIN('SERV_NOW_EN V_u_project_baseline'[prj_schedule_start_date]),
+			    FILTER(
+			        RELATEDTABLE('SERV_NOW_EN V_u_project_baseline'),
+			        'SERV_NOW_EN V_u_project_baseline'[item_sys_created_on] = 
+			        CALCULATE(
+			            MIN('SERV_NOW_EN V_u_project_baseline'[item_sys_created_on]),
+			            RELATEDTABLE('SERV_NOW_EN V_u_project_baseline')
+			        )
+			    )
+			)
+			
+			```
+		formatString: dd/mm/yyyy
+		lineageTag: 28f4d316-39dc-4153-af1b-d21a1ae60e9a
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 49bb0f75-e210-4f1f-9544-4d7470323b10
+			defaultHierarchy: LocalDateTable_2efc884a-0f93-4208-a342-ec7a723d9733.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column ZCC_línea_base_finish = ```
+			
+			CALCULATE(
+			    MIN('SERV_NOW_EN V_u_project_baseline'[prj_schedule_end_date]),
+			    FILTER(
+			        RELATEDTABLE('SERV_NOW_EN V_u_project_baseline'),
+			        'SERV_NOW_EN V_u_project_baseline'[item_sys_created_on] = 
+			        CALCULATE(
+			            MIN('SERV_NOW_EN V_u_project_baseline'[item_sys_created_on]),
+			            RELATEDTABLE('SERV_NOW_EN V_u_project_baseline')
+			        )
+			    )
+			)
+			
+			```
+		formatString: dd/mm/yyyy
+		lineageTag: d663b4db-c901-42dd-b7d8-d6ac8fa120be
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 6a723dbf-63c6-49b4-a7b7-47b31ed405ed
+			defaultHierarchy: LocalDateTable_f5d2c0cf-31e6-421b-a5f3-f3ae89d98127.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'ZCC_max replanificación start' = Completa[schedule_start_date]
+		formatString: dd/mm/yyyy
+		lineageTag: a16a3a83-6dd8-41b3-92db-c96e3b051d52
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: c60ce9fb-199f-4353-905b-e3ce2c981db6
+			defaultHierarchy: LocalDateTable_26f754f0-dda5-494e-9e51-e420749609f4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'ZCC_max replanificación finish' = ```
+			Completa[schedule_end_date]
+			
+			```
+		formatString: dd/mm/yyyy
+		lineageTag: 9bcde8d6-3fed-4a9e-9171-0a7f1779ce32
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 7731caf1-ab30-41b6-8b1f-62f3de0ea945
+			defaultHierarchy: LocalDateTable_d4eb2f5e-5d43-4082-a1e5-c85bc46bb6c0.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'ZCC_ Estimado inicio demanda' = ```
+			related(Demandas[start_date]) 
+			```
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: de39f6e8-af21-4923-bb81-ac8a4cc3bfdd
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 44485584-ac52-426c-8ae3-770e5c4e73ba
+			defaultHierarchy: LocalDateTable_89087b55-ebe8-4898-9bb7-b27e80253075.'Jerarquía de fechas'
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'ZCC_ Estimado fin demanda' = related(Demandas[u_due_date])
+		formatString: dd/mm/yyyy
+		lineageTag: 9e217732-620d-4b48-a6ff-567c72e933a2
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: caab28d5-629f-4fd6-b13c-d9a4a457cbd0
+			defaultHierarchy: LocalDateTable_f6bfd57c-524c-4930-b413-7101bcd3e403.'Jerarquía de fechas'
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column ZCC_KPIPrincipal_Inicio_Retrasado = ```
+			
+			IF(
+			    NOT ISBLANK('Completa'[schedule_start_date]), 
+			    IF(
+			        NOT ISBLANK('Completa'[work_start]), 
+			        DATEDIFF('Completa'[schedule_start_date], 'Completa'[work_start], DAY),
+			        IF(
+			            'Completa'[schedule_start_date] < TODAY(),
+			            DATEDIFF('Completa'[schedule_start_date], TODAY(), DAY),
+			            BLANK()
+			        )
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: 24ac46ad-014d-4117-9495-d0e42788b274
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Duracion_del_proyecto_Planificada = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[schedule_start_date])) && 
+			    NOT(ISBLANK('Completa'[schedule_end_date])) &&
+			    'Completa'[schedule_start_date] <> 0 &&
+			    'Completa'[schedule_end_date] <> 0,
+			    DATEDIFF('Completa'[schedule_start_date], 'Completa'[schedule_end_date], DAY),
+			    BLANK()
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 8d4ca1e8-578b-4f9f-8744-02bf10516a7d
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIPrincipal_%_Inicio_Retrasado = ```
+			
+			
+			    IF(
+			
+			        Completa[ZCC_KPIPrincipal_Inicio_Retrasado]=0 || Completa[ZCC_Duracion_del_proyecto_Planificada]= 0,
+			
+			        BLANK(),
+			
+			        (('Completa'[ZCC_KPIPrincipal_Inicio_Retrasado] / Completa[ZCC_Duracion_del_proyecto_Planificada]))
+			    )
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: a8ef1409-7238-4643-b977-e9c66ac902bc
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIPrincipal_Fin_Retrasado = ```
+			
+			
+				IF(	
+			
+				not isblank(('Completa'[schedule_end_date])), 
+			
+			   IF(
+			
+			       NOT ISBLANK('Completa'[work_end]),
+			
+			       DATEDIFF('Completa'[schedule_end_date],'Completa'[work_end], DAY),
+			
+			        IF(
+			
+			            'Completa'[schedule_end_date] < TODAY(),
+			
+			            TODAY() - 'Completa'[schedule_end_date], 
+			
+			        BLANK()
+			
+			   )))
+			
+			```
+		lineageTag: b7ceb61b-7954-45f9-b9c8-0efb8b1c0bf4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIPRINCIPAL_%_Fin_Retrasado = ```
+			
+			    DIVIDE(
+			        'Completa'[ZCC_KPIPrincipal_Fin_Retrasado],
+			        DATEDIFF('Completa'[schedule_start_date], 'Completa'[schedule_end_date], DAY),
+			        BLANK()
+			    ) 
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 102d4c80-997d-40ec-8a49-1939f89ed9ce
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Duracion_linea_base_inicial = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_línea_base_finish])) && 
+			    NOT(ISBLANK('Completa'[ZCC_línea_base_start])), 
+			    IF(
+			        'Completa'[ZCC_línea_base_finish] = 'Completa'[ZCC_línea_base_start], 
+			        BLANK(), 
+			        'Completa'[ZCC_línea_base_finish] - 'Completa'[ZCC_línea_base_start]
+			    ), 
+			    BLANK()
+			)
+			
+			```
+		dataType: double
+		lineageTag: 2da1768c-516d-4069-bb12-42a0227d5da8
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'ZCC_ Duración linea base última' = 'Completa'[ZCC_max replanificación finish]-'Completa'[ZCC_max replanificación start]
+		dataType: double
+		lineageTag: 5a85ea35-f968-4b0f-916b-a780c3c2fdf1
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_ Estimado inicio demanda])) && 
+			    NOT(ISBLANK('Completa'[ZCC_ Estimado fin demanda])) && 
+			    NOT(ISBLANK('Completa'[ZCC_Duracion_linea_base_inicial])),
+			    DATEDIFF('Completa'[ZCC_ Estimado inicio demanda], 'Completa'[ZCC_ Estimado fin demanda], DAY) - 'Completa'[ZCC_Duracion_linea_base_inicial],
+			    BLANK()
+			)
+			```
+		lineageTag: 082db35b-10c1-4882-b3e0-ba38ee441199
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIPrincipal_Proyectos_%_Duracion_DemandavsEjecucion = ```
+			
+			IF(
+			    NOT(ISBLANK(Completa[ZCC_Duracion_linea_base_inicial])) && 
+			    NOT(ISBLANK(Completa[ZCC_KPIDuracion_Demanda_Proyecto]))  &&
+			    Completa[ZCC_Duracion_linea_base_inicial] <> 0 &&
+			    Completa[ZCC_KPIDuracion_Demanda_Proyecto] <> 0,
+			    ((Completa[ZCC_Duracion_linea_base_inicial] - Completa[ZCC_KPIDuracion_Demanda_Proyecto]) / Completa[ZCC_KPIDuracion_Demanda_Proyecto]),
+			    BLANK()
+			)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 2014ddd0-cb94-474d-9f04-c7388e0cdb53
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIPrincipal_Evolutivos_Duracion_DemandavsEjecucion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_ Estimado inicio demanda])) && 
+			    NOT(ISBLANK('Completa'[ZCC_ Estimado fin demanda])) && 
+			    NOT(ISBLANK('Completa'[ZCC_Duracion_del_proyecto_Planificada])),
+			    DATEDIFF('Completa'[ZCC_ Estimado inicio demanda], 'Completa'[ZCC_ Estimado fin demanda], DAY) - 'Completa'[ZCC_Duracion_del_proyecto_Planificada],
+			    BLANK()
+			)
+			```
+		lineageTag: 58f96bbe-7abb-4f10-b1da-946e6248f7d1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIPrincipal_Evolutivos_%_Duracion_DemandavsEjecucion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_ Estimado fin demanda])) && 
+			    NOT(ISBLANK('Completa'[ZCC_ Estimado inicio demanda])) && 
+			    NOT(ISBLANK('Completa'[ZCC_Duracion_del_proyecto_Planificada])) && 
+			    'Completa'[ZCC_Duracion_del_proyecto_Planificada] <> 0,
+			    ((DATEDIFF('Completa'[ZCC_ Estimado inicio demanda], 'Completa'[ZCC_ Estimado fin demanda], DAY) / 'Completa'[ZCC_Duracion_del_proyecto_Planificada]))-1,
+			    BLANK()
+			)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: fe1009a0-81ea-4906-935e-518757a8a970
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Boolean_Evolutivo_CerradosUltimos7Dias =
+			
+			IF(
+			    'Completa'[work_end] >= TODAY() - 7 && 'Completa'[work_end] <= TODAY(),
+			    1,
+			    BLANK()
+			)
+		formatString: 0
+		lineageTag: 4e48a820-70d4-40df-bb72-28dcb8fc588e
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Boolean_Evolutivo_CerradosUltimos30Dias =
+			
+			IF(
+			    'Completa'[work_end] >= TODAY() - 30 && 'Completa'[work_end] <= TODAY(),
+			    1,
+			    BLANK()
+			)
+		formatString: 0
+		lineageTag: 210d494b-4acd-4424-b35f-5af27c8b048f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPI_Proyectos_%_Duracion_LineaBaseUltimaReplanificacion = ```
+			
+			IF(
+			    NOT(ISBLANK(Completa[ZCC_Duracion_linea_base_inicial])) && 
+			    NOT(ISBLANK(Completa[ZCC_KPIDuracion_Ejecucion_maxreplanificacion])) &&
+			    Completa[ZCC_Duracion_linea_base_inicial] <> 0 &&
+			    Completa[ZCC_KPIDuracion_Ejecucion_maxreplanificacion] <> 0,
+			    ((Completa[ZCC_KPIDuracion_Ejecucion_maxreplanificacion] - Completa[ZCC_Duracion_linea_base_inicial]) / Completa[ZCC_Duracion_linea_base_inicial]),
+			    BLANK()
+			)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 780b0894-31ca-406c-b8c7-f5fce65818fc
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPI_ProyectosyEvolutivos_%_Duracion_UltimaReplanificacionvsReal =
+			
+			IF(
+			    NOT(ISBLANK(Completa[ZCC_KPIDuracion_Ejecucion_maxreplanificacion])) &&
+			    NOT(ISBLANK([ZMD_KPIDuracion_Ejecucion_Real_Proyecto])) &&
+			    Completa[ZMD_KPIDuracion_Ejecucion_Real_Proyecto] <> 0 &&
+			    Completa[ZCC_KPIDuracion_Ejecucion_maxreplanificacion] <> 0,
+			    (([ZMD_KPIDuracion_Ejecucion_Real_Proyecto] - Completa[ZCC_KPIDuracion_Ejecucion_maxreplanificacion]) / Completa[ZCC_KPIDuracion_Ejecucion_maxreplanificacion]),
+			    BLANK()
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 858b437c-ba22-4a01-8c69-8c637414bdf1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Owner =
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_JP_Demanda])),
+			    'Completa'[ZCC_JP_Demanda],
+			        IF(
+			        NOT(ISBLANK('Completa'[dv_project_manager])),
+			        'Completa'[dv_project_manager],
+			        IF(
+			            NOT(ISBLANK('Completa'[dv_assigned_to])),
+			            'Completa'[dv_assigned_to],
+			            BLANK()
+			        )
+			))
+		lineageTag: 772d5522-b011-429d-b118-fc02a640803a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ZCC_Dv_top_task proyectos' = if(Completa[ZCC_Proyecto- Evol] ="Proyecto", Completa[dv_top_task],blank())
+		lineageTag: bb97bab8-93a6-41a9-a87b-8e2c9561aa76
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_ColumnaRepetidos =
+			
+			VAR CurrentValue = Completa[ZCC_Dv_top_task proyectos]
+			VAR CountOccurrences =
+			    CALCULATE(
+			        COUNTROWS(Completa),
+			        FILTER(Completa, Completa[ZCC_Dv_top_task proyectos] = CurrentValue)
+			    )
+			RETURN
+			IF(CountOccurrences > 1, "Repetido", "Único")
+		lineageTag: 3cf259a2-cfd4-4dae-9701-36a7fe1535a4
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Conteo_ProyectosyEvolutivos_porencimade_RetrasoInicio_Medio_Columna = ```
+			
+			VAR Promedio_Duracion = 
+			        AVERAGE('Completa'[ZCC_KPIPrincipal_Inicio_Retrasado])
+			RETURN
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_KPIPrincipal_Inicio_Retrasado])) &&
+			    'Completa'[ZCC_KPIPrincipal_Inicio_Retrasado] > Promedio_Duracion,
+			    1,
+			    BLANK()
+			)
+			```
+		formatString: 0
+		lineageTag: e511a712-1b7a-406a-a274-fb22a8c97b00
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Conteo_Evolutivos_porencimade_Duracion_DemandavsEjecucion_Media = ```
+			
+			VAR Promedio_Duracion = 
+			        AVERAGE('Completa'[ZCC_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion])
+			RETURN
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_KPIPrincipal_Evolutivos_Duracion_DemandavsEjecucion])) &&
+			    'Completa'[ZCC_KPIPrincipal_Evolutivos_Duracion_DemandavsEjecucion] > Promedio_Duracion,
+			    1,
+			    BLANK()
+			)
+			```
+		formatString: 0
+		lineageTag: 3148923f-8445-4ea5-b49d-b7af842f7fa2
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Conteo_Proyectos_porencimade_Duracion_DemandavsEjecucion_Media = ```
+			
+			VAR Promedio_Duracion = 
+			        AVERAGE('Completa'[ZCC_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion])
+			RETURN
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion])) &&
+			    'Completa'[ZCC_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion] > Promedio_Duracion,
+			    1,
+			    BLANK()
+			)
+			```
+		formatString: 0
+		lineageTag: 4d086f4e-9643-4d8c-b662-70c22b3a6046
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Conteo_porencimade_Duracion_Ejecucion_Media = ```
+			
+			VAR Promedio_Duracion = 
+			        AVERAGE('Completa'[ZCC_KPI_Evolutivo_Duracion_Ejecucion])
+			RETURN
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_KPI_Evolutivo_Duracion_Ejecucion])) &&
+			    'Completa'[ZCC_KPI_Evolutivo_Duracion_Ejecucion] > Promedio_Duracion,
+			    1,
+			    BLANK()
+			)
+			```
+		formatString: 0
+		lineageTag: 40162e90-6b97-4b9a-be80-9bf818af2902
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Conteo_porencimade_RetrasoFin_Medio = ```
+			
+			VAR Promedio_Duracion = 
+			        AVERAGE('Completa'[ZCC_KPIPrincipal_Fin_Retrasado])
+			RETURN
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_KPIPrincipal_Fin_Retrasado])) &&
+			    'Completa'[ZCC_KPIPrincipal_Fin_Retrasado] > Promedio_Duracion,
+			    1,
+			    BLANK()
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 3a1ebfc6-7f44-4070-8fb3-f3e7cf6fda99
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Tipo = ```
+			
+			IF (
+			    LEFT('Completa'[number], 4) = "ENHC", 
+			    "mejora", 
+			    IF (
+			        'Completa'[ZCC_Proyecto- Evol] = "Evolutivo", 
+			        IF (
+			            LEFT('Completa'[number], 7) = "prjtask", 
+			                "evolutivo",  
+			            IF (
+			                LEFT('Completa'[number], 3) = "prj", 
+			            "proyecto evolutivo",
+			                "proyecto"
+			            )
+			        ), 
+			        "proyecto"
+			    )
+			)
+			```
+		lineageTag: 47da4e45-e7c1-49f2-92a7-7864e319ef03
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPI_ProyectosyEvolutivos_Dif_Duracion_UltimaReplanificacionvsReal = ```
+			
+			IFERROR(
+			    IF(
+			        NOT(ISBLANK('Completa'[work_start])) && 
+			        NOT(ISBLANK('Completa'[work_end])) && 
+			        NOT(ISBLANK('Completa'[ZCC_max replanificación finish])) &&
+			        NOT(ISBLANK('Completa'[ZCC_max replanificación start])),
+			        DATEDIFF('Completa'[work_start], 'Completa'[work_end], DAY) 
+			        - 
+			        DATEDIFF('Completa'[ZCC_max replanificación start], 'Completa'[ZCC_max replanificación finish], DAY),
+			        BLANK()
+			    ),
+			    BLANK() 
+			)
+			```
+		formatString: 0
+		lineageTag: 0ecbc50b-2727-4996-801a-051dfba3cd7f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Media_KPIPrincipal_Evolutivos_Duracion_DemandavsEjecucion =
+			CALCULATE(
+			    AVERAGE('Completa'[ZCC_KPIPrincipal_Proyectos_Duracion_DemandavsEjecucion])
+			)
+		lineageTag: cf8f6448-748f-47fc-a761-de96d24a17f6
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_Applications_conblancorelleno =
+			
+			IF(
+			    LEN(TRIM([dv_cmdb_ci_business_app])) = 0,
+			    "Sin Rellenar",
+			    [dv_cmdb_ci_business_app]
+			)
+		lineageTag: 6e802c8c-a34b-4e55-a031-42c10ac36bf9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Días_Desde_FFP_Caducada = ```
+			
+			IF(
+			    ISBLANK('Completa'[work_end]) && 
+			    NOT(ISBLANK('Completa'[schedule_end_date])) && 
+			    'Completa'[schedule_end_date] < TODAY() &&
+			    'Completa'[ZCC_Estado_Evolutivo] <> "Cerrado",
+			    DATEDIFF('Completa'[schedule_end_date], TODAY(), DAY),
+			    BLANK()
+			)
+			```
+		formatString: 0
+		lineageTag: f7a2016d-b748-4e98-8819-3e174a66ba78
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_DiashastaCaducidad_Proy/Evol = ```
+			
+			IF(
+			    ISBLANK('Completa'[work_end]) && 
+			    NOT(ISBLANK('Completa'[schedule_end_date])) && 
+			    'Completa'[ZCC_Estado_Evolutivo] <> "Cerrado",
+			    DATEDIFF(TODAY(), 'Completa'[schedule_end_date], DAY),
+			    BLANK()
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 28892390-1796-423b-bab5-9ecc36d2a783
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Duracion_del_proyecto_que_deberia_tener_segun_porcentaje_completado = ('Completa'[ZCC_Duracion_del_proyecto_Planificada] *('Completa'[percent_complete])/100)
+		lineageTag: 25f4e2a9-8dbe-4785-9253-68aa832f7673
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_Fecha_Actual_Teorica_Completada =
+			IF(
+			    NOT ISBLANK('Completa'[work_start]) && ISBLANK('Completa'[work_end]),
+			    'Completa'[work_start] + 'Completa'[ZCC_Duracion_del_proyecto_que_deberia_tener_segun_porcentaje_completado],
+			    BLANK()
+			)
+		formatString: Short Date
+		lineageTag: 960aef28-e213-4fff-9c2e-490afd1e0cbf
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 6f2a712f-60c2-42b6-8222-6626a6172d7b
+			defaultHierarchy: LocalDateTable_ff8dc541-2c1d-4706-a26c-f9804f2ab764.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Desviacionconporcentaje_completado = ```
+			IF( 
+			    NOT ISBLANK('Completa'[work_start]) && ISBLANK('Completa'[work_end]),
+			    today()- 'Completa'[ZCC_Fecha_Actual_Teorica_Completada],
+			    BLANK()
+			)
+			```
+		dataType: double
+		formatString: 0
+		lineageTag: 6919ee5c-fb32-4d98-9f31-9ddfadcdac1e
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column ZCC_Proyectos_Evolutivos_pendientes_ejecutar =
+			
+			IF(
+			    ISBLANK('Completa'[work_start]) && 'Completa'[dv_state] <> "Completado" && 'Completa'[schedule_start_date] > TODAY(),
+			    "Pendiente de Ejecutar",
+			    BLANK()
+			)
+		lineageTag: 3fb74d8a-56f6-4518-b619-5c5266a12b69
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Negocio_Asociado = RELATED('Equipos Gestores'[Negocio])
+		lineageTag: f8a0c772-469e-425a-82fd-a540c016d111
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_DiashastaCaducidaddeInicio_Proy_Evol = ```
+			
+			IF(
+			    ISBLANK('Completa'[work_start]) && 
+			    NOT(ISBLANK('Completa'[schedule_start_date])) && 
+			    'Completa'[ZCC_Estado_Evolutivo] = "Planificacion",
+			    DATEDIFF('Completa'[schedule_start_date], TODAY(), DAY),
+			    BLANK()
+			)
+			```
+		formatString: 0
+		lineageTag: 68c4f339-5c7d-4029-b849-6a1259436f74
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_porcentaje_avance_actual =
+			
+			IF(
+			    'Completa'[dv_state] = "Cerrado",
+			    100,
+			    IF(
+			        NOT(ISBLANK('Completa'[start_date])) && NOT(ISBLANK('Completa'[end_date])),
+			        MAX(
+			            0,
+			            MIN(
+			                (DATEDIFF('Completa'[start_date], TODAY(), DAY) / DATEDIFF('Completa'[start_date], 'Completa'[end_date], DAY)) * 100,
+			                100
+			            )
+			        ),
+			        BLANK()
+			    )
+			)
+		formatString: 0
+		lineageTag: 320fffc5-9a82-49d6-ada3-05b559688380
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column ZMD_Comparar_Progreso_Avance = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_porcentaje_avance_actual])) && 
+			    NOT(ISBLANK('Completa'[percent_complete])) &&
+			    'Completa'[ZCC_porcentaje_avance_actual] > 'Completa'[percent_complete],
+			    "Avance actual por debajo",
+			    BLANK()
+			)
+			
+			```
+		lineageTag: 324e508c-702c-4c9d-b136-da95cfd6b63e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_dv_state_Ordenado = ```
+			
+			SWITCH(
+			    'Completa'[dv_state],
+			    "Draft", "01. Draft",
+			    "Pending", "02. Pending",
+			    "Open", "03. Open",
+			    "Work in Progress", "04. Work in Progress",
+			    "In Development", "05. In Development",
+			    "Testing/QA", "06. Testing/QA",
+			    "Deploy/Launch", "07. Deploy/Launch",
+			    "On Hold", "08. On Hold",
+			    "Closed Complete", "09. Closed Complete",
+			    "Closed Incomplete", "10. Closed Incomplete",
+			    "Closed Skipped", "11. Closed Skipped",
+			    "Cancelled", "12. Cancelled",
+			    BLANK()  
+			)
+			```
+		lineageTag: 47b2a436-7ad1-4e00-aeba-9bd9714fcf6a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Estado_Evolutivo_Ordenado = ```
+			
+			SWITCH(
+			    'Completa'[ZCC_Estado_Evolutivo],
+			    "Planificacion", "02. Planificacion",
+			    "Iniciacion", "01. Iniciacion",
+			    "Ejecucion", "03. Ejecucion",
+			    "Pausados", "04. Pausados",
+			    "Cierre", "05. Cierre",
+			    "Cerrado", "06. Cerrado",
+			    BLANK() 
+			)
+			```
+		lineageTag: 1c622efe-84aa-4b56-889c-6cd61bfbd70b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_DiasDesdeUltimoEstado_ProyEvoAbiertos = ```
+			
+			IF(
+			    'Completa'[ZCC_Elemento_Activo] = "Abierto",
+			    DATEDIFF('Completa'[u_state_date], TODAY(), DAY),
+			    BLANK()  
+			)
+			```
+		formatString: 0
+		lineageTag: 131ee4fb-dfdd-43f9-87cc-569e4c8e8629
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Alerta_Ultimo_Estado = ```
+			
+			VAR Umbral = 
+			    LOOKUPVALUE(
+			        'Días Alertas por Fase'[Días],
+			        'Días Alertas por Fase'[Estado],
+			        'Completa'[ZCC_Estado_Evolutivo_Ordenado]
+			    )
+			RETURN
+			    IF(
+			        ISBLANK(Umbral),
+			        BLANK(),
+			        IF(
+			            NOT ISBLANK('Completa'[ZCC_DiasDesdeUltimoEstado_ProyEvoAbiertos]) && 
+			            'Completa'[ZCC_DiasDesdeUltimoEstado_ProyEvoAbiertos] > Umbral,
+			            1,
+			            BLANK()
+			        )
+			    )
+			
+			```
+		formatString: 0
+		lineageTag: db01be15-32e0-4ba9-9605-345a6648d309
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIDuracion_Demanda_Proyecto = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_ Estimado inicio demanda])) && 
+			    NOT(ISBLANK('Completa'[ZCC_ Estimado fin demanda])) && 
+			    ('Completa'[ZCC_ Estimado fin demanda] > 'Completa'[ZCC_ Estimado inicio demanda]),
+			    'Completa'[ZCC_ Estimado fin demanda] - 'Completa'[ZCC_ Estimado inicio demanda],
+			    BLANK()
+			)
+			```
+		dataType: double
+		lineageTag: 50e1e950-6ba7-4120-aa88-6998a665a70b
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[schedule_start_date])) && 
+			    NOT(ISBLANK('Completa'[schedule_end_date])) &&
+			    ('Completa'[schedule_end_date] > 'Completa'[schedule_start_date]),
+			    NETWORKDAYS('Completa'[schedule_start_date],'Completa'[schedule_end_date]),
+			    BLANK()
+			)
+			```
+		dataType: double
+		lineageTag: ed177fdd-dd3e-43af-894d-617fc94a2d05
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIDuracion_Ejecucion_Real_Proyecto = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[work_end])) && 
+			    NOT(ISBLANK('Completa'[work_start])) &&
+				('Completa'[work_end] > 'Completa'[work_start]),
+			    NETWORKDAYS('Completa'[work_start], 'Completa'[work_end]),
+			    BLANK()
+			)
+			```
+		dataType: double
+		lineageTag: 01803a5a-c68d-48f3-903f-8bdbe5963bcc
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIDuracion_faltafecha =
+			
+			IF (
+			    ISBLANK([work_start]) ||
+			    ISBLANK([work_end]) ||
+			    ISBLANK([schedule_start_date]) ||
+			    ISBLANK([schedule_end_date]) ||
+			    ISBLANK('Completa'[ZCC_ Estimado inicio demanda]) ||
+			    ISBLANK('Completa'[ZCC_ Estimado fin demanda]),
+			    "Fechas no informadas",
+			    "Fechas completas"
+			)
+		lineageTag: 87d0debc-6c12-4e89-a744-481ca1f0a679
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Proyectos_Contados_Segun_FormuladelBacklog = ```
+			
+			VAR _Current_EOM = EOMONTH(MAX(CalendarTable[Date]), 0)
+			VAR _work_start = 'Completa'[opened_at]
+			VAR _work_end = 'Completa'[closed_at]
+			VAR _ZCC_Estado_Evolutivo = 'completa'[ZCC_Estado_Evolutivo]
+			VAR _ZCC_Proyecto_Evol = 'completa'[ZCC_Proyecto- Evol]
+			
+			VAR _Contado = 
+			    IF(
+			        (
+			            _work_start <= _Current_EOM
+			            && _work_start > DATE(2019, 1, 1)
+			        )
+			        || (
+			            ISBLANK(_work_start)
+			            && _ZCC_Estado_Evolutivo <> "Cerrado"
+			        )
+			        || (
+			            _work_end <= _Current_EOM
+			            && _work_end > DATE(2019, 1, 1)
+			        )
+			        || (
+			            ISBLANK(_work_end)
+			            && _ZCC_Estado_Evolutivo = "Cerrado"
+			        )
+			        && _ZCC_Proyecto_Evol = "Evolutivo",
+			        1,
+			        0
+			    )
+			
+			RETURN
+			    _Contado
+			```
+		formatString: 0
+		lineageTag: 117e6d18-90a5-49e9-b1ec-da4a500b0c82
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_GraficaBacklog_New_Closed_at = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[closed_at])) && 'Completa'[ZCC_Estado_Evolutivo] = "Cerrado",
+			    'Completa'[closed_at],
+			    IF(
+			        NOT(ISBLANK('Completa'[closed_at])) && 'Completa'[ZCC_Estado_Evolutivo] <> "Cerrado",
+			        BLANK(),
+			        IF(
+			            'Completa'[ZCC_Estado_Evolutivo] = "Cerrado",
+			            IF(
+			                NOT(ISBLANK('Completa'[schedule_end_date])),
+			                'Completa'[schedule_end_date],
+			                'Completa'[opened_at]        
+			            ),
+			            BLANK()
+			        )
+			    )
+			)
+			```
+		formatString: General Date
+		lineageTag: e7ab3330-b055-464b-8578-67fef27c4034
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 4134d191-b1a6-4b6e-b298-b76bf31156c5
+			defaultHierarchy: LocalDateTable_a3f72257-ba4d-40b2-8f2c-00c1d2794ba5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_start
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: e8b626eb-a9a5-489f-9077-6bafe9a348d7
+		summarizeBy: none
+		sourceColumn: work_start
+
+		variation Variación
+			isDefault
+			relationship: 8cee50f0-9dd1-4e4b-96fe-84012776e482
+			defaultHierarchy: LocalDateTable_49584f24-e460-48c2-b50a-b56ed16a2ebc.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_end
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 77950af8-d92e-4631-a25a-d2360cd3bf3d
+		summarizeBy: none
+		sourceColumn: work_end
+
+		variation Variación
+			isDefault
+			relationship: 2adb6754-5a9f-435a-a887-8bbd202e61d4
+			defaultHierarchy: LocalDateTable_f2c54147-0a81-4cae-aae8-bc95e48bcd74.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Primera_Fecha_Inicio_ProyEvol =
+			
+			MINX(
+			    { [work_start], [ZCC_max replanificación start] },
+			    [Value]
+			)
+		formatString: Short Date
+		lineageTag: b511c921-455a-4c31-adb7-384b9f253925
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 7e988e5e-faba-4650-913e-1fde8aa97e3d
+			defaultHierarchy: LocalDateTable_941b6e87-1e24-4697-af39-195ba87a8125.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Ultima_Fecha_Fin_ProyEvol =
+			
+			MAXX(
+			    { [work_end], [ZCC_max replanificación finish] },
+			    [Value]
+			)
+		formatString: Short Date
+		lineageTag: 1ac817c0-6fd0-4795-98a8-8d950fc5f834
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: c1348463-66c4-4e04-b27f-6e9d642fc591
+			defaultHierarchy: LocalDateTable_caca56b6-7ecf-4122-9679-09cd9c02298b.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIDuracion_Ejecucion_maxreplanificacion = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[ZCC_max replanificación start])) && 
+			    NOT(ISBLANK('Completa'[ZCC_max replanificación finish])) &&
+				('Completa'[ZCC_max replanificación finish] > 'Completa'[ZCC_max replanificación start]),
+			    NETWORKDAYS('Completa'[ZCC_max replanificación start], 'Completa'[ZCC_max replanificación finish]),
+			    BLANK()
+			)
+			```
+		dataType: double
+		lineageTag: 07d78002-3ae1-499d-9de1-3152aa9d4090
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIDuracion%_Demanda_a_Ejecucion_Planificado_Proyecto = ```
+			
+			IF(
+			    NOT(ISBLANK([ZCC_KPIDuracion_Demanda_Proyecto])) && 
+			    NOT(ISBLANK([ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto])) &&
+			    [ZCC_KPIDuracion_Demanda_Proyecto] <> 0 && 
+			    [ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto] <> 0,
+			    (([ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto] - [ZCC_KPIDuracion_Demanda_Proyecto]) / [ZCC_KPIDuracion_Demanda_Proyecto]),
+			    BLANK()
+			)
+			
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: dc3ee4a5-825c-4c7c-b435-a7e849f84c5c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIDuracion%_Demanda_a_Ejecucion_Real_Proyecto = ```
+			
+			IF(
+			    NOT(ISBLANK([ZCC_KPIDuracion_Demanda_Proyecto])) && 
+			    NOT(ISBLANK([ZCC_KPIDuracion_Ejecucion_Real_Proyecto])) &&
+			    [ZCC_KPIDuracion_Demanda_Proyecto] <> 0 &&
+			    [ZCC_KPIDuracion_Ejecucion_Real_Proyecto] <> 0,
+			    (([ZCC_KPIDuracion_Ejecucion_Real_Proyecto] - [ZCC_KPIDuracion_Demanda_Proyecto]) / [ZCC_KPIDuracion_Demanda_Proyecto]),
+			    BLANK()
+			)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: c1dc91de-e34a-48cb-b212-bbdb2918b8ea
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIDuracion_faltan2fechasdeEvolutivos =
+			
+			IF (
+			    ISBLANK([ZCC_ Estimado inicio demanda]) ||
+			    ISBLANK([ZCC_ Estimado fin demanda]) ||
+			    ISBLANK('Completa'[ZCC_max replanificación start]) ||
+			    ISBLANK('Completa'[ZCC_max replanificación finish]),
+			    "Fechas no informadas",
+			    "Fechas informadas"
+			)
+		lineageTag: 25ceff46-47b4-42a8-beef-3cfde4bc19a8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIDuracion_faltan3fechasdeProyectos =
+			
+			IF (
+			    ISBLANK([ZCC_ Estimado inicio demanda]) ||
+			    ISBLANK([ZCC_ Estimado fin demanda]) ||
+			    ISBLANK('Completa'[ZCC_max replanificación start]) ||
+			    ISBLANK('Completa'[ZCC_max replanificación finish]) ||
+				ISBLANK('Completa'[ZCC_línea_base_start]) ||
+				ISBLANK('Completa'[ZCC_línea_base_finish]),
+			    "Fechas no informadas",
+			    "Fechas informadas"
+			)
+		lineageTag: 7584d1ba-be4e-4bf2-816c-813ea5d047bc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIDuracion_faltan2fechasdeProyectos =
+			
+			IF (
+			    ISBLANK([ZCC_ Estimado inicio demanda]) ||
+			    ISBLANK([ZCC_ Estimado fin demanda]) ||
+				ISBLANK('Completa'[ZCC_línea_base_start]) ||
+				ISBLANK('Completa'[ZCC_línea_base_finish]),
+			    "Fechas no informadas",
+			    "Fechas informadas"
+			)
+		lineageTag: 1bbc54d2-a9a6-4de3-a129-7f8568c641ea
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAPROYECTO = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[work_end])) && 
+			    NOT(ISBLANK('Completa'[work_start])) &&
+			    ('Completa'[work_end] > 'Completa'[work_start]),
+			    NETWORKDAYS('Completa'[work_start], 'Completa'[work_end]),
+			    IF(
+			        ISBLANK('Completa'[work_end]) && 
+			        NOT(ISBLANK('Completa'[ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto])) && 
+			        'Completa'[ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto] <> 0,
+			        'Completa'[ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto], 	
+			        BLANK()
+			    )
+			)
+			```
+		lineageTag: 40d42803-707a-49dd-a1f2-7da31fa5f0cd
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_KPIDuracion_Ejecucion_Real_ProyectoMODIFICADAEVOLUTIVO = ```
+			
+			IF(
+			    NOT(ISBLANK('Completa'[work_end])) && 
+			    NOT(ISBLANK('Completa'[work_start])) &&
+			    ('Completa'[work_end] > 'Completa'[work_start]),
+			    NETWORKDAYS('Completa'[work_start], 'Completa'[work_end]),
+			    IF(
+			        ISBLANK('Completa'[work_end]) && 
+			        NOT(ISBLANK('Completa'[ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto])) &&
+			        'Completa'[ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto] <> 0,
+			        'Completa'[ZCC_KPIDuracion_Ejecucion_Planificado_Proyecto], 	
+			        BLANK()
+			    )
+			)
+			```
+		lineageTag: a6487aa2-bf4d-4d9e-a6ec-87678686ced2
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Proyecto_Contado_Backlog = ```
+			
+			VAR _Current_EOM = EOMONTH(TODAY(), 0)
+			VAR _Past_EOM = EOMONTH(TODAY(), -1)
+			 
+			RETURN
+			    IF(
+			        'completa'[opened_at] <= _Current_EOM
+			&& 'completa'[opened_at] > DATE(2019, 1, 1)
+			&& (
+			            ISBLANK('completa'[ZCC_GraficaBacklog_New_Closed_at])
+			            || 'completa'[ZCC_GraficaBacklog_New_Closed_at] > _Current_EOM
+			        )
+			&& 'completa'[ZCC_Proyecto- Evol] = "Proyecto",
+			        "Contado",
+			        "No Contado"
+			    )
+			```
+		lineageTag: 44cb35da-908e-4169-9c98-8c117de69196
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Demanda = ```
+			RELATED(Demandas[number]) 
+			```
+		lineageTag: d3dc88e4-8e18-477b-9082-28fcf55de3b0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_TotalDuracionDeman = ```
+			
+			 VAR _DemanActual = Completa[ZCC_Demanda]
+			 RETURN
+			SUMX(
+			    FILTER(Completa, Completa[ZCC_Demanda] = _DemanActual),
+			    Completa[ZMD_KPIDuracion_Ejecucion_Planificado_Proyecto]
+			)
+			```
+		lineageTag: f7c52e05-3a0a-449f-8c1a-73afcb80672a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_Tamaño = RELATED(Demandas[ZCC_Tamaño])
+		lineageTag: 98659b35-2375-4811-87d5-58cd99c7b484
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_MargenAñadido =
+			
+			SWITCH(Completa[ZCC_Tamaño],
+			-- se calcula el 200% del max estipulado de la talla (X = 0-40h), se divide entre 8, y se suma el 80% de 1/8 parte a la duración total de la demanda
+			"XS", Completa[ZCC_TotalDuracionDeman] + 8,
+			-- se calcula el 150% del max estipulado de la talla (S = 40-750h), se divide entre 8, y se suma el 70% de 1/8 parte a la duración total de la demanda
+			-- "S", Completa[ZCC_TotalDuracionDeman]+98,
+			"S", Completa[ZCC_TotalDuracionDeman] + (((Completa[ZCC_TotalDuracionDeman]*40)/750)*2),
+			-- se calcula el 100% del max estipulado de la talla (M = 750-1500h), se divide entre 8, y se suma el 60% de 1/8 parte a la duración total de la demanda
+			-- "M", Completa[ZCC_TotalDuracionDeman]+113,
+			"M", Completa[ZCC_TotalDuracionDeman] + (((Completa[ZCC_TotalDuracionDeman]/4)*750)/1500),
+			 BLANK())
+		lineageTag: 9df83b4c-0afc-4a10-af86-903607e502b9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ZCC_FechaTope =
+			
+			CALCULATE(SUM(Completa[ZCC_MargenAñadido])) + Completa[work_start].[Date]
+		formatString: Short Date
+		lineageTag: e4625bd3-5335-441c-8968-a3c133bea029
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 7d2cf83d-6b78-4aad-b15d-94706a34cd8c
+			defaultHierarchy: LocalDateTable_652882da-d5e2-4f6c-9305-9941d903e6f9.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_KPI_Excede_Margen =
+			
+			IF(Completa[ZCC_Tamaño] = "", "N",
+			IF(TODAY() > Completa[ZCC_FechaTope].[Date], "S", "N"))
+		lineageTag: a17baa40-a653-4aad-adc3-2a816c69893f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Estado_Demanda = ```
+			RELATED(Demandas[dv_state]) 
+			```
+		lineageTag: 0a8d698d-eb65-416f-8ec7-5cc7fcfc6a93
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column attr_based_planning
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8ebe7d13-527d-420a-afc7-1a70499010a7
+		summarizeBy: none
+		sourceColumn: attr_based_planning
+
+		annotation SummarizationSetBy = Automatic
+
+	column auto_save
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 0f5dee43-0f4f-44b2-abc5-d8ee92c41d2c
+		summarizeBy: none
+		sourceColumn: auto_save
+
+		annotation SummarizationSetBy = Automatic
+
+	column contract
+		dataType: string
+		lineageTag: 2289e8a6-90a3-4ea4-b2e6-712241838de7
+		summarizeBy: none
+		sourceColumn: contract
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_contract
+		dataType: string
+		lineageTag: 0db6ba95-1f13-48a9-8d3f-a6c21676af58
+		summarizeBy: none
+		sourceColumn: dv_contract
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_expense_type
+		dataType: string
+		lineageTag: ff71ac6b-a282-4616-89d2-bddfa9774ff4
+		summarizeBy: none
+		sourceColumn: dv_expense_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_model_id
+		dataType: string
+		lineageTag: 50e5eba5-a842-4303-906c-85003593c771
+		summarizeBy: none
+		sourceColumn: dv_model_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_software_model
+		dataType: string
+		lineageTag: 4bc609c4-e1bd-4ce8-bb1f-076521e2dabd
+		summarizeBy: none
+		sourceColumn: dv_software_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_devops_manager
+		dataType: string
+		lineageTag: 73905325-4d68-4713-841b-fee477a064d1
+		summarizeBy: none
+		sourceColumn: dv_u_devops_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_pmo_manager
+		dataType: string
+		lineageTag: dbe8e330-1b6f-4566-950b-dbef236cbb9d
+		summarizeBy: none
+		sourceColumn: dv_u_pmo_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_qa_manager
+		dataType: string
+		lineageTag: e3265ed2-f173-4e6f-bfb5-511942c3775c
+		summarizeBy: none
+		sourceColumn: dv_u_qa_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_rfp_phases
+		dataType: string
+		lineageTag: 424b318f-6a71-4e48-887e-08358dea4f9a
+		summarizeBy: none
+		sourceColumn: dv_u_rfp_phases
+
+		annotation SummarizationSetBy = Automatic
+
+	column expense_type
+		dataType: string
+		lineageTag: b9cba053-c291-4f43-9d3d-e82f48c4ba34
+		summarizeBy: none
+		sourceColumn: expense_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column group_resource_assignee
+		dataType: string
+		lineageTag: f37cc2e6-c78a-4762-a7ec-244c209f5d46
+		summarizeBy: none
+		sourceColumn: group_resource_assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column model_id
+		dataType: string
+		lineageTag: c7bbc157-08f7-48da-9f62-11f8f195f228
+		summarizeBy: none
+		sourceColumn: model_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column resource_assignee
+		dataType: string
+		lineageTag: 60415b78-b248-409a-b11e-af1b7b4193fa
+		summarizeBy: none
+		sourceColumn: resource_assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column software_model
+		dataType: string
+		lineageTag: 0d2cf5ca-6ad2-4caf-b202-327465a63ab2
+		summarizeBy: none
+		sourceColumn: software_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_commented
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 04373185-e7e8-4c20-878a-49b79e876c1f
+		summarizeBy: none
+		sourceColumn: u_commented
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_devops_manager
+		dataType: string
+		lineageTag: 2aa6b70c-f4da-4a30-84e8-7fb4bbb3ca32
+		summarizeBy: none
+		sourceColumn: u_devops_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impacted_applications
+		dataType: string
+		lineageTag: 26593e86-ed81-493b-9cc1-5b507abfff7e
+		summarizeBy: none
+		sourceColumn: u_impacted_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_operational_committee_comment
+		dataType: string
+		lineageTag: 79b498e8-09cb-4b05-8108-a151d1afc515
+		summarizeBy: none
+		sourceColumn: u_operational_committee_comment
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_project_typology
+		dataType: string
+		lineageTag: fcc94b2f-61b0-469c-a9a0-d67ca5bfd55a
+		summarizeBy: none
+		sourceColumn: u_project_typology
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_qa_manager
+		dataType: string
+		lineageTag: aa68292d-3eed-4cbf-9bd4-71ad2327602a
+		summarizeBy: none
+		sourceColumn: u_qa_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_relevant_project_for_cio
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: deeadaef-17e6-48d1-82c5-639137465cb6
+		summarizeBy: none
+		sourceColumn: u_relevant_project_for_cio
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_rfp_phases
+		dataType: string
+		lineageTag: 5899d966-fb0f-4880-a413-7e2a360c1172
+		summarizeBy: none
+		sourceColumn: u_rfp_phases
+
+		annotation SummarizationSetBy = Automatic
+
+	column EjecuCaducada =
+			
+			IF('Completa'[end_date]<TODAY(),"S","N")
+		lineageTag: 4b67946a-1aa5-493c-b6f0-c7a327e84d9e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_JP_Demanda = RELATED('Demandas'[dv_u_project_manager])
+		lineageTag: 24a3b02d-87e8-46c8-99d6-87b94c7c52bd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Completa = m
+		mode: import
+		source =
+				let
+				    Origen = Table.Combine({
+				    #"SERV_NOW_EN V_rm_enhancement",
+				    #"SERV_NOW_EN V_pm_project",
+				    #"SERV_NOW_EN V_pm_project_task_Evolutivos"
+				}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"work_end", "work_end_delDatalake"}, {"work_start", "work_start_delDatalake"}}),
+				    #"Columna duplicada" = Table.DuplicateColumn(#"Columnas con nombre cambiado", "opened_at", "opened_at - Copia"),
+				    #"Columna duplicada1" = Table.DuplicateColumn(#"Columna duplicada", "closed_at", "closed_at - Copia"),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columna duplicada1",{{"opened_at - Copia", "work_start"}, {"closed_at - Copia", "work_end"}})
+				in
+				    #"Columnas con nombre cambiado1"
+
+	annotation PBI_ResultType = Table
+

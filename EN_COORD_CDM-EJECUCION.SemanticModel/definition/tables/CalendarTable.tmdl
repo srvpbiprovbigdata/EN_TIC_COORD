@@ -1,0 +1,124 @@
+table CalendarTable
+	lineageTag: 88394c87-e253-4613-ad4b-84958aa130c8
+
+	measure ZMD_%_ALERTAS = 0
+		formatString: 0
+		lineageTag: ddfb6527-f3f2-405c-a3f2-781350e6db96
+
+	measure ZMD_Proyectos_Que_Comienzan_En_30_Días =
+			
+			VAR FechaActual = TODAY()
+			VAR FechaLimite = FechaActual + 30
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Subproyectos'),
+			    'Subproyectos'[schedule_start_date] >= FechaActual,
+			    'Subproyectos'[schedule_start_date] <= FechaLimite
+			)
+		formatString: 0
+		lineageTag: 70048d96-a160-4a78-a789-83009cd13578
+
+	measure ZMD_Proyectos_Que_Terminan_En_30_Días =
+			
+			VAR FechaActual = TODAY()
+			VAR FechaLimite = FechaActual + 30
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Subproyectos'),
+			    'Subproyectos'[schedule_end_date] >= FechaActual,
+			    'Subproyectos'[schedule_end_date] <= FechaLimite
+			)
+		formatString: 0
+		lineageTag: 7d94a6a0-6740-4182-8ac1-3375bf6492a7
+
+	measure ZMD_Proyectos_Actuales_Ajustados = COUNTROWS('Subproyectos')- [ZMD_Proyectos_Que_Terminan_En_30_Días]+[ZMD_Proyectos_Que_Comienzan_En_30_Días]
+		formatString: 0
+		lineageTag: ba247910-45dd-4f27-ba52-92b4558ae2be
+
+	measure ZMD_Evolutivos_Que_Comienzan_En_30_Días =
+			
+			VAR FechaActual = TODAY()
+			VAR FechaLimite = FechaActual + 30
+			RETURN
+			CALCULATE(
+			    COUNTROWS('Tareas'),
+			    'Tareas'[schedule_start_date] >= FechaActual,
+			    'Tareas'[schedule_start_date] <= FechaLimite
+			)
+		formatString: 0
+		lineageTag: 9749651a-f647-4cbe-961c-4aa0fe5cc9f3
+
+	column Date
+		formatString: General Date
+		lineageTag: 5bf9f4ca-c833-459c-9fc2-d7c498a6d1fb
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variación
+			isDefault
+			relationship: ffedb5d9-3695-4f90-809a-accb5f54d54c
+			defaultHierarchy: LocalDateTable_156e18b4-e82e-4b89-a092-01ff60d78c83.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		formatString: 0
+		lineageTag: 8f2c27dd-8e15-4297-901e-73a4d5e47b86
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		formatString: 0
+		lineageTag: c7aa0769-42c9-4687-ae8e-c7b2342916b5
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Month]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		formatString: 0
+		lineageTag: 287e5bcd-d484-4de1-a6b7-27e546af3994
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Day]
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthYear
+		lineageTag: 8e504209-7b8b-4547-b52a-a3df2406de31
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [MonthYear]
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthName
+		lineageTag: ed239be2-4507-4d72-afd0-c57db9c6ee9f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [MonthName]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition CalendarTable = calculated
+		mode: import
+		source = ```
+				
+				ADDCOLUMNS (
+				    CALENDAR (DATE (2019, 1, 1), DATE (YEAR(TODAY()), MONTH(TODAY()), DAY(TODAY()))),
+				    "Year", YEAR([Date]),
+				    "Month", MONTH([Date]),
+				    "Day", DAY([Date]),
+				    "MonthYear", FORMAT([Date], "MMM YYYY"),
+				    "MonthName", FORMAT([Date], "MMMM")
+				)
+				
+				```
+
+	annotation PBI_Id = 1a554ea8054a43c19571d98e19b3b3c3
+

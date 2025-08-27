@@ -1,0 +1,66 @@
+table 'Parametros KGI24'
+	excludeFromModelRefresh
+	lineageTag: ca655147-3bbb-49fb-8376-fdec81a0f18a
+
+	column 'Número Máximo de Incidencias'
+		dataType: int64
+		formatString: 0
+		lineageTag: ded6b745-b7e0-42a5-8ac7-226f32b9a937
+		summarizeBy: sum
+		sourceColumn: Número Máximo de Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cumplimiento Objetivo %'
+		dataType: string
+		lineageTag: 8f254fe5-ec69-473b-8991-82b99634c805
+		summarizeBy: none
+		sourceColumn: Cumplimiento Objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso %'
+		dataType: int64
+		formatString: 0
+		lineageTag: e0c58223-f387-457d-bf28-8cbca32b57d3
+		summarizeBy: sum
+		sourceColumn: Peso %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI24'
+		dataType: int64
+		formatString: 0
+		lineageTag: a3e7317e-1079-4aef-a169-f9b93fc3c0c7
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI24
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: cbb1d1b4-9da5-41f4-bccd-4f2ec138bbbe
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI24-eb3c6bf0-c7db-4ea1-841f-0c7749dc2177' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/" & AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    #"Parametros KGI2-4_Sheet" = Origen{[Item="Parametros KGI2-4",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Parametros KGI2-4_Sheet", [PromoteAllScalars=true]),
+				    Personalizado1 = Table.TransformColumnTypes(#"Promoted Headers",{{"Número Máximo de Incidencias", Int64.Type}, {"Cumplimiento Objetivo %", type text}, {"Peso %", Int64.Type}, {"Puntos de KGI24", Int64.Type}, {"KGI", type text}})
+				in
+				    Personalizado1
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

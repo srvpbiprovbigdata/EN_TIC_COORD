@@ -1,0 +1,162 @@
+table 'PRO - Jira - Historias'
+	lineageTag: 3e78fb8e-1919-43a9-ad40-e1ab5dfe189a
+
+	column Components
+		dataType: string
+		lineageTag: 60e1ea03-d3d0-426a-bdc6-b8fcca706cd3
+		summarizeBy: none
+		sourceColumn: Components
+
+		annotation SummarizationSetBy = Automatic
+
+	column Project
+		dataType: string
+		lineageTag: 3c4c9916-e7b5-4c07-aead-3b8e065c74e6
+		summarizeBy: none
+		sourceColumn: Project
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Type'
+		dataType: string
+		lineageTag: ea285798-54a2-4db2-a29c-8be7daaeabe1
+		summarizeBy: none
+		sourceColumn: Issue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key
+		dataType: string
+		lineageTag: 2037b036-87fd-42a8-ad50-fa60f7fadf32
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: 93e4d541-6cbc-4881-ac5f-37bd09e631d5
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignee
+		dataType: string
+		lineageTag: e359861e-5c18-487c-bd49-c66adec1525e
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reporter
+		dataType: string
+		lineageTag: b44fe678-e740-4517-a458-233799b71f60
+		summarizeBy: none
+		sourceColumn: Reporter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: 7cf48c97-0e3e-480c-bbd9-a309a63a3b48
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 32ff6135-70c2-4506-a6f9-e4d7ab5cb697
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d495b7de-2535-41f2-89aa-3a87b52e6616
+		summarizeBy: none
+		sourceColumn: Created
+
+		variation Variation
+			isDefault
+			relationship: 8431216c-b400-4b54-93d4-87289f7ebf98
+			defaultHierarchy: LocalDateTable_5b346fa8-0020-46db-a02b-29456f43359c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Linked Issues'
+		dataType: string
+		lineageTag: d8a699d0-05b8-42cb-a15b-6e02581a22b3
+		summarizeBy: none
+		sourceColumn: Linked Issues
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-tasks
+		dataType: string
+		lineageTag: 5771c9b2-268f-4f3a-9329-3973b3d11021
+		summarizeBy: none
+		sourceColumn: Sub-tasks
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de prueba'
+		dataType: string
+		lineageTag: 9d913c76-4cc3-4d7a-a13f-692a1f695abb
+		summarizeBy: none
+		sourceColumn: Tipo de prueba
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resolved
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b07d26e4-4510-4db7-b55e-53348f69bc30
+		summarizeBy: none
+		sourceColumn: Resolved
+
+		variation Variation
+			isDefault
+			relationship: 5a663a0c-1db2-4fee-aa05-6d8c95fb4e6f
+			defaultHierarchy: LocalDateTable_02358946-bcd1-421d-967b-a0ad14b50b3e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Jira - Historias-c7523024-d4f7-4501-9d3e-67879c622ea8' = m
+		mode: import
+		queryGroup: KGIs_I
+		source = ```
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/AMS_IAR_CDM_SLA_I_Entregables, Pruebas y Defectos" & xlsx, //& AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    Stories_Sheet = Origen{[Item="Stories",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Stories_Sheet, [PromoteAllScalars=true]),
+				
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Components", type text}, {"Project", type text}, {"Issue Type", type text}, {"Key", type text}, {"Summary", type text}, {"Assignee", type text}, {"Reporter", type text}, {"Priority", type text}, {"Status", type text}, {"Created", type datetime}, {"Linked Issues", type text}, {"Sub-tasks", type text}, {"Tipo de prueba", type text}, {"Resolved", type datetime}}),
+				
+				    //Filtra por aplicaciones correspondientes a iAR
+				    #"Filtered Rows" = Table.SelectRows(#"Changed Type", each ([Components] 
+				        = "EM: DAT"             or [Components] 
+				        = "EM: MXM"             or [Components] 
+				        = "EM: OAT"             or [Components] 
+				        = "EM: WTM"             or [Components]
+				        = "EM: RDO Movil"       or [Components]
+				        = "RDO"                 or [Components]  
+				        = "HTFV"                or [Components]  
+				        = "IOC"                 or [Components]  
+				        = "MXM-HTVF"            or [Components]  
+				        = "Web Calendario de Guardias"))
+				    
+				in
+				    #"Filtered Rows"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

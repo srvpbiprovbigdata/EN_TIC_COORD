@@ -1,0 +1,138 @@
+table 'Resumen KGI15'
+	lineageTag: 5b108f33-0e84-4ed0-a178-0aa675a6d6f3
+
+	column Tipo
+		dataType: string
+		lineageTag: 023eb54a-a354-442c-846e-ed950fafde17
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resolved - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 228c7bae-e0b6-4d17-bf9f-b34b3977c989
+		summarizeBy: none
+		sourceColumn: Resolved - Copy
+
+		variation Variation
+			isDefault
+			relationship: 9b65c479-0066-47bb-937c-eef16c17a7f2
+			defaultHierarchy: LocalDateTable_235adb0e-e86b-4a15-a9a6-dbea86a867c4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Pruebas UAT'
+		dataType: double
+		formatString: 0
+		lineageTag: 67a27f3c-39a7-4fdc-afc3-6065159d7869
+		summarizeBy: sum
+		sourceColumn: Pruebas UAT
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Defectos UAT'
+		dataType: double
+		formatString: 0
+		lineageTag: d3a6b78e-31ca-4b0f-9e49-224d441be550
+		summarizeBy: sum
+		sourceColumn: Defectos UAT
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de desviación máxima %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: ac4e0686-b4f1-4ccd-ac03-4b8a91e13ced
+		summarizeBy: sum
+		sourceColumn: Tasa de desviación máxima %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 9a3eeef0-3364-4781-af33-27b1d56431e3
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI15'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1797e3f7-c47d-4f3a-8638-30edc09b21ef
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI15
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: fa811cee-13a1-48f3-8a9d-74d4bef715f2
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Real %' = ('Resumen KGI15'[Defectos UAT])/'Resumen KGI15'[Pruebas UAT]
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 86d942aa-68e5-44fb-bd9d-936f62cbd03a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI15'[Tasa Real %]<='Resumen KGI15'[Tasa de desviación máxima %],"Si","No")
+		lineageTag: 9785df55-575a-4daf-be71-349db4c304da
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI15'[¿Cumple?]="Si",'Resumen KGI15'[Peso del KGI %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: af496fbd-7c37-4435-8d1f-af4d4fdcaea3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI15'[¿Cumple?]="No",'Resumen KGI15'[Peso del KGI %],0)
+		lineageTag: 59362966-03cb-4b6a-8cc1-7dd2d8525b42
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Resumen KGI15-35d48130-6675-4e32-a74a-82a6e4bd3844' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Jira - Pruebas con SLA",
+				
+				    //Filtro por tipo de Pruebas UAT
+				    #"Filtered Rows" = Table.SelectRows(Source, each Text.Contains([Tipo de prueba], "UAT")),
+				
+				    //Agrupa por número de Pruebas UAT por Prioridad de la Pruebas
+				    #"Grouped Rows" = Table.Group(#"Filtered Rows", {"PRO - Jira - Historias.Resolved - Copy", "Priority"}, {{"Pruebas UAT", each Table.RowCount(_), type number}}),
+				
+				    //Une con tabla de defectos UAT
+				    #"Merged Queries" = Table.NestedJoin(#"Grouped Rows", {"PRO - Jira - Historias.Resolved - Copy", "Priority"}, #"PRO - Jira - Defectos con SLA - UAT", {"PRO - Jira - Historias y Ejecuciones.Resolved - Copy", "Priority"}, "PRO - Jira - Defectos con SLA - UAT", JoinKind.LeftOuter),
+				    #"Expanded PRO - Jira - Defectos con SLA - UAT" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Jira - Defectos con SLA - UAT", {"Defectos UAT"}, {"PRO - Jira - Defectos con SLA - UAT.Defectos UAT"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded PRO - Jira - Defectos con SLA - UAT",{{"PRO - Jira - Defectos con SLA - UAT.Defectos UAT", "Defectos UAT"}}),
+				    
+				    //Une con tabla de Parámetros
+				    #"Merged Queries1" = Table.NestedJoin(#"Renamed Columns", {"Priority"}, #"Parametros KGI15", {"Prioridad"}, "Parametros KGI1-5", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI1-5" = Table.ExpandTableColumn(#"Merged Queries1", "Parametros KGI1-5", {"Tasa de desviación máxima %", "Peso del KGI %", "Puntos de KGI15", "KGI"}, {"Parametros KGI1-5.Tasa de desviación máxima %", "Parametros KGI1-5.Peso del KGI %", "Parametros KGI1-5.Puntos de KGI15", "Parametros KGI1-5.KGI"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded Parametros KGI1-5",{{"Parametros KGI1-5.Tasa de desviación máxima %", "Tasa de desviación máxima %"}, {"Parametros KGI1-5.Peso del KGI %", "Peso del KGI %"}, {"Parametros KGI1-5.Puntos de KGI15", "Puntos de KGI15"}, {"Parametros KGI1-5.KGI", "KGI"}, {"Priority", "Tipo"}, {"PRO - Jira - Historias.Resolved - Copy", "Resolved - Copy"}})
+				in
+				    #"Renamed Columns1"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

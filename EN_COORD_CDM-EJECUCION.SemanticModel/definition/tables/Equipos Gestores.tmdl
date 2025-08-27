@@ -1,0 +1,53 @@
+table 'Equipos Gestores'
+	lineageTag: 9d6ee822-2048-4f92-aaa6-78f4e4418913
+
+	column Portfolio
+		dataType: string
+		lineageTag: 9434f5b0-8da9-4d41-8068-32d6113dfea7
+		summarizeBy: none
+		sourceColumn: Portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Negocio
+		dataType: string
+		lineageTag: 481bc5f7-4acc-4fd1-b76c-90f839fd901c
+		summarizeBy: none
+		sourceColumn: Negocio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Departamento
+		dataType: string
+		lineageTag: af193bf1-4ae7-40bc-a925-2932a25d90e4
+		summarizeBy: none
+		sourceColumn: Departamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Portfolio Abreviado'
+		dataType: string
+		lineageTag: 3cfa0aac-d6b6-4108-9e52-cb32005b40ac
+		summarizeBy: none
+		sourceColumn: Portfolio Abreviado
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Equipos Gestores' = m
+		mode: import
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents("https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRO/Documentos%20compartidos/Demanda/EN_COORD_CDM-CONFIGURACION.xlsx"), null, true),
+				    #"Equipos Gestores _Sheet" = Origen{[Item="Equipos Gestores ",Kind="Sheet"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Equipos Gestores _Sheet",{"Column1", "Column2", "Column7", "Column8", "Column9", "Column10", "Column11", "Column12", "Column13", "Column14", "Column15", "Column16"}),
+				    #"Filas en blanco eliminadas" = Table.SelectRows(#"Columnas quitadas", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Filas en blanco eliminadas", [PromoteAllScalars=true]),
+				    #"Encabezados promovidos2" = Table.PromoteHeaders(#"Encabezados promovidos", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos2",{{"Portfolio", type text}, {"Negocio", type text}, {"Departamento", type text}, {"Portfolio Abreviado", type text}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

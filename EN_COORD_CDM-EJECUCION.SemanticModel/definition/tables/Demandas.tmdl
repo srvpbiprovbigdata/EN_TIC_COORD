@@ -1,0 +1,2959 @@
+table Demandas
+	lineageTag: c4549296-f92c-4c92-9f00-941db39d042f
+
+	measure ZMD_Demandas_Que_Terminan_En_30_Días =
+			
+			VAR FechaActual = TODAY()
+			VAR FechaLimite = FechaActual + 30
+			RETURN
+			CALCULATE(
+			    COUNTROWS(Demandas),
+			    'Demandas'[approved_end_date] >= FechaActual,
+			    'Demandas'[approved_end_date] <= FechaLimite
+			)
+		formatString: 0
+		lineageTag: 0915d2d1-bc3a-4885-be7a-a2e82fdd4ca1
+
+	measure ZMD_Demandas_Que_Terminan_En_7_Días =
+			
+			VAR FechaActual = TODAY()
+			VAR FechaLimite = FechaActual + 7
+			RETURN
+			CALCULATE(
+			    COUNTROWS(Demandas),
+			    'Demandas'[approved_end_date] >= FechaActual,
+			    'Demandas'[approved_end_date] <= FechaLimite
+			)
+		formatString: 0
+		lineageTag: a088eac7-1a67-49b7-b060-40785f356edb
+
+	measure ZMD_KPI_Demandas_CerradasEsteAno =
+			
+			CALCULATE(
+			    COUNT('Demandas'[number]),
+			    FILTER(
+			        'Demandas',
+			        YEAR('Demandas'[u_actual_end_date]) = YEAR(TODAY())
+			    )
+			)
+		formatString: 0
+		lineageTag: 5c79245c-8e15-475f-9873-165c129e2be6
+
+	measure ZMD_Demandas_sinProyEvol =
+			
+			COUNTROWS(
+			    FILTER(
+			        Demandas,
+			        ISBLANK(
+			            CALCULATE(
+			                MIN('Completa'[number]),
+			                FILTER(
+			                    'Completa',
+			                    'Completa'[UnionConDemanda] = Demandas[sys_id]
+			                )
+			            )
+			        )
+			    )
+			)
+		formatString: 0
+		lineageTag: 822e0836-b617-4170-be35-b3f2f87b88d2
+
+	measure Recuento_Demandas_Sin_Proyecto = ```
+			
+			CALCULATE(
+			    COUNTROWS('Demandas'),
+			    'Demandas'[ZCC_ProyectoAsociado] = FALSE()
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 51603c33-6f12-479c-8c3e-bf133750d8cd
+
+	measure ZMD_AvisoSeleccionDemanda =
+			
+			IF(
+			    OR(
+			        ISFILTERED('Demandas'[number]),
+			        ISFILTERED('Demandas'[short_description])
+			    ),
+			    BLANK(),
+			    "Por favor, seleccione una demanda en el filtro."
+			)
+		lineageTag: e607cad1-9c41-4bcf-a09f-ca336a1940a8
+
+	column active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: dab7f974-a839-43ab-99d1-c06f36679e53
+		summarizeBy: none
+		sourceColumn: active
+
+		annotation SummarizationSetBy = Automatic
+
+	column activity_due
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ceeb5a60-ad16-48ad-8f29-481e32a20490
+		summarizeBy: none
+		sourceColumn: activity_due
+
+		variation Variación
+			isDefault
+			relationship: fafb1520-967e-437d-bb29-8e2873fdde27
+			defaultHierarchy: LocalDateTable_e205ce63-1817-4d4e-880b-67b69d53692b.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column additional_assignee_list
+		dataType: string
+		lineageTag: c8a61e8a-aad8-48d7-82b4-3d82791a60d0
+		summarizeBy: none
+		sourceColumn: additional_assignee_list
+
+		annotation SummarizationSetBy = Automatic
+
+	column apm_idea_action
+		dataType: string
+		lineageTag: c905deee-ab13-4dc2-87dc-95f487c9f385
+		summarizeBy: none
+		sourceColumn: apm_idea_action
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_apm_idea_action
+		dataType: string
+		lineageTag: f107caf2-ec80-423b-98d7-6ac072e05b6c
+		summarizeBy: none
+		sourceColumn: dv_apm_idea_action
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval
+		dataType: string
+		lineageTag: 263edfca-ce20-4563-b110-d5ac1db7475c
+		summarizeBy: none
+		sourceColumn: approval
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_approval
+		dataType: string
+		lineageTag: d1d88ed3-0f1a-4ffb-9074-2699642fa70a
+		summarizeBy: none
+		sourceColumn: dv_approval
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval_history
+		dataType: string
+		lineageTag: 49efa584-cc98-49a4-a693-a105a2daa549
+		summarizeBy: none
+		sourceColumn: approval_history
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval_set
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8f0bb7fa-7991-47cc-9c5e-f63d9abafee1
+		summarizeBy: none
+		sourceColumn: approval_set
+
+		variation Variación
+			isDefault
+			relationship: 09c7fc63-71b4-4b7c-99bc-664d0b35ec38
+			defaultHierarchy: LocalDateTable_3ca347c0-4094-4853-a9e4-227a026b1f42.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column assessment_required
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8fbe7062-23ae-46b6-8fb1-cb18b753bdf8
+		summarizeBy: none
+		sourceColumn: assessment_required
+
+		annotation SummarizationSetBy = Automatic
+
+	column assigned_to
+		dataType: string
+		lineageTag: 32ed6614-1670-4faa-9aa2-9ffa2d6f2c8d
+		summarizeBy: none
+		sourceColumn: assigned_to
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_assigned_to
+		dataType: string
+		lineageTag: b8aea4a9-55e0-4b77-9b36-a5f6678078a8
+		summarizeBy: none
+		sourceColumn: dv_assigned_to
+
+		annotation SummarizationSetBy = Automatic
+
+	column assignment_group
+		dataType: string
+		lineageTag: 20291947-54e2-4d18-a149-54d63a0f6a9f
+		summarizeBy: none
+		sourceColumn: assignment_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_assignment_group
+		dataType: string
+		lineageTag: fc72fdfe-e34a-4eef-ad8c-ea1f7b425f5c
+		summarizeBy: none
+		sourceColumn: dv_assignment_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column assumptions
+		dataType: string
+		lineageTag: b74eba76-3ee4-4a40-a303-865230db65f2
+		summarizeBy: none
+		sourceColumn: assumptions
+
+		annotation SummarizationSetBy = Automatic
+
+	column barriers
+		dataType: string
+		lineageTag: ae303efa-38e6-4879-87de-a8725e019a4f
+		summarizeBy: none
+		sourceColumn: barriers
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_applications
+		dataType: string
+		lineageTag: e43c54ed-8bf2-42b1-8b0c-b2eb503b8378
+		summarizeBy: none
+		sourceColumn: business_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_capabilities
+		dataType: string
+		lineageTag: a8fea46d-c00c-4ddc-8d37-af380be9f079
+		summarizeBy: none
+		sourceColumn: business_capabilities
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_case
+		dataType: string
+		lineageTag: 654cd4e5-f131-4a4c-8318-73af4ec2b1b8
+		summarizeBy: none
+		sourceColumn: business_case
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fa8a7d57-bd54-4382-875c-d44bf9b0a7d8
+		summarizeBy: none
+		sourceColumn: business_duration
+
+		variation Variación
+			isDefault
+			relationship: 97ff3206-94e7-49ff-afd6-1c353faab692
+			defaultHierarchy: LocalDateTable_97dcdbfe-9c01-487f-86bb-7297d936ac61.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_business_duration
+		dataType: string
+		lineageTag: f1e49cd5-3dd4-409e-8896-32b3893bf035
+		summarizeBy: none
+		sourceColumn: dv_business_duration
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_service
+		dataType: string
+		lineageTag: 353c6b49-4c26-49f5-b6fb-5e3c9b599afb
+		summarizeBy: none
+		sourceColumn: business_service
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_business_service
+		dataType: string
+		lineageTag: 4d586f4d-b87a-4302-952e-d68e13fc7e69
+		summarizeBy: none
+		sourceColumn: dv_business_service
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_unit
+		dataType: string
+		lineageTag: 55bd8f40-f820-475c-996f-2c83f6844cfb
+		summarizeBy: none
+		sourceColumn: business_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_business_unit
+		dataType: string
+		lineageTag: f7e67c87-2c28-482c-ae8b-d30dd6a2fef7
+		summarizeBy: none
+		sourceColumn: dv_business_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column calendar_duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 95f4556a-2bfb-4589-8535-c512af7fa252
+		summarizeBy: none
+		sourceColumn: calendar_duration
+
+		variation Variación
+			isDefault
+			relationship: 8795c17f-568c-427f-b9b6-d3839e78985e
+			defaultHierarchy: LocalDateTable_fad6f131-dabd-40ee-ba26-39376baa1066.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_calendar_duration
+		dataType: string
+		lineageTag: 3c99bd26-c473-4e62-8dc9-a8a107515c6c
+		summarizeBy: none
+		sourceColumn: dv_calendar_duration
+
+		annotation SummarizationSetBy = Automatic
+
+	column capital_budget
+		dataType: double
+		lineageTag: 11e9398c-8c44-4bba-9110-45985480975d
+		summarizeBy: sum
+		sourceColumn: capital_budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column capital_outlay
+		dataType: double
+		lineageTag: e5b435f1-1acc-4392-97a4-2ea83e3c4233
+		summarizeBy: sum
+		sourceColumn: capital_outlay
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column category
+		dataType: string
+		lineageTag: eaa4ced6-6bd2-4a88-877b-2120c5f1fa48
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_category
+		dataType: string
+		lineageTag: b6fcd932-d570-47a6-addb-5a04d75a0654
+		summarizeBy: none
+		sourceColumn: dv_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column change
+		dataType: string
+		lineageTag: d916fec9-aced-4280-a8a9-217c957e4e6d
+		summarizeBy: none
+		sourceColumn: change
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_change
+		dataType: string
+		lineageTag: 1d4a3e4b-cd9d-4de2-834d-d078d3274483
+		summarizeBy: none
+		sourceColumn: dv_change
+
+		annotation SummarizationSetBy = Automatic
+
+	column close_demand
+		dataType: string
+		lineageTag: 2e7a3ac1-9e2d-4f8a-9087-8d7c5397cf82
+		summarizeBy: none
+		sourceColumn: close_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_close_demand
+		dataType: string
+		lineageTag: 1f978424-de46-4275-9fd9-ef73373129e9
+		summarizeBy: none
+		sourceColumn: dv_close_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column close_notes
+		dataType: string
+		lineageTag: 10cfbdce-f1af-4318-8740-0757af1aa337
+		summarizeBy: none
+		sourceColumn: close_notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column closed_at
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: aa78b09c-eed9-4d35-becd-61b5e32a9db9
+		summarizeBy: none
+		sourceColumn: closed_at
+
+		variation Variación
+			isDefault
+			relationship: d26ca711-f8d0-4919-bf6d-b6f2a2ef0d4b
+			defaultHierarchy: LocalDateTable_6bb1f9c2-5d8f-45cd-9ff2-eb2277d3fcff.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column closed_by
+		dataType: string
+		lineageTag: 26ab0375-f1f2-49ef-af7a-2cea374affc6
+		summarizeBy: none
+		sourceColumn: closed_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_closed_by
+		dataType: string
+		lineageTag: 6b96850a-f65b-4496-b77e-b91a85eefb54
+		summarizeBy: none
+		sourceColumn: dv_closed_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmdb_ci
+		dataType: string
+		lineageTag: 8bf9bf20-191a-4ef0-8f8e-01b8dbd74f01
+		summarizeBy: none
+		sourceColumn: cmdb_ci
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_cmdb_ci
+		dataType: string
+		lineageTag: f725e6e8-4d0e-4541-a1e3-e340f807e0ea
+		summarizeBy: none
+		sourceColumn: dv_cmdb_ci
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmdb_ci_business_app
+		dataType: string
+		lineageTag: 87c9d54e-afc0-469e-aee7-da0b190bcffb
+		summarizeBy: none
+		sourceColumn: cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_cmdb_ci_business_app
+		dataType: string
+		lineageTag: 1313f216-ce8d-49f2-a81f-20482854db05
+		summarizeBy: none
+		sourceColumn: dv_cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column collaborators
+		dataType: string
+		lineageTag: 79f7f593-6ee2-4395-838d-bf2062912672
+		summarizeBy: none
+		sourceColumn: collaborators
+
+		annotation SummarizationSetBy = Automatic
+
+	column comments
+		dataType: string
+		lineageTag: bb2a08ea-bfd8-490b-9cec-f2b97d32d834
+		summarizeBy: none
+		sourceColumn: comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column comments_and_work_notes
+		dataType: string
+		lineageTag: 4747e251-6d03-475a-bdc5-6258b2f47fd1
+		summarizeBy: none
+		sourceColumn: comments_and_work_notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column company
+		dataType: string
+		lineageTag: b659ebe1-bad0-4ecd-968f-db61d25c2170
+		summarizeBy: none
+		sourceColumn: company
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_company
+		dataType: string
+		lineageTag: 9175ed69-0df1-4cda-82e3-704b1747f150
+		summarizeBy: none
+		sourceColumn: dv_company
+
+		annotation SummarizationSetBy = Automatic
+
+	column contact_type
+		dataType: string
+		lineageTag: c7713ddb-a137-4a81-a9b9-0ec148cd1144
+		summarizeBy: none
+		sourceColumn: contact_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_contact_type
+		dataType: string
+		lineageTag: 2b2a8f28-adb0-4b5f-9695-8dd07d1078e5
+		summarizeBy: none
+		sourceColumn: dv_contact_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column correlation_display
+		dataType: string
+		lineageTag: 37e3f920-a900-4f86-a261-e677db51e26c
+		summarizeBy: none
+		sourceColumn: correlation_display
+
+		annotation SummarizationSetBy = Automatic
+
+	column correlation_id
+		dataType: string
+		lineageTag: edc9275e-fcca-460f-852f-41e04ea5a0b6
+		summarizeBy: none
+		sourceColumn: correlation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column defect
+		dataType: string
+		lineageTag: 8b2cbf14-565a-41b3-85ee-90f4722e8358
+		summarizeBy: none
+		sourceColumn: defect
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_defect
+		dataType: string
+		lineageTag: 311850f3-9817-4df9-974d-dc27cbbf5ef3
+		summarizeBy: none
+		sourceColumn: dv_defect
+
+		annotation SummarizationSetBy = Automatic
+
+	column delivery_plan
+		dataType: string
+		lineageTag: af82b04d-c34a-4d0e-b542-9c251c0555df
+		summarizeBy: none
+		sourceColumn: delivery_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_delivery_plan
+		dataType: string
+		lineageTag: 24a00e01-4f54-4a3b-abda-9f547ea97054
+		summarizeBy: none
+		sourceColumn: dv_delivery_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column delivery_task
+		dataType: string
+		lineageTag: 03a4474b-9b57-4f51-957b-6f0b8dda6fb8
+		summarizeBy: none
+		sourceColumn: delivery_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_delivery_task
+		dataType: string
+		lineageTag: 8c83392e-ebc3-4808-bcc6-7ef9a5b6ff8f
+		summarizeBy: none
+		sourceColumn: dv_delivery_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column demand
+		dataType: string
+		lineageTag: 9b502725-d6a7-46eb-89e5-361b35eaf378
+		summarizeBy: none
+		sourceColumn: demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column demand_actual_cost
+		dataType: double
+		lineageTag: 3e328709-1dc7-4453-b799-8f772eaec166
+		summarizeBy: sum
+		sourceColumn: demand_actual_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column demand_actual_effort
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 695871af-4a56-4770-b1fb-985634aa34ae
+		summarizeBy: none
+		sourceColumn: demand_actual_effort
+
+		variation Variación
+			isDefault
+			relationship: f1709cdb-36ad-4c6a-91db-ea51ef2af70d
+			defaultHierarchy: LocalDateTable_95063eda-2030-4237-8e8b-15b30a13870c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_demand_actual_effort
+		dataType: string
+		lineageTag: 713bf983-a5f4-46df-af0b-543cd1a6ae90
+		summarizeBy: none
+		sourceColumn: dv_demand_actual_effort
+
+		annotation SummarizationSetBy = Automatic
+
+	column demand_manager
+		dataType: string
+		lineageTag: 668e9114-d90c-417b-8f00-c99744b37b81
+		summarizeBy: none
+		sourceColumn: demand_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_demand_manager
+		dataType: string
+		lineageTag: e3a67a32-49f9-4c20-8360-3e9c85217e3f
+		summarizeBy: none
+		sourceColumn: dv_demand_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column department
+		dataType: string
+		lineageTag: c4ffb891-41f7-4821-a1c1-b1cce68a4d3c
+		summarizeBy: none
+		sourceColumn: department
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_department
+		dataType: string
+		lineageTag: fb06644d-1369-4614-aadb-40c7ec404c87
+		summarizeBy: none
+		sourceColumn: dv_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: 4e755241-6c22-4c45-bc67-143eccba4795
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column discount_rate
+		dataType: double
+		lineageTag: aaed93c2-2dae-46f6-914b-d96801b58596
+		summarizeBy: sum
+		sourceColumn: discount_rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column due_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 144856f4-c987-445c-ba81-202d0dd1551f
+		summarizeBy: none
+		sourceColumn: due_date
+
+		variation Variación
+			isDefault
+			relationship: 07e4159c-107d-4afc-be00-005a2b98b129
+			defaultHierarchy: LocalDateTable_cfd9b57e-9447-428f-8bc0-f7a677f6af1a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_escalation
+		dataType: string
+		lineageTag: 88868464-2874-4c6b-b2fc-bb2991259b96
+		summarizeBy: none
+		sourceColumn: dv_escalation
+
+		annotation SummarizationSetBy = Automatic
+
+	column expected_risk
+		dataType: string
+		lineageTag: 6abb9321-29d9-4fe8-a9ce-49236ca4c01b
+		summarizeBy: none
+		sourceColumn: expected_risk
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_expected_risk
+		dataType: string
+		lineageTag: 1f91372a-c9c8-4362-b467-8fdec6ac8621
+		summarizeBy: none
+		sourceColumn: dv_expected_risk
+
+		annotation SummarizationSetBy = Automatic
+
+	column expected_roi
+		dataType: double
+		lineageTag: eebeb496-df9b-44c7-a636-d5f0b99171f8
+		summarizeBy: sum
+		sourceColumn: expected_roi
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column expected_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a299398e-9aa8-4722-9229-3462652b0627
+		summarizeBy: none
+		sourceColumn: expected_start
+
+		variation Variación
+			isDefault
+			relationship: 62cc2b03-4753-49b5-ac0b-71faa0c6db82
+			defaultHierarchy: LocalDateTable_c39c763d-e2b5-4d87-b475-78e28fb15a32.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column financial_benefit
+		dataType: double
+		lineageTag: 447f23d6-f827-403f-bef7-b845b3f1cdd1
+		summarizeBy: sum
+		sourceColumn: financial_benefit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column financial_return
+		dataType: double
+		lineageTag: 1133e31c-8874-4e14-a251-b536ba43933c
+		summarizeBy: sum
+		sourceColumn: financial_return
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column follow_up
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f389a962-bf28-473d-bfd8-e0d77fe74013
+		summarizeBy: none
+		sourceColumn: follow_up
+
+		variation Variación
+			isDefault
+			relationship: a64a84ad-c2bc-4662-967a-83a67c50ae86
+			defaultHierarchy: LocalDateTable_eca89858-88ab-4c37-8af8-3682fc3328b3.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column goal
+		dataType: string
+		lineageTag: 5e7a6c8a-854a-4812-932f-586b301764a6
+		summarizeBy: none
+		sourceColumn: goal
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_goal
+		dataType: string
+		lineageTag: e37894eb-948e-4a01-822f-9ee7737d4ccf
+		summarizeBy: none
+		sourceColumn: dv_goal
+
+		annotation SummarizationSetBy = Automatic
+
+	column goals
+		dataType: string
+		lineageTag: 9e52feae-43c6-437c-9289-1d39f7b68af6
+		summarizeBy: none
+		sourceColumn: goals
+
+		annotation SummarizationSetBy = Automatic
+
+	column group_list
+		dataType: string
+		lineageTag: b684c892-cab3-49a1-81bf-27e182229e49
+		summarizeBy: none
+		sourceColumn: group_list
+
+		annotation SummarizationSetBy = Automatic
+
+	column impact
+		dataType: int64
+		formatString: 0
+		lineageTag: 11ac2ac5-cf8b-4fc8-9414-4d1708a280ce
+		summarizeBy: sum
+		sourceColumn: impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_impact
+		dataType: string
+		lineageTag: 439965a1-5d3b-469b-8c37-daf58598ddbf
+		summarizeBy: none
+		sourceColumn: dv_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column impacted_business_units
+		dataType: string
+		lineageTag: fc3259af-fa43-4782-ad98-2ab72343a632
+		summarizeBy: none
+		sourceColumn: impacted_business_units
+
+		annotation SummarizationSetBy = Automatic
+
+	column in_scope
+		dataType: string
+		lineageTag: 1377fbdc-98ff-4d80-8f94-560e1c830566
+		summarizeBy: none
+		sourceColumn: in_scope
+
+		annotation SummarizationSetBy = Automatic
+
+	column irr_value
+		dataType: double
+		lineageTag: fe05a2fc-9220-44ff-ac61-c62369d3a52c
+		summarizeBy: sum
+		sourceColumn: irr_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column location
+		dataType: string
+		lineageTag: efe93b1a-89c6-4cc7-9277-89e40375a014
+		summarizeBy: none
+		sourceColumn: location
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_location
+		dataType: string
+		lineageTag: 317c9728-c318-4fba-a404-06fac0ac0668
+		summarizeBy: none
+		sourceColumn: dv_location
+
+		annotation SummarizationSetBy = Automatic
+
+	column made_sla
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: df4e219b-4446-4673-b289-0ee6e333f446
+		summarizeBy: none
+		sourceColumn: made_sla
+
+		annotation SummarizationSetBy = Automatic
+
+	column npv_value
+		dataType: double
+		lineageTag: 28de4198-d925-4981-bdc1-eb8b611596ce
+		summarizeBy: sum
+		sourceColumn: npv_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column number
+		dataType: string
+		lineageTag: 3ec6e173-b01d-4b0d-bcf5-7f6f349192ae
+		summarizeBy: none
+		sourceColumn: number
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_at
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 003bcddd-d1ef-418a-a952-35c480d1ca57
+		summarizeBy: none
+		sourceColumn: opened_at
+
+		variation Variación
+			isDefault
+			relationship: 9baa754c-472a-43d0-a436-9792ec06c4f9
+			defaultHierarchy: LocalDateTable_305043d9-74f8-4ea8-bd1f-42d172ae3678.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_by
+		dataType: string
+		lineageTag: e8214745-3c52-45f4-95af-511cfb84010b
+		summarizeBy: none
+		sourceColumn: opened_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_opened_by
+		dataType: string
+		lineageTag: 6ff909fd-8b31-4666-8c67-a32c7a3e3293
+		summarizeBy: none
+		sourceColumn: dv_opened_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column operational_budget
+		dataType: double
+		lineageTag: 05a02d93-3a86-4869-bc8d-36301bae343d
+		summarizeBy: sum
+		sourceColumn: operational_budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column operational_outlay
+		dataType: double
+		lineageTag: 053b34f5-04ad-4d06-b490-b6f15a665714
+		summarizeBy: sum
+		sourceColumn: operational_outlay
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column order
+		dataType: int64
+		formatString: 0
+		lineageTag: 026999a2-f8f2-408e-87cc-aa66b0fa299e
+		summarizeBy: sum
+		sourceColumn: order
+
+		annotation SummarizationSetBy = Automatic
+
+	column other_costs
+		dataType: double
+		lineageTag: 79898560-d140-42d9-998e-9784905130fd
+		summarizeBy: sum
+		sourceColumn: other_costs
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column parent
+		dataType: string
+		lineageTag: cc343f76-7eb0-40fa-b98f-86049c3e7c0b
+		summarizeBy: none
+		sourceColumn: parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_parent
+		dataType: string
+		lineageTag: 216fe05e-9de8-4eea-b4f9-5437df3da749
+		summarizeBy: none
+		sourceColumn: dv_parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column portfolio
+		dataType: string
+		lineageTag: 0841aed6-b6d2-4f12-9a0a-305ffa11c5ac
+		summarizeBy: none
+		sourceColumn: portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_portfolio
+		dataType: string
+		lineageTag: 78b2ccca-2e89-451c-a6f2-c82bfeb4d2d7
+		summarizeBy: none
+		sourceColumn: dv_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column priority
+		dataType: int64
+		formatString: 0
+		lineageTag: 17e82df3-f495-4a64-ad09-40f8680ef2b5
+		summarizeBy: sum
+		sourceColumn: priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_priority
+		dataType: string
+		lineageTag: b99038d6-992c-469d-a899-6408b05cf4eb
+		summarizeBy: none
+		sourceColumn: dv_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column project
+		dataType: string
+		lineageTag: 8ccfcb5a-9703-42f1-a8d1-cadcd7afd20b
+		summarizeBy: none
+		sourceColumn: project
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_project
+		dataType: string
+		lineageTag: a6902490-c3f0-4b2d-bd8e-7df5b1338366
+		summarizeBy: none
+		sourceColumn: dv_project
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_manager
+		dataType: string
+		lineageTag: ebb20b80-02d4-4334-9282-131cc1d46fb4
+		summarizeBy: none
+		sourceColumn: project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_project_manager
+		dataType: string
+		lineageTag: 55c9fb46-d322-4d3a-a3a9-9201c3f21e90
+		summarizeBy: none
+		sourceColumn: dv_project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column related_records
+		dataType: string
+		lineageTag: 51c3436d-3f34-4a21-b698-3096ecfc6d14
+		summarizeBy: none
+		sourceColumn: related_records
+
+		annotation SummarizationSetBy = Automatic
+
+	column requested_by
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6a76f098-e426-4443-9b93-f78752844e78
+		summarizeBy: none
+		sourceColumn: requested_by
+
+		variation Variación
+			isDefault
+			relationship: 5640fd53-90ce-4e07-8b9a-c7382c47de2e
+			defaultHierarchy: LocalDateTable_fcabcbdb-df41-46c0-81a5-f96a1fd1438f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column resource_allocated_cost
+		dataType: double
+		lineageTag: 796a01e3-9792-4fa0-84e3-fd3104dfb2b5
+		summarizeBy: sum
+		sourceColumn: resource_allocated_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column resource_planned_cost
+		dataType: double
+		lineageTag: 11115cb3-177b-4517-a0a2-9b1bb6e91897
+		summarizeBy: sum
+		sourceColumn: resource_planned_cost
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column risk_of_not_performing
+		dataType: string
+		lineageTag: e1c5bf76-e0d3-440b-a9d2-31f4f4fe5ef3
+		summarizeBy: none
+		sourceColumn: risk_of_not_performing
+
+		annotation SummarizationSetBy = Automatic
+
+	column risk_of_performing
+		dataType: string
+		lineageTag: b7d29f65-d5d6-45e3-8626-857d1f723448
+		summarizeBy: none
+		sourceColumn: risk_of_performing
+
+		annotation SummarizationSetBy = Automatic
+
+	column route_reason
+		dataType: int64
+		formatString: 0
+		lineageTag: 55a46f8d-33ab-42ed-9c1f-7297409f5220
+		summarizeBy: sum
+		sourceColumn: route_reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_route_reason
+		dataType: string
+		lineageTag: 560d12b4-8b6f-4d8d-8833-da228a222ca3
+		summarizeBy: none
+		sourceColumn: dv_route_reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column score
+		dataType: double
+		lineageTag: a6276b3b-37b6-4435-97bb-05ffdf2f425d
+		summarizeBy: sum
+		sourceColumn: score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column score_cost
+		dataType: double
+		lineageTag: eefd78cc-d92b-44ef-afb0-bb8f716a1a92
+		summarizeBy: sum
+		sourceColumn: score_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column score_risk
+		dataType: double
+		lineageTag: 0c395d5e-85d6-4adf-b8c9-dadb321569e0
+		summarizeBy: sum
+		sourceColumn: score_risk
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dv_score_risk
+		dataType: int64
+		formatString: 0
+		lineageTag: c37ebff5-f59b-4922-af91-59bb6fd67949
+		summarizeBy: sum
+		sourceColumn: dv_score_risk
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column score_size
+		dataType: double
+		lineageTag: a627fc89-c8da-4005-a57f-149c50a0c14b
+		summarizeBy: sum
+		sourceColumn: score_size
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column score_strategic_allignment
+		dataType: double
+		lineageTag: 83cc1ed3-0a83-4bdd-8a70-ee052cd00b37
+		summarizeBy: sum
+		sourceColumn: score_strategic_allignment
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column score_value
+		dataType: double
+		lineageTag: 38e2a1cf-b3d1-48ba-82c0-929c7d952041
+		summarizeBy: sum
+		sourceColumn: score_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dv_score_value
+		dataType: string
+		lineageTag: 4dba07b8-ed79-4a2e-8523-4202bced3cde
+		summarizeBy: none
+		sourceColumn: dv_score_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column short_description
+		dataType: string
+		lineageTag: ef164c58-6f7a-40f6-a82d-2abcc4557716
+		summarizeBy: none
+		sourceColumn: short_description
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column size
+		dataType: string
+		lineageTag: c410c93c-1c84-4008-b0b0-902d7d816d75
+		summarizeBy: none
+		sourceColumn: size
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_size
+		dataType: string
+		lineageTag: 9ab73dc2-804d-4c7c-b4f9-b115ec316e3e
+		summarizeBy: none
+		sourceColumn: dv_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column skills
+		dataType: string
+		lineageTag: 1f072819-59cb-46c8-ba39-a72dc0c46144
+		summarizeBy: none
+		sourceColumn: skills
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_due
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 09532345-5906-42c7-b47f-ab55815d4786
+		summarizeBy: none
+		sourceColumn: sla_due
+
+		variation Variación
+			isDefault
+			relationship: a8e075db-5965-45a3-9732-9d10df9f457a
+			defaultHierarchy: LocalDateTable_fac16460-e7c4-45ae-889d-6840c5e3bb24.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column stage
+		dataType: string
+		lineageTag: 3b6528bf-be14-438c-8009-069c23c444d9
+		summarizeBy: none
+		sourceColumn: stage
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b08b5467-53be-4bc1-9f89-08c61549e85f
+		summarizeBy: none
+		sourceColumn: start_date
+
+		variation Variación
+			isDefault
+			relationship: 164d9882-c6cb-4269-8d13-191da5d29304
+			defaultHierarchy: LocalDateTable_7eba3c9f-6f97-4aee-84a8-bd3dc41f3f89.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: int64
+		formatString: 0
+		lineageTag: 3f04c6cd-6c72-4e90-8875-5ee5a80dec8a
+		summarizeBy: sum
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_state
+		dataType: string
+		lineageTag: 7b84a853-3e63-4b6b-8a1e-37ecee585d23
+		summarizeBy: none
+		sourceColumn: dv_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column strategic_objectives
+		dataType: string
+		lineageTag: c19a7d26-3f02-443f-b757-6d6fde41ecd8
+		summarizeBy: none
+		sourceColumn: strategic_objectives
+
+		annotation SummarizationSetBy = Automatic
+
+	column submitted_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d136c89d-1a35-4e60-bd4a-3ce3794ce21a
+		summarizeBy: none
+		sourceColumn: submitted_date
+
+		variation Variación
+			isDefault
+			relationship: e5c16308-e98d-4799-aaf8-96d92c273289
+			defaultHierarchy: LocalDateTable_ab6d4600-26f4-4416-bd26-d6b4793c48cb.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column submitter
+		dataType: string
+		lineageTag: 3ae45177-ef57-473c-973f-8b8d841b696c
+		summarizeBy: none
+		sourceColumn: submitter
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_submitter
+		dataType: string
+		lineageTag: 1a82e75f-e8b5-48b1-b214-6002896a570d
+		summarizeBy: none
+		sourceColumn: dv_submitter
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_class_name
+		dataType: string
+		lineageTag: ea948d8a-30bd-4421-8c79-926844788595
+		summarizeBy: none
+		sourceColumn: sys_class_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_sys_class_name
+		dataType: string
+		lineageTag: 029fcbe4-a5ce-48f9-9eea-1f81ac778bf9
+		summarizeBy: none
+		sourceColumn: dv_sys_class_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_by
+		dataType: string
+		lineageTag: 0ab3d84f-78d9-466c-b659-44770207160a
+		summarizeBy: none
+		sourceColumn: sys_created_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bf427547-d9e2-4427-ad2f-bdf111da8ffa
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: 300ea0ec-df0c-4665-b3ee-19efff46e29c
+			defaultHierarchy: LocalDateTable_bfefe236-19e1-41b9-93b7-15a930b5a050.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_domain
+		dataType: string
+		lineageTag: c9a1f2ca-fd22-427e-812c-64b4d9d36a37
+		summarizeBy: none
+		sourceColumn: sys_domain
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_domain_path
+		dataType: string
+		lineageTag: a83b6851-3fc3-463d-a526-d6f594eac2e5
+		summarizeBy: none
+		sourceColumn: sys_domain_path
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: 600d8468-ff36-4b81-960d-5151268cc052
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_mod_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 2155c042-98b6-4cbb-a5c0-38051ff9a87c
+		summarizeBy: sum
+		sourceColumn: sys_mod_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_tags
+		dataType: string
+		lineageTag: 4418defe-da1b-4380-895f-6615f4006a84
+		summarizeBy: none
+		sourceColumn: sys_tags
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_updated_by
+		dataType: string
+		lineageTag: 5fffd8cd-95d6-4864-82b6-649ce16da9cb
+		summarizeBy: none
+		sourceColumn: sys_updated_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_updated_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3037af78-7c2f-4291-b784-57aeb88e6187
+		summarizeBy: none
+		sourceColumn: sys_updated_on
+
+		variation Variación
+			isDefault
+			relationship: 33756841-01ff-4ae2-9659-adc2e623fbc1
+			defaultHierarchy: LocalDateTable_a409ab41-ccf2-4806-b7d8-2eec137667b0.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_effective_number
+		dataType: string
+		lineageTag: 9cd40bf1-ec36-4b86-a5e3-e1d065537a61
+		summarizeBy: none
+		sourceColumn: task_effective_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_for
+		dataType: string
+		lineageTag: 8d9a376d-4d74-4fc4-952a-d8c2b6497b3c
+		summarizeBy: none
+		sourceColumn: task_for
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_task_for
+		dataType: string
+		lineageTag: aa891269-4ef2-448c-905a-0beefe774c64
+		summarizeBy: none
+		sourceColumn: dv_task_for
+
+		annotation SummarizationSetBy = Automatic
+
+	column time_worked
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e4d9ae4d-eb5b-4af7-8ee2-cbc9cd1e9a25
+		summarizeBy: none
+		sourceColumn: time_worked
+
+		variation Variación
+			isDefault
+			relationship: f7c84956-d889-4e82-8139-38cb5b63c7e4
+			defaultHierarchy: LocalDateTable_21b3e93b-0487-47af-a4cb-ec93ff2aca0d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_time_worked
+		dataType: string
+		lineageTag: f6babceb-e843-4d26-84a1-46b5ec933fd9
+		summarizeBy: none
+		sourceColumn: dv_time_worked
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_costs
+		dataType: double
+		lineageTag: f4520c5d-50b6-434c-aaa9-acd867c41e3f
+		summarizeBy: sum
+		sourceColumn: total_costs
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column type
+		dataType: string
+		lineageTag: 27eb9487-0d10-48e4-a1bd-4ba06da06576
+		summarizeBy: none
+		sourceColumn: type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_type
+		dataType: string
+		lineageTag: 8930267f-68de-4872-a2f1-19474216679b
+		summarizeBy: none
+		sourceColumn: dv_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_acciona_priority
+		dataType: int64
+		formatString: 0
+		lineageTag: 1e94ba8f-9152-4a6a-a20d-6b3af96c27f3
+		summarizeBy: sum
+		sourceColumn: u_acciona_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_actual_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ec03f2aa-dd5e-42cf-8663-16e2f871f7c5
+		summarizeBy: none
+		sourceColumn: u_actual_end_date
+
+		variation Variación
+			isDefault
+			relationship: cc7bce0f-7db9-41d4-bf93-19e4cd0a7d3a
+			defaultHierarchy: LocalDateTable_bd5b6753-051c-4a31-89b5-746df0b40c70.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_actual_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c1d096ee-74ac-4833-a3ba-4ba4f5d8a415
+		summarizeBy: none
+		sourceColumn: u_actual_start_date
+
+		variation Variación
+			isDefault
+			relationship: 80826657-50fa-4b01-be4a-db18edf8cd81
+			defaultHierarchy: LocalDateTable_cebe0786-d1b8-49dc-b627-80d1c10757df.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_affected_portfolios
+		dataType: string
+		lineageTag: d182baf8-4283-4530-8599-a78c3ae458d0
+		summarizeBy: none
+		sourceColumn: u_affected_portfolios
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_ambito_global
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a3a23cb6-8604-4fc3-84da-dc2bdf27234f
+		summarizeBy: none
+		sourceColumn: u_ambito_global
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_analysis_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b5fab791-e1ac-4038-824a-f834bd4aa17a
+		summarizeBy: none
+		sourceColumn: u_analysis_date
+
+		variation Variación
+			isDefault
+			relationship: 94d497b6-06a2-48b4-b5b9-13ab95e1269e
+			defaultHierarchy: LocalDateTable_0de99c57-c650-487c-b8d1-518cb82b73c5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_approval_sent
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5d2df21c-fc53-4b9b-8bac-76d009ccbda2
+		summarizeBy: none
+		sourceColumn: u_approval_sent
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_approved_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: dfde34e8-bec8-4132-b8b2-93f41f0ccc1b
+		summarizeBy: none
+		sourceColumn: u_approved_date
+
+		variation Variación
+			isDefault
+			relationship: d07f122c-0c18-4f7e-af8c-8e0d97836255
+			defaultHierarchy: LocalDateTable_57c0e359-d268-4d80-a702-96932bb7555e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_approver
+		dataType: string
+		lineageTag: 6a643cbb-45bc-47dd-bf51-b71bdffc207c
+		summarizeBy: none
+		sourceColumn: u_approver
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_approver
+		dataType: string
+		lineageTag: 4b2a7b49-5680-478e-ba2a-63816266810b
+		summarizeBy: none
+		sourceColumn: dv_u_approver
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_architecture_analysis
+		dataType: string
+		lineageTag: e713471f-dd11-42c9-aeee-fee067086636
+		summarizeBy: none
+		sourceColumn: u_architecture_analysis
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_business_applications
+		dataType: string
+		lineageTag: cecc98ad-bc53-41c5-947e-736f227ed8d5
+		summarizeBy: none
+		sourceColumn: u_business_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_business_applications
+		dataType: string
+		lineageTag: 501abfad-e018-4e44-8d2d-3d5c1af996b1
+		summarizeBy: none
+		sourceColumn: dv_u_business_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_business_line
+		dataType: string
+		lineageTag: 2f8b6204-2007-44a3-baba-e704fa246bcf
+		summarizeBy: none
+		sourceColumn: u_business_line
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_business_line
+		dataType: string
+		lineageTag: d70dade2-2e4f-42f9-9ce8-49f19a81972d
+		summarizeBy: none
+		sourceColumn: dv_u_business_line
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_catalog
+		dataType: string
+		lineageTag: 9a71cae2-fe89-4c3c-a785-d9c42a8409a9
+		summarizeBy: none
+		sourceColumn: u_catalog
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_catalog
+		dataType: string
+		lineageTag: aa2f400f-6a9b-4044-b803-c7bc9a8e36c6
+		summarizeBy: none
+		sourceColumn: dv_u_catalog
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_company
+		dataType: string
+		lineageTag: 337c2357-7745-4228-8b67-453eae3d043a
+		summarizeBy: none
+		sourceColumn: u_company
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_company
+		dataType: string
+		lineageTag: 9ca493d1-d0e0-4180-9eff-100ab5375422
+		summarizeBy: none
+		sourceColumn: dv_u_company
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_concurrent_users
+		dataType: string
+		lineageTag: adcf2a84-608d-4382-8c64-2ba3fe652efa
+		summarizeBy: none
+		sourceColumn: u_concurrent_users
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_concurrent_users
+		dataType: string
+		lineageTag: 39e4be3d-e130-45de-b835-e8800fa324db
+		summarizeBy: none
+		sourceColumn: dv_u_concurrent_users
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_country
+		dataType: string
+		lineageTag: 3eb2a208-dc1b-4459-9310-a0766bce32e4
+		summarizeBy: none
+		sourceColumn: u_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_country
+		dataType: string
+		lineageTag: 8d8fb0ab-5519-4b0e-b568-7dae67bd4934
+		summarizeBy: none
+		sourceColumn: dv_u_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_criticality_level
+		dataType: string
+		lineageTag: 2dfdcc3c-6178-42db-b944-8d12457d279e
+		summarizeBy: none
+		sourceColumn: u_criticality_level
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_criticality_level
+		dataType: string
+		lineageTag: 87d055a9-a23d-4f25-b2ee-21b4a56af719
+		summarizeBy: none
+		sourceColumn: dv_u_criticality_level
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_current_situation
+		dataType: string
+		lineageTag: 8483128a-c96a-4506-9ad9-035d41773ad6
+		summarizeBy: none
+		sourceColumn: u_current_situation
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_demand_category
+		dataType: string
+		lineageTag: 7ec6272d-08c4-463c-bee5-423c55c0f636
+		summarizeBy: none
+		sourceColumn: u_demand_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_demand_category
+		dataType: string
+		lineageTag: f99c3a33-e0d2-43a6-8f70-c4ab4d411c52
+		summarizeBy: none
+		sourceColumn: dv_u_demand_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_demand_type_description
+		dataType: string
+		lineageTag: c748144e-0a17-477e-a246-a1c9482e5e24
+		summarizeBy: none
+		sourceColumn: u_demand_type_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_department
+		dataType: string
+		lineageTag: 7b66f344-131c-449e-8f17-fc4c7c157dc1
+		summarizeBy: none
+		sourceColumn: u_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_department
+		dataType: string
+		lineageTag: 885a6eaa-a3e9-42c3-8b30-36915e49ab01
+		summarizeBy: none
+		sourceColumn: dv_u_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_dependencies
+		dataType: string
+		lineageTag: 4beaa482-3a92-49bd-957f-791b26bbcc2c
+		summarizeBy: none
+		sourceColumn: u_dependencies
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_due_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bd980895-b59f-4481-a8c6-d33403a6815d
+		summarizeBy: none
+		sourceColumn: u_due_date
+
+		variation Variación
+			isDefault
+			relationship: d9aad735-4552-4e04-90fb-b4a975d3d7c0
+			defaultHierarchy: LocalDateTable_b8267f33-284b-4510-b8a0-7c44d4177273.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_duration_to_manage_a_demand
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 817f3856-4de5-4681-8f2b-ee0964da85d8
+		summarizeBy: none
+		sourceColumn: u_duration_to_manage_a_demand
+
+		variation Variación
+			isDefault
+			relationship: 4c864852-a50b-45c9-b4cb-b0f82fee5368
+			defaultHierarchy: LocalDateTable_86714c61-f0bc-4da3-b48c-0d733d4766f8.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_duration_to_manage_a_demand
+		dataType: string
+		lineageTag: 0f22a5f5-96f9-4797-8b6e-1fa3d43884a6
+		summarizeBy: none
+		sourceColumn: dv_u_duration_to_manage_a_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_duration_to_reach_analysis
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ae8da22f-5e12-4782-aefb-e3639ebb538b
+		summarizeBy: none
+		sourceColumn: u_duration_to_reach_analysis
+
+		variation Variación
+			isDefault
+			relationship: 2e2a4727-98cc-485b-88e0-3879d21a56d7
+			defaultHierarchy: LocalDateTable_e12b52b2-aab8-4015-ada5-76c682947f15.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_duration_to_reach_analysis
+		dataType: string
+		lineageTag: 3b75873d-4fa2-4a22-8a45-6df9433dd0c4
+		summarizeBy: none
+		sourceColumn: dv_u_duration_to_reach_analysis
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_execution_type
+		dataType: string
+		lineageTag: 1aeba3d5-7d5d-4ba2-963b-dbe71f64d4fd
+		summarizeBy: none
+		sourceColumn: u_execution_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_execution_type
+		dataType: string
+		lineageTag: de21a660-f43e-4c81-ab6d-3aea62bc598b
+		summarizeBy: none
+		sourceColumn: dv_u_execution_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_external_vendor
+		dataType: string
+		lineageTag: 6ef89adc-6673-43e6-87ed-e3f82de7a283
+		summarizeBy: none
+		sourceColumn: u_external_vendor
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_external_vendor
+		dataType: string
+		lineageTag: e73dea9f-2498-4713-95cd-5e07be88f7ec
+		summarizeBy: none
+		sourceColumn: dv_u_external_vendor
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_first_commettee_state
+		dataType: string
+		lineageTag: 27708bda-0c24-45a1-8557-72b3673a1d8c
+		summarizeBy: none
+		sourceColumn: u_first_commettee_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_first_commettee_state
+		dataType: string
+		lineageTag: a520f2d0-0988-4f41-b90e-105ab9c484e5
+		summarizeBy: none
+		sourceColumn: dv_u_first_commettee_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_first_committee_date
+		dataType: string
+		lineageTag: 6af2ea9d-c952-4bcc-95d2-a766a519d2e0
+		summarizeBy: none
+		sourceColumn: u_first_committee_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_first_committee_date
+		dataType: string
+		lineageTag: 21177805-5f44-4b99-9847-09e6d11f60e5
+		summarizeBy: none
+		sourceColumn: dv_u_first_committee_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_frecuency_of_use
+		dataType: string
+		lineageTag: 9e66ee1e-a38b-494c-9b30-7f51cdb6400d
+		summarizeBy: none
+		sourceColumn: u_frecuency_of_use
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_frecuency_of_use
+		dataType: string
+		lineageTag: 89fb56bc-fbf3-431d-a8b1-ae4dfa3cbade
+		summarizeBy: none
+		sourceColumn: dv_u_frecuency_of_use
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impact
+		dataType: string
+		lineageTag: cb05d9df-f38c-46e1-aafe-0d746102bd5e
+		summarizeBy: none
+		sourceColumn: u_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_impact
+		dataType: string
+		lineageTag: e83a53c1-454c-4b82-98cd-52beedf9a4ea
+		summarizeBy: none
+		sourceColumn: dv_u_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impacted_companies
+		dataType: string
+		lineageTag: 8e854220-d4f3-40c9-97b6-d667d836e9e4
+		summarizeBy: none
+		sourceColumn: u_impacted_companies
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impacted_countries
+		dataType: string
+		lineageTag: bd313244-a130-43a4-82db-6443592eb134
+		summarizeBy: none
+		sourceColumn: u_impacted_countries
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impacted_groups
+		dataType: string
+		lineageTag: 26b6588a-8e90-4991-82f1-19db9e790e15
+		summarizeBy: none
+		sourceColumn: u_impacted_groups
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_is_parent
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a96b5a20-d800-4a9a-93ea-e72d7fdbf27d
+		summarizeBy: none
+		sourceColumn: u_is_parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_metal
+		dataType: string
+		lineageTag: d15a0b3c-4e0b-4b5d-81f7-94a15761e323
+		summarizeBy: none
+		sourceColumn: u_metal
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_metal
+		dataType: string
+		lineageTag: e1fefab0-3fa7-4766-8a78-21ff00652595
+		summarizeBy: none
+		sourceColumn: dv_u_metal
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_module
+		dataType: string
+		lineageTag: 53ffb533-73e4-47f9-8d0f-9b8191eecf38
+		summarizeBy: none
+		sourceColumn: u_module
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_module
+		dataType: string
+		lineageTag: 03f37d25-f1fd-45b4-bad0-fe3ec3f48599
+		summarizeBy: none
+		sourceColumn: dv_u_module
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_old_state
+		dataType: string
+		lineageTag: 08b2bec1-5d51-40dc-8103-67fd2e860685
+		summarizeBy: none
+		sourceColumn: u_old_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_openned_up
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0c0e1a62-f795-4766-9ce6-556549c036f0
+		summarizeBy: none
+		sourceColumn: u_openned_up
+
+		variation Variación
+			isDefault
+			relationship: 541a4075-c440-4ebf-ac87-081a08603c17
+			defaultHierarchy: LocalDateTable_d14c9b30-14e2-4d3e-b473-2b1718aaeb25.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_parent_demand
+		dataType: string
+		lineageTag: f2694ec3-3bb7-48cf-b629-cb306182943e
+		summarizeBy: none
+		sourceColumn: u_parent_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_parent_demand
+		dataType: string
+		lineageTag: aedd8a86-7b7b-45fe-b98e-0699d1fb659a
+		summarizeBy: none
+		sourceColumn: dv_u_parent_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_phone
+		dataType: string
+		lineageTag: 3a023f6c-5009-45cc-8ec0-2a991692130d
+		summarizeBy: none
+		sourceColumn: u_phone
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_pilot
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: bf683432-9d33-48d2-85c5-e716f5696230
+		summarizeBy: none
+		sourceColumn: u_pilot
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_planned_demand
+		dataType: string
+		lineageTag: 93b96f29-0c96-4253-85ec-38fa4e01e0a3
+		summarizeBy: none
+		sourceColumn: u_planned_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_planned_demand
+		dataType: string
+		lineageTag: f61a81e8-b969-4b82-9c23-46dd22a37500
+		summarizeBy: none
+		sourceColumn: dv_u_planned_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_previous_groups
+		dataType: string
+		lineageTag: c56ca27e-5085-497f-99d9-d2907d20798d
+		summarizeBy: none
+		sourceColumn: u_previous_groups
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_priority_justification
+		dataType: string
+		lineageTag: 60b38109-e565-430c-9e25-1ecdc57aab04
+		summarizeBy: none
+		sourceColumn: u_priority_justification
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_progress
+		dataType: double
+		lineageTag: 3fe7c584-edda-480c-95d1-2ff719c63166
+		summarizeBy: sum
+		sourceColumn: u_progress
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_project_manager
+		dataType: string
+		lineageTag: a0114f82-fc51-4afb-ad2d-0d079f0df219
+		summarizeBy: none
+		sourceColumn: u_project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_project_manager
+		dataType: string
+		lineageTag: 4185cb66-db6d-4274-966d-70df3c7db9b5
+		summarizeBy: none
+		sourceColumn: dv_u_project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_qualification_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 58a51830-a440-408a-97c8-b03793d8146a
+		summarizeBy: none
+		sourceColumn: u_qualification_date
+
+		variation Variación
+			isDefault
+			relationship: 01a33c8a-3a0a-46dd-a05a-31a8d9d2d6a9
+			defaultHierarchy: LocalDateTable_99090bfe-7e59-45bb-9a4e-4597ddd77305.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_reasons_for_delay
+		dataType: string
+		lineageTag: 9db37b8d-451d-4ec9-a6be-8eede96bc6d3
+		summarizeBy: none
+		sourceColumn: u_reasons_for_delay
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_reasons_for_delay
+		dataType: string
+		lineageTag: 4549e3d9-3809-494a-91cc-7ed16faecbfc
+		summarizeBy: none
+		sourceColumn: dv_u_reasons_for_delay
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_ref_country
+		dataType: string
+		lineageTag: a1af8cc1-8c51-448d-8a48-3d7811746c27
+		summarizeBy: none
+		sourceColumn: u_ref_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_ref_country
+		dataType: string
+		lineageTag: 62fe40a6-7fbb-42dd-a9a0-9b7c16d78459
+		summarizeBy: none
+		sourceColumn: dv_u_ref_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_reg_country
+		dataType: string
+		lineageTag: 0693840f-f645-47a7-8879-2af9b98fab19
+		summarizeBy: none
+		sourceColumn: u_reg_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_reg_country
+		dataType: string
+		lineageTag: f8910580-6a44-40ef-9839-c0c411e2fad0
+		summarizeBy: none
+		sourceColumn: dv_u_reg_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_reg_department
+		dataType: string
+		lineageTag: 75ffc18a-c6f6-48a5-bffe-ade74f71aab3
+		summarizeBy: none
+		sourceColumn: u_reg_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_reg_department
+		dataType: string
+		lineageTag: 2441ff35-4f56-43f3-a522-79536255f3da
+		summarizeBy: none
+		sourceColumn: dv_u_reg_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_reg_division
+		dataType: string
+		lineageTag: c553e11a-1160-45cf-965d-fcc985a3da82
+		summarizeBy: none
+		sourceColumn: u_reg_division
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_reg_division
+		dataType: string
+		lineageTag: aea95f9f-969d-4267-8822-8c7ad45278c3
+		summarizeBy: none
+		sourceColumn: dv_u_reg_division
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_reg_user
+		dataType: string
+		lineageTag: e1053116-cc68-41fe-aa08-e241581f6585
+		summarizeBy: none
+		sourceColumn: u_reg_user
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_reg_user
+		dataType: string
+		lineageTag: 54493910-63cb-406b-ad32-29b64919c654
+		summarizeBy: none
+		sourceColumn: dv_u_reg_user
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_rejected_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7862ce98-7847-4c79-b7e9-3dfed5e4c6b5
+		summarizeBy: none
+		sourceColumn: u_rejected_date
+
+		variation Variación
+			isDefault
+			relationship: 839c66b2-ac0b-470d-9bae-5233f09db595
+			defaultHierarchy: LocalDateTable_279a76e8-4abb-43f2-addb-8059a8773dfd.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_relevant
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d669a98e-e63f-4ad8-8352-51f50c606e40
+		summarizeBy: none
+		sourceColumn: u_relevant
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_responded
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 319c66d1-bb91-48d2-bdb6-1ed7ecbfa2bc
+		summarizeBy: none
+		sourceColumn: u_responded
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_rfp
+		dataType: string
+		lineageTag: e56595cb-5407-4b1e-9588-1025ed1e7c9d
+		summarizeBy: none
+		sourceColumn: u_rfp
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_rfp
+		dataType: string
+		lineageTag: 47d86db2-559b-4f45-9949-c46ab8832da5
+		summarizeBy: none
+		sourceColumn: dv_u_rfp
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_run
+		dataType: double
+		lineageTag: 5d12540b-5eee-4db8-9838-bf00f4d2419d
+		summarizeBy: sum
+		sourceColumn: u_run
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_run_description
+		dataType: string
+		lineageTag: 08e1135c-3ec8-4f6c-9bfc-a9849ce7df1c
+		summarizeBy: none
+		sourceColumn: u_run_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_second_commettee_state
+		dataType: string
+		lineageTag: ed552b26-57b0-45f1-b72a-43a05fd61fa8
+		summarizeBy: none
+		sourceColumn: u_second_commettee_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_second_commettee_state
+		dataType: string
+		lineageTag: 7474b7f4-0ecd-4af5-8146-16bf720692cf
+		summarizeBy: none
+		sourceColumn: dv_u_second_commettee_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_second_committee_date
+		dataType: string
+		lineageTag: ff699f40-feed-4d43-b42b-ea4d362955ef
+		summarizeBy: none
+		sourceColumn: u_second_committee_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_second_committee_date
+		dataType: string
+		lineageTag: bf6f5ece-ed8f-49b8-8fa3-866169585c0b
+		summarizeBy: none
+		sourceColumn: dv_u_second_committee_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_size
+		dataType: string
+		lineageTag: 79219282-60a5-4047-8052-e2d2e215aa34
+		summarizeBy: none
+		sourceColumn: u_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_size
+		dataType: string
+		lineageTag: 7ebc8a74-eace-4d0d-b62f-966a5ffa4eec
+		summarizeBy: none
+		sourceColumn: dv_u_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_sourcing
+		dataType: string
+		lineageTag: 916cbd46-09a0-4dc2-a919-fca6925a58b4
+		summarizeBy: none
+		sourceColumn: u_sourcing
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8bfcd7cf-a8b9-42e4-ad07-19ed6443df73
+		summarizeBy: none
+		sourceColumn: u_start_date
+
+		variation Variación
+			isDefault
+			relationship: 7c45bf6c-502a-41d2-91f3-35398aeeab75
+			defaultHierarchy: LocalDateTable_e22b5caf-c437-4193-a76d-4e328ee1e403.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_state_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7ee3c153-dca9-45f7-91fd-778cdc727d72
+		summarizeBy: none
+		sourceColumn: u_state_date
+
+		variation Variación
+			isDefault
+			relationship: 3add699e-55c6-45e0-b217-d47fb826339d
+			defaultHierarchy: LocalDateTable_e594b856-4c84-481f-8af1-b21c068aea79.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_status_report
+		dataType: string
+		lineageTag: 5dcccae9-b272-42d7-888e-7b5aa86e1492
+		summarizeBy: none
+		sourceColumn: u_status_report
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_subcategory
+		dataType: string
+		lineageTag: 2af8c965-864a-4987-ba3a-58bcafe4f109
+		summarizeBy: none
+		sourceColumn: u_subcategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_subcategory
+		dataType: string
+		lineageTag: 8eaea71e-2642-44e3-b3f3-6a762381da4e
+		summarizeBy: none
+		sourceColumn: dv_u_subcategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_submission_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 53db4e3c-6277-4d52-a19d-12d59099b8c4
+		summarizeBy: none
+		sourceColumn: u_submission_date
+
+		variation Variación
+			isDefault
+			relationship: 2c6df955-698e-4418-84d6-6e24f8cd9786
+			defaultHierarchy: LocalDateTable_eace4081-cca5-4938-bb8a-9af3d35e987c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_tic_unit
+		dataType: string
+		lineageTag: f1d2e317-81e8-4fcf-a91f-7a548b349355
+		summarizeBy: none
+		sourceColumn: u_tic_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_tic_unit
+		dataType: string
+		lineageTag: 42a06fb0-9e54-42e5-ba08-627969300abd
+		summarizeBy: none
+		sourceColumn: dv_u_tic_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_time_to_manage_a_demand
+		dataType: int64
+		formatString: 0
+		lineageTag: 53f811a0-ac32-4cdf-8bc8-01c0db39501a
+		summarizeBy: sum
+		sourceColumn: u_time_to_manage_a_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_time_to_reach_analysis
+		dataType: int64
+		formatString: 0
+		lineageTag: 782d6789-2bb0-4541-a6c1-d21d8b401bf2
+		summarizeBy: sum
+		sourceColumn: u_time_to_reach_analysis
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_total_budget
+		dataType: double
+		lineageTag: 7df10e75-85b7-4c59-86e8-9da311afe46e
+		summarizeBy: sum
+		sourceColumn: u_total_budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_total_effort
+		dataType: string
+		lineageTag: 4b5cc09e-9cbf-42db-90e0-4da42cf1c67a
+		summarizeBy: none
+		sourceColumn: u_total_effort
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_total_effort_req
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3e2e6124-ce3f-4552-91bc-9d0a00189262
+		summarizeBy: none
+		sourceColumn: u_total_effort_req
+
+		variation Variación
+			isDefault
+			relationship: 2377a30f-2558-444b-a1fd-ac72d2514af0
+			defaultHierarchy: LocalDateTable_f7379367-5e0d-47da-aa52-157ade272795.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_total_effort_req
+		dataType: string
+		lineageTag: 7a6c4803-1aeb-436c-8728-9121ab9c8da5
+		summarizeBy: none
+		sourceColumn: dv_u_total_effort_req
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_total_planned_hours
+		dataType: double
+		lineageTag: 058a1b25-78b3-4efb-bbd9-4e2d35cd04b0
+		summarizeBy: sum
+		sourceColumn: u_total_planned_hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dv_upon_reject
+		dataType: string
+		lineageTag: 768c4ea1-14a6-45d3-8873-117c678f5c47
+		summarizeBy: none
+		sourceColumn: dv_upon_reject
+
+		annotation SummarizationSetBy = Automatic
+
+	column urgency
+		dataType: int64
+		formatString: 0
+		lineageTag: 97b739f4-67b5-4090-be68-b648703d996a
+		summarizeBy: sum
+		sourceColumn: urgency
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_urgency
+		dataType: string
+		lineageTag: 51a7b507-8bc5-459a-ae2d-3f843663b004
+		summarizeBy: none
+		sourceColumn: dv_urgency
+
+		annotation SummarizationSetBy = Automatic
+
+	column PortfolioActual
+		dataType: string
+		lineageTag: f8727169-9792-4149-bf6c-edfbf6ea51df
+		summarizeBy: none
+		sourceColumn: PortfolioActual
+
+		annotation SummarizationSetBy = Automatic
+
+	column Observaciones
+		dataType: string
+		lineageTag: d5eaaa88-be5d-46c6-8a2d-834aa4d39356
+		summarizeBy: none
+		sourceColumn: Observaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column approved_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4920a879-c0c2-4e1f-ac59-5c13b3345cf6
+		summarizeBy: none
+		sourceColumn: approved_end_date
+
+		variation Variación
+			isDefault
+			relationship: 7dfd761b-c57f-4570-b846-2cf60b8ee596
+			defaultHierarchy: LocalDateTable_2db27053-4024-442e-b3d6-bdb8ec3f0c2f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column approved_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 848b33b9-ca4c-4b4c-a46e-e81741260c98
+		summarizeBy: none
+		sourceColumn: approved_start_date
+
+		variation Variación
+			isDefault
+			relationship: 56de9cfc-2d53-4d5b-9c3d-0cbcc3bc3483
+			defaultHierarchy: LocalDateTable_e858c2c7-cd7d-4ca5-a7c2-6a0e7ba235e5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column calculation_type
+		dataType: string
+		lineageTag: 64686f8b-e369-4993-bcb9-43f07e03c8f2
+		summarizeBy: none
+		sourceColumn: calculation_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_calculation_type
+		dataType: string
+		lineageTag: 8599b3af-7867-42c5-90bc-14778204cbb0
+		summarizeBy: none
+		sourceColumn: dv_calculation_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column contract
+		dataType: string
+		lineageTag: f16795f4-7a87-4b17-b3ff-e2960962df49
+		summarizeBy: none
+		sourceColumn: contract
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_contract
+		dataType: string
+		lineageTag: 6eae5a95-6dba-46a7-a7a4-9f32c4593581
+		summarizeBy: none
+		sourceColumn: dv_contract
+
+		annotation SummarizationSetBy = Automatic
+
+	column model_id
+		dataType: string
+		lineageTag: 8d494aea-df04-41c8-b710-7220875525af
+		summarizeBy: none
+		sourceColumn: model_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_model_id
+		dataType: string
+		lineageTag: ac5013fd-882a-4f6f-a51f-30a0677a9b68
+		summarizeBy: none
+		sourceColumn: dv_model_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column software_model
+		dataType: string
+		lineageTag: eacfcb77-3b01-4083-83a4-f2c8099daa81
+		summarizeBy: none
+		sourceColumn: software_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_software_model
+		dataType: string
+		lineageTag: 9e02daab-6e81-42d5-a135-d587e6e0e615
+		summarizeBy: none
+		sourceColumn: dv_software_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_commented
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: baf5734a-0b53-45aa-8f55-469fb4333785
+		summarizeBy: none
+		sourceColumn: u_commented
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_deferred_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1813b775-63c1-4ab5-aa63-a029181dae51
+		summarizeBy: none
+		sourceColumn: u_deferred_end_date
+
+		variation Variación
+			isDefault
+			relationship: 38acf734-b998-47fa-993c-db47b55f42a7
+			defaultHierarchy: LocalDateTable_4918c525-c842-4fd8-907c-0166b9704101.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_deferred_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6b1a99dd-b52d-42a7-970d-af17530d8062
+		summarizeBy: none
+		sourceColumn: u_deferred_start_date
+
+		variation Variación
+			isDefault
+			relationship: 520b8865-69dd-4f72-8df9-906d01587b50
+			defaultHierarchy: LocalDateTable_476e922f-4ce1-4ee9-879c-82cfc377fe11.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_digital_transformation
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 16cad5f4-b48d-413d-8b9a-11fc4f6ed874
+		summarizeBy: none
+		sourceColumn: u_digital_transformation
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_fases_rfi
+		dataType: string
+		lineageTag: 41c4ff64-cf4c-4cec-b5e5-fd78fdd7b9d5
+		summarizeBy: none
+		sourceColumn: u_fases_rfi
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_fases_rfi
+		dataType: string
+		lineageTag: 4422a4df-c15a-424c-8770-8a858c16eb36
+		summarizeBy: none
+		sourceColumn: dv_u_fases_rfi
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_operational_committee_comment
+		dataType: string
+		lineageTag: 0cb63a74-01b7-4aeb-b796-517163c7aca1
+		summarizeBy: none
+		sourceColumn: u_operational_committee_comment
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_origin_country_of_the_demand
+		dataType: string
+		lineageTag: 409bb632-9838-4672-a349-60e6f6ca4fd1
+		summarizeBy: none
+		sourceColumn: u_origin_country_of_the_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_payroll_area
+		dataType: string
+		lineageTag: 89567525-f66a-46dd-9822-ea452919641f
+		summarizeBy: none
+		sourceColumn: u_payroll_area
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_payroll_area
+		dataType: string
+		lineageTag: 1a8fa8e3-bed4-4fce-853e-0e24266641d4
+		summarizeBy: none
+		sourceColumn: dv_u_payroll_area
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_planned_capital
+		dataType: double
+		lineageTag: 71e6b39f-c2f8-45ba-92fd-efa565dd577d
+		summarizeBy: sum
+		sourceColumn: u_planned_capital
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_planned_operating
+		dataType: double
+		lineageTag: 5bc8444f-2cc1-413f-85af-de56329844de
+		summarizeBy: sum
+		sourceColumn: u_planned_operating
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_program_manager
+		dataType: string
+		lineageTag: 8eb59638-7033-4116-9c21-9d340b9cd6a9
+		summarizeBy: none
+		sourceColumn: u_program_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_program_manager
+		dataType: string
+		lineageTag: 46abd05f-6273-49b1-a775-ef7777390622
+		summarizeBy: none
+		sourceColumn: dv_u_program_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_relevant_project_for_cio
+		dataType: string
+		lineageTag: 7535df54-0f68-437c-843a-40aea6f2e72e
+		summarizeBy: none
+		sourceColumn: u_relevant_project_for_cio
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_rfi
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1b898bd3-1c5f-4292-9300-08472c7b4678
+		summarizeBy: none
+		sourceColumn: u_rfi
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_selected_suppliers
+		dataType: string
+		lineageTag: b40db9c9-4595-49db-a4b1-c8acb83b9181
+		summarizeBy: none
+		sourceColumn: u_selected_suppliers
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_targets
+		dataType: string
+		lineageTag: be748e90-4295-4ec7-ad42-81359b8c971e
+		summarizeBy: none
+		sourceColumn: u_targets
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_total_planned_cost
+		dataType: double
+		lineageTag: 75fa0e75-58d5-498b-bf20-6d7ddf2bb8d4
+		summarizeBy: sum
+		sourceColumn: u_total_planned_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'ZCC_URL Demanda' = CONCATENATE("https://acciona.service-now.com/dmn_demand.do?sysparm_query=number%3d",Demandas[number])
+		lineageTag: cf503f90-bfce-4ee9-877a-333f8c1131f6
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Primera_Fecha_Inicio_Demanda = ```
+			
+			VAR MinWorkStartDate = 
+			    CALCULATE(
+			        MIN('Completa'[work_start]),
+			        FILTER(
+			            'Completa',
+			            'Completa'[UnionConDemanda] = 'Demandas'[sys_id]
+			        )
+			    )
+			RETURN
+			IF(
+			    NOT(ISBLANK(MinWorkStartDate)),
+			    MinWorkStartDate,
+			    IF(
+			        NOT(ISBLANK('Demandas'[start_date])),
+			        'Demandas'[start_date],
+			        BLANK()
+			    )
+			)
+			```
+		formatString: dd/mm/yyyy
+		lineageTag: ae829ecc-5acd-4941-b76a-b9a90fc3022e
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 5abbb727-e539-4d4d-a168-4be6d5321aab
+			defaultHierarchy: LocalDateTable_636b0a11-939f-4283-85ba-48e7192347fb.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column ZCC_Ultima_Fecha_Fin_Demanda = ```
+			
+			VAR MaxWorkEndDate = 
+			    CALCULATE(
+			        MAX('Completa'[schedule_end_date]),
+			        FILTER(
+			            'Completa',
+			            'Completa'[UnionConDemanda] = 'Demandas'[sys_id]
+			        )
+			    )
+			RETURN
+			IF(
+			    NOT(ISBLANK(MaxWorkEndDate)),
+			    MaxWorkEndDate,
+			    IF(
+			        NOT(ISBLANK('Demandas'[due_date])),
+			        'Demandas'[due_date],
+			        BLANK()
+			    )
+			)
+			```
+		formatString: dd/mm/yyyy
+		lineageTag: 049e31dc-6a14-4e85-a2e6-0fda0bffb70f
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 8d6efb12-5b95-4b01-8486-536ee134629b
+			defaultHierarchy: LocalDateTable_c48d018b-b78a-482d-ab5a-28213d9ace68.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column ZCC_ProyectoAsociado = ```
+			
+			VAR Proyecto = 
+			    CALCULATE(
+			        MIN('Completa'[number]),
+			        FILTER(
+			            'Completa',
+			            'Completa'[UnionConDemanda] = 'Demandas'[sys_id]
+			        )
+			    )
+			RETURN 
+			IF(
+			    ISBLANK(Proyecto),
+			    BLANK(),
+			    Proyecto
+			)
+			```
+		lineageTag: efa72001-2d05-4b2e-be93-4e5d6edb3981
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_NegocioAsociado = RELATED('Equipos Gestores'[Negocio])
+		lineageTag: 7265b27c-ae89-4c3a-8809-aa4a3db1274d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tiene_Proyectos/Evolutivos_Asociados =
+			
+			IF(
+			    ISBLANK(Demandas[ZCC_ProyectoAsociado]),
+			    "No tiene",
+			    "Si tiene"
+			)
+		lineageTag: 08c56adc-7ac4-4cc6-a5cd-c28ce823e1cf
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column EsTransfDigit = IF(Demandas[strategic_objectives] = "7b324ef5dbb1a3000a3f944adb96199e", TRUE(), FALSE())
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c102a140-c4b8-4dd7-bea1-3209f21a6874
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_enhancement
+		dataType: string
+		lineageTag: 00358a9c-bd25-4f73-a5fe-8c5b00b125f1
+		summarizeBy: none
+		sourceColumn: dv_enhancement
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZCC_Tamaño = ```
+			
+			SWITCH(
+			    'Demandas'[size],
+			    "xsmall", "XS",
+			    "newsmall", "S",
+			    "small", "S",
+			    "medium", "M",
+			    "newmedium", "M",
+			    BLANK() 
+			)
+			```
+		lineageTag: 5468c340-1105-456e-b924-032db38c9c32
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Demandas = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Databases("QECCDWH.ACCIONA.INT:60001"),
+				    DWH = Origen{[Name="DWH"]}[Data],
+				    SERV_NOW_EN_V_dmn_demand = DWH{[Schema="SERV_NOW_EN",Item="V_dmn_demand"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_EN_V_dmn_demand,{"work_notes_list", "work_start", "u_idl", "u_id_plan", "watch_list", "wf_activity", "dv_wf_activity", "work_end", "work_notes", "user_input", "variables", "visited_state", "universal_request", "dv_universal_request", "dv_upon_approval", "upon_reject", "u_volume_impacted_users", "upon_approval", "enablers", "enhancement", "escalation", "idea", "dv_idea", "investment_class", "dv_investment_class", "investment_type", "dv_investment_type", "knowledge", "labor_costs", "out_of_scope", "primary_program", "dv_primary_program", "rate_model", "dv_rate_model", "reassignment_count", "rejection_goto", "dv_rejection_goto", "scrum_epic", "dv_scrum_epic", "scrum_story", "dv_scrum_story", "service_offering", "dv_service_offering"}),
+				    #"Filas en blanco eliminadas" = Table.SelectRows(#"Columnas quitadas", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+				    #"Errores quitados" = Table.RemoveRowsWithErrors(#"Filas en blanco eliminadas", {"active"})
+				in
+				    #"Errores quitados"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

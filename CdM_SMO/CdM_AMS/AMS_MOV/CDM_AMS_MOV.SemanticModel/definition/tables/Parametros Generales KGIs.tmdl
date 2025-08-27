@@ -1,0 +1,54 @@
+table 'Parametros Generales KGIs'
+	lineageTag: 1dc58307-7c85-4f23-804e-1de993949269
+
+	column KGI
+		dataType: string
+		lineageTag: 55111e01-1468-40ac-9777-0006768086f2
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: 03da2bcb-ebe0-4b6a-9a10-717b39849821
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos por KGI'
+		dataType: int64
+		formatString: 0
+		lineageTag: 076ca9ed-af2b-44a4-ad1e-19d14ab24c5a
+		summarizeBy: sum
+		sourceColumn: Puntos por KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos Obtenidos' = ('Parametros Generales KGIs'[Puntos por KGI]*1)
+		formatString: 0
+		lineageTag: fc720e14-bd9e-4022-bb3c-0761dd369331
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros Generales KGIs-0a9d686e-8b1f-4685-94bc-a1c8ecae7c87' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/" & AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    #"Parametros Generales KGIs_Sheet" = Origen{[Item="Parametros Generales KGIs",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Parametros Generales KGIs_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"KGI", type text}, {"Descripción", type text}, {"Puntos por KGI", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,36 @@
+table '% Semáforo alertas'
+	lineageTag: fcd3096d-241e-4e7d-81af-093296ade637
+
+	column Color
+		dataType: string
+		lineageTag: 32050a09-a417-4bb8-9a33-90f8eaffbc37
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	column %
+		dataType: double
+		lineageTag: a6968e23-f24d-49ba-931e-774b91fbf1ca
+		summarizeBy: sum
+		sourceColumn: %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition '% Semáforo alertas' = m
+		mode: import
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents("https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRO/Documentos%20compartidos/Demanda/EN_COORD_CDM-CONFIGURACION.xlsx"), null, true),
+				    #"% Semáforo alertas_Sheet" = Origen{[Item="% Semáforo alertas",Kind="Sheet"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(#"% Semáforo alertas_Sheet",{"Column1", "Column2", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10", "Column11", "Column12"}),
+				    #"Filas en blanco eliminadas" = Table.SelectRows(#"Columnas quitadas", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Filas en blanco eliminadas", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Color", type text}, {"%", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,68 @@
+table 'Parametros KGI16'
+	excludeFromModelRefresh
+	lineageTag: 7be01342-c436-416e-92c5-425c5c1ea023
+
+	column Prioridad
+		dataType: string
+		lineageTag: 7cd899b5-16f1-452c-847d-1ad950a216e7
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI16'
+		dataType: int64
+		formatString: 0
+		lineageTag: ea626585-5dac-4834-98b5-f5d83e0c25b5
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI16
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 7310e507-ca4f-4f48-8ce5-ef8f0360529a
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de desviación máxima %'
+		dataType: double
+		lineageTag: b85435e1-4815-4970-b51b-75ce9cd3a4a5
+		summarizeBy: sum
+		sourceColumn: Tasa de desviación máxima %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Peso del KGI %'
+		dataType: double
+		lineageTag: 0324ca12-c4fa-4a7c-aff0-adb9ced53207
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros KGI16-af3fb681-3afd-4353-ae5e-511fc84ee722' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/" & AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    #"Parametros KGI1-6_Sheet" = Origen{[Item="Parametros KGI1-6",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Parametros KGI1-6_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Prioridad", type text}, {"Tasa de desviación máxima %", type number}, {"Peso del KGI %", type number}, {"Puntos de KGI16", Int64.Type}, {"KGI", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,150 @@
+table 'PRO - Mejoras propuestas'
+	lineageTag: fb94c447-3e39-4a7d-a315-b34220020df0
+
+	column ID
+		dataType: string
+		lineageTag: da7e25f5-a100-4e0a-bfb7-08e96e796acd
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nombre
+		dataType: string
+		lineageTag: a303e527-f883-4a71-b223-2142294c5022
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: eae50bb6-e540-47d6-adc9-0abc40660c61
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column Responsable
+		dataType: string
+		lineageTag: c1da7b88-56b7-4019-b4d9-a4784a460d01
+		summarizeBy: none
+		sourceColumn: Responsable
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado de Aprobación'
+		dataType: string
+		lineageTag: a0a931cc-ded8-4755-b6ca-80727c8b6a40
+		summarizeBy: none
+		sourceColumn: Estado de Aprobación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Aprobación / Rechazo'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2b842d97-632f-418f-a44c-46312eea91ef
+		summarizeBy: none
+		sourceColumn: Fecha de Aprobación / Rechazo
+
+		variation Variation
+			isDefault
+			relationship: 1d7c7499-fe40-4e4f-87ba-e432f0896129
+			defaultHierarchy: LocalDateTable_fb7f74eb-7a87-45f7-92f5-84e46640ab3a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Estado
+		dataType: string
+		lineageTag: 67351c1d-5987-4d48-b918-474ec46a0f5d
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Cierre'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7682ab45-0309-4b69-b3b9-8cd2288dae03
+		summarizeBy: none
+		sourceColumn: Fecha de Cierre
+
+		variation Variation
+			isDefault
+			relationship: 9bf08d81-e4d0-4322-b244-f6e57e87da29
+			defaultHierarchy: LocalDateTable_e45a97f7-f656-4c7b-9c42-5c1e8c0fe22e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Comentarios
+		dataType: string
+		lineageTag: 3cdc336e-25b8-4cda-a548-6ed0e8318586
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Aprobacion / Rechazo - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b598f9a2-144e-4d13-91fe-4534fdc4f75d
+		summarizeBy: none
+		sourceColumn: Fecha de Aprobacion / Rechazo - Copy
+
+		variation Variation
+			isDefault
+			relationship: f8a9d9ef-4808-400b-85c0-1c48d8db91f2
+			defaultHierarchy: LocalDateTable_80012ccd-a4d1-4fde-a23c-cfe090c1ef97.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Fecha de Medición KGI'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6ee3c5ea-aa6d-42c1-be44-c78917bb3311
+		summarizeBy: none
+		sourceColumn: Fecha de Medición KGI
+
+		variation Variation
+			isDefault
+			relationship: 544c4ef7-02ee-4abb-9e11-9f08e01fe737
+			defaultHierarchy: LocalDateTable_a9be28a3-c919-4e19-ad80-b454151cae54.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'PRO - Mejoras propuestas-70aff895-7838-4787-a089-052304c524dc' = m
+		mode: import
+		queryGroup: KGIs_I
+		source = ```
+				let
+				     Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/Proveedor_Cliente/AMS_IAR_CDM_SLA_I_Mejoras propuestas" & xlsx, //& AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    LBSTICAE_Plt401_MejorasP_Table = Origen{[Item="LBSTICAE_Plt401_MejorasP",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(LBSTICAE_Plt401_MejorasP_Table,{{"ID", type text}, {"Nombre", type text}, {"Descripción", type text}, {"Responsable", type text}, {"Estado de Aprobación", type text}, {"Fecha de Aprobación / Rechazo", type date}, {"Estado", type text}, {"Fecha de Cierre", type date}, {"Comentarios", type text}}),
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Changed Type", "Fecha de Aprobación / Rechazo", "Fecha de Aprobación / Rechazo - Copy"),
+				    #"Calculated End of Quarter" = Table.TransformColumns(#"Duplicated Column",{{"Fecha de Aprobación / Rechazo - Copy", Date.EndOfQuarter, type date}}),
+				
+				    #"Renamed Columns" = Table.RenameColumns(#"Calculated End of Quarter",{{"Fecha de Aprobación / Rechazo - Copy", "Fecha de Aprobacion / Rechazo - Copy"}}),
+				    
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Fecha de Medición KGI", each Date.AddDays([#"Fecha de Aprobacion / Rechazo - Copy"],1)),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Fecha de Medición KGI", type date}}),
+				    #"Removed Blank Rows" = Table.SelectRows(#"Changed Type1", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null})))
+				in
+				    #"Removed Blank Rows"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

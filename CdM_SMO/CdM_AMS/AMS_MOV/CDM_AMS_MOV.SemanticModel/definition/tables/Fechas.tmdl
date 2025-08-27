@@ -1,0 +1,66 @@
+table Fechas
+	lineageTag: 4cee7d38-de07-4ae9-9c3b-a7c8c4c3ab98
+
+	column Date
+		formatString: dd/mm/yyyy
+		lineageTag: aa89be32-4d4d-4012-af0b-f080a188153e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variación
+			isDefault
+			relationship: 569ea53f-7f87-40a2-bd97-6697aea3e611
+			defaultHierarchy: LocalDateTable_0c2e90dc-5aac-46e9-93b8-96f52ac01694.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column MesNombreCorto = REPLACE(LEFT(Fechas[Date].[Mes],3),1,1,UPPER(LEFT(Fechas[Date].[Mes],1)))
+		lineageTag: 6ca6e0c6-bc88-4ffc-95b8-1b95ef6e52eb
+		summarizeBy: none
+		sortByColumn: MesNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNumero = Fechas[Date].[NroMes]
+		formatString: 0
+		lineageTag: c311fad5-b14d-4bab-ad22-eaa8f7a9199b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_1er_día_mes = STARTOFMONTH(Fechas[Date])
+		formatString: General Date
+		lineageTag: 9b1b46d2-e619-4a1d-bc7a-7048a4f0d7bb
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNombreComp = UPPER(LEFT(FORMAT(Fechas[Date],"MMMM"),10))
+		lineageTag: c5b4914b-cf96-41ae-b995-dcc960ae7bba
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column SERVICE_P = IF(Fechas[Date]>=DATE(2020,10,01) && Fechas[Date]<TODAY(),1,0)
+		formatString: 0
+		lineageTag: 193e824e-543d-42ed-a22d-fb9b9eb38cac
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año = YEAR([Date_1er_día_mes])
+		formatString: 0
+		lineageTag: a9d45eae-3c8e-40e5-acab-0b45232af562
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fechas-4d255649-a49d-4b3d-844c-89f20bea1cd2 = calculated
+		mode: import
+		source = CALENDAR(date(2018,01,01),MAX('PRO - Incidencias con SLA (NY y MAD)'[Cerrado].[Date]))
+

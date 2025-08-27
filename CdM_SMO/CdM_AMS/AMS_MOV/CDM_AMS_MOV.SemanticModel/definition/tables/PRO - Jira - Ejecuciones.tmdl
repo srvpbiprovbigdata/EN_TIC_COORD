@@ -1,0 +1,186 @@
+table 'PRO - Jira - Ejecuciones'
+	lineageTag: 19e9dd92-4d7c-45c6-bd95-6797cd744d13
+
+	column Project
+		dataType: string
+		lineageTag: 6171ecb8-b8e9-4b19-bd73-506e783709da
+		summarizeBy: none
+		sourceColumn: Project
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Type'
+		dataType: string
+		lineageTag: 32fe691c-d0a5-477b-9fb2-0b28ecd78639
+		summarizeBy: none
+		sourceColumn: Issue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key
+		dataType: string
+		lineageTag: 71574832-3967-4b30-b89a-56120c39aa0d
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: 9756524d-6a5c-435b-836f-fec1453467ac
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignee
+		dataType: string
+		lineageTag: 9158b339-567d-44bd-8d10-c005ce3cbbdf
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reporter
+		dataType: string
+		lineageTag: 30f96a3e-e4b5-4ded-816f-6798cc2f84df
+		summarizeBy: none
+		sourceColumn: Reporter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: d16d5b7f-323e-439f-be5e-703cf9feb0fe
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 7ce97333-0070-4909-9dda-081790ca02dc
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f8ea5907-7ab2-4fb1-9a85-c1f3ba015e05
+		summarizeBy: none
+		sourceColumn: Created
+
+		variation Variation
+			isDefault
+			relationship: 472dca0a-0902-49ff-b5c6-26e761fcc457
+			defaultHierarchy: LocalDateTable_983d8cc9-6d2c-4720-8469-a9ee9f91728e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-tasks
+		dataType: string
+		lineageTag: 2f738d51-e3f5-4ae9-8ff1-ac21c674d663
+		summarizeBy: none
+		sourceColumn: Sub-tasks
+
+		annotation SummarizationSetBy = Automatic
+
+	column Components
+		dataType: string
+		lineageTag: 43ee86af-374a-417c-8197-0264f7a1de63
+		summarizeBy: none
+		sourceColumn: Components
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de prueba'
+		dataType: string
+		lineageTag: 3c55b4d7-af1b-4dac-92ae-6cf0004a9707
+		summarizeBy: none
+		sourceColumn: Tipo de prueba
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resolved
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c9e660e0-caf7-4d01-86c5-df37e66dbc1c
+		summarizeBy: none
+		sourceColumn: Resolved
+
+		variation Variation
+			isDefault
+			relationship: 0dfd37fd-904f-4d4b-a3fa-12ada7ae09b5
+			defaultHierarchy: LocalDateTable_198eadfc-10dc-40a8-bb5b-8b008e475c72.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Attribute
+		dataType: string
+		lineageTag: 359e4b05-6a0d-462e-a5ae-69c0e61c4794
+		summarizeBy: none
+		sourceColumn: Attribute
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value (Excecutions)'
+		dataType: string
+		lineageTag: 1973835d-f069-4315-b09d-3b7ab905b5e3
+		summarizeBy: none
+		sourceColumn: Value (Excecutions)
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Jira - Ejecuciones-538a3518-c638-4645-b682-6ed3f355d2f4' = m
+		mode: import
+		queryGroup: KGIs_I
+		source = ```
+				let
+				     Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/AMS_IAR_CDM_SLA_I_Entregables, Pruebas y Defectos" & xlsx, //& AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    ST_Executions_Sheet = Origen{[Item="ST_Executions",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(ST_Executions_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Components", type text}, {"Project", type text}, {"Issue Type", type text}, {"Key", type text}, {"Summary", type text}, {"Assignee", type text}, {"Reporter", type text}, {"Priority", type text}, {"Status", type text}, {"Created", type datetime}, {"Linked Issues", type text}, {"Sub-tasks", type any}, {"Tipo de prueba", type text}, {"Resolved", type datetime}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Tipo cambiado",{{"Components", type text}, {"Project", type text}, {"Issue Type", type text}, {"Key", type text}, {"Summary", type text}, {"Assignee", type text}, {"Reporter", type text}, {"Priority", type text}, {"Status", type text}, {"Created", type datetime}, {"Linked Issues", type text}, {"Sub-tasks", type text}, {"Tipo de prueba", type text}, {"Resolved", type datetime}}),
+				
+				    //Separa los Linked Issues de cada Ejecución
+				    #"Split Column by Delimiter" = Table.SplitColumn(#"Changed Type", "Linked Issues", Splitter.SplitTextByDelimiter(";", QuoteStyle.Csv), {
+				        "Linked Issues.1",
+				        "Linked Issues.2",
+				        "Linked Issues.3",
+				        "Linked Issues.4",
+				        "Linked Issues.5",        
+				        "Linked Issues.6",        
+				        "Linked Issues.7",        
+				        "Linked Issues.8",       
+				        "Linked Issues.9",
+				        "Linked Issues.10"        
+				        }),
+				
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Split Column by Delimiter",{
+				        {"Linked Issues.1", type text}, 
+				        {"Linked Issues.2", type text}, 
+				        {"Linked Issues.3", type text},
+				        {"Linked Issues.4", type text},
+				        {"Linked Issues.5", type text},
+				        {"Linked Issues.6", type text},
+				        {"Linked Issues.7", type text},
+				        {"Linked Issues.8", type text},
+				        {"Linked Issues.9", type text},
+				        {"Linked Issues.10", type text}
+				        }),
+				
+				    //Transforma la separación en tipo lista (Cada Ejecución Link con la Ejecución a la cual está relacionada)
+				    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Changed Type1", {"Components","Project", "Issue Type", "Key", "Summary", "Assignee", "Reporter", "Priority", "Status", "Created", "Sub-tasks", "Tipo de prueba", "Resolved"}, "Attribute", "Value (Excecutions)")
+				in
+				    #"Unpivoted Columns"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

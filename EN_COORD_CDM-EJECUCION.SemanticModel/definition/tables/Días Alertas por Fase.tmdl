@@ -1,0 +1,41 @@
+table 'Días Alertas por Fase'
+	lineageTag: 2cf5d559-2a03-412b-825f-789a474c158c
+
+	column Estado
+		dataType: string
+		lineageTag: e0407360-e703-45ac-ae22-5b9f1ed22555
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Días
+		dataType: int64
+		formatString: 0
+		lineageTag: 23ba09ed-2d7b-4ad0-98fe-d9110509685a
+		summarizeBy: none
+		sourceColumn: Días
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Días Alertas por Fase' = m
+		mode: import
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents("https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRO/Documentos%20compartidos/Ejecucion/EN_COORD_CDM_Config_CdM_Ejecuci%C3%B3n.xlsx"), null, true),
+				    #"Días Alertas por Fase _Sheet" = Origen{[Item="Días Alertas por Fase ",Kind="Sheet"]}[Data],
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Días Alertas por Fase _Sheet",{{"Column1", type any}, {"Column2", type any}, {"Column3", type text}, {"Column4", type any}, {"Column5", type any}, {"Column6", type any}, {"Column7", type any}, {"Column8", type any}, {"Column9", type any}, {"Column10", type any}, {"Column11", type any}, {"Column12", type any}, {"Column13", type any}, {"Column14", type any}, {"Column15", type any}, {"Column16", type any}, {"Column17", type any}, {"Column18", type any}, {"Column19", type any}, {"Column20", type any}, {"Column21", type any}, {"Column22", type any}, {"Column23", type any}, {"Column24", type any}, {"Column25", type any}, {"Column26", type any}, {"Column27", type any}, {"Column28", type any}, {"Column29", type any}, {"Column30", type any}, {"Column31", type any}, {"Column32", type any}, {"Column33", type any}, {"Column34", type any}, {"Column35", type any}, {"Column36", type any}, {"Column37", type any}, {"Column38", type any}, {"Column39", type any}, {"Column40", type any}, {"Column41", type any}, {"Column42", type any}, {"Column43", type any}, {"Column44", type any}, {"Column45", type any}, {"Column46", type any}, {"Column47", type any}, {"Column48", type any}, {"Column49", type any}, {"Column50", type any}, {"Column51", type any}}),
+				    #"Otras columnas quitadas" = Table.SelectColumns(#"Tipo cambiado",{"Column3", "Column4"}),
+				    #"Filas en blanco eliminadas" = Table.SelectRows(#"Otras columnas quitadas", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+				    #"Filas en blanco eliminadas1" = Table.SelectRows(#"Filas en blanco eliminadas", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+				    #"Filas superiores quitadas" = Table.Skip(#"Filas en blanco eliminadas1",7),
+				    #"Filas inferiores quitadas" = Table.RemoveLastN(#"Filas superiores quitadas",2),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Filas inferiores quitadas", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Estado", type text}, {"Días", Int64.Type}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,42 @@
+table 'Parametros KGI22'
+	excludeFromModelRefresh
+	lineageTag: 29e2dcaa-83ee-4add-af28-934d37ae1528
+
+	column '% Cumplimiento INCs Reabiertas'
+		dataType: double
+		lineageTag: 9bda2578-3ac3-41ab-be74-224940062f3f
+		summarizeBy: sum
+		sourceColumn: % Cumplimiento INCs Reabiertas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Peso
+		dataType: int64
+		formatString: 0
+		lineageTag: e2d205b0-4cd1-41ca-8e84-7e89a7618a42
+		summarizeBy: sum
+		sourceColumn: Peso
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI22-a18c8a43-36f9-4286-a845-5a64420c2e3a' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/" & AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    #"Parametros KGI2-2_Sheet" = Origen{[Item="Parametros KGI2-2",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Parametros KGI2-2_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"% Cumplimiento INCs Reabiertas", type number}, {"Peso", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

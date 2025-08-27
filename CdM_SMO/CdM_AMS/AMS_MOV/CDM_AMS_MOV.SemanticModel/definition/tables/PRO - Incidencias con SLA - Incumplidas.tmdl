@@ -1,0 +1,65 @@
+table 'PRO - Incidencias con SLA - Incumplidas'
+	lineageTag: 2bc62acf-1b7e-43ab-be1b-87fec4e261ae
+
+	column Prioridad
+		dataType: string
+		lineageTag: 02540053-1a4a-480f-a821-265e88228f45
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado_1er_día_mes
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fe6219f9-c2bb-4fc3-85b6-16cf9e1e2cdf
+		summarizeBy: none
+		sourceColumn: Cerrado_1er_día_mes
+
+		variation Variation
+			isDefault
+			relationship: 36d2c153-e33c-4697-ada9-6d52ab03e1ce
+			defaultHierarchy: LocalDateTable_566d98f7-5bd5-4e47-986e-7c4acde88b8e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Infringido
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 3a11ac30-61b3-42ff-9609-ccaec7e7d32f
+		summarizeBy: none
+		sourceColumn: Infringido
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Incumplidas'
+		dataType: double
+		lineageTag: 4f273428-a18f-439c-96ff-1a991a076658
+		summarizeBy: sum
+		sourceColumn: INCs Incumplidas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'PRO - Incidencias con SLA - Incumplidas-8aaac431-853f-45ba-8fae-3cf1017a131b' = m
+		mode: import
+		queryGroup: KGIs_II
+		source =
+				let
+				    Source = #"PRO - Incidencias con SLA (NY y MAD) KGI21",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Infringido", "Cerrado - Copy"}, {{"Count", each Table.RowCount(_), type number}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Grouped Rows", each ([Infringido] = true)),
+				    #"Renamed Columns" = Table.RenameColumns(#"Filtered Rows",{{"Cerrado - Copy", "Cerrado_1er_día_mes"}}),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Prioridad", "Cerrado_1er_día_mes", "Infringido", "Count"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Reordered Columns",{{"Count", "INCs Incumplidas"}})
+				in
+				    #"Renamed Columns1"
+
+	annotation PBI_ResultType = Exception
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,135 @@
+table 'Resumen KGI22'
+	lineageTag: c07de1a8-62b0-4bb0-afb5-1d191d438970
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 00e0023d-ec70-42b2-8732-22efbb3e0c15
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Total INCs'
+		dataType: double
+		formatString: 0
+		lineageTag: 44a9fcf8-ab4d-43b4-a50e-ff41ba26a609
+		summarizeBy: sum
+		sourceColumn: Total INCs
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cump. Objetivo %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 57610d26-e54d-4ede-b711-a70168c49b24
+		summarizeBy: sum
+		sourceColumn: Cump. Objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 6639cf80-4d5f-4bfa-ac63-a48757f9ca7c
+		summarizeBy: sum
+		sourceColumn: Peso %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Cumplidas' = ('Resumen KGI22'[Total INCs]-'Resumen KGI22'[INCs Reabiertas])
+		formatString: 0
+		lineageTag: 52c23b8c-0172-48cf-908c-c8a81f6ae1dc
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cump. Real %' = ('Resumen KGI22'[INCs Reabiertas]/'Resumen KGI22'[Total INCs])
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 7b834fd5-fd2c-4413-817c-73cab8f61f32
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI22'[Cump. Real %]<='Resumen KGI22'[Cump. Objetivo %],"Si","No")
+		lineageTag: ea26b2ce-060b-4730-87dc-99af64a1ed67
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI22'[¿Cumple?]="Si",'Resumen KGI22'[Peso %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 7fa7bf87-fcf3-4e0e-ba7f-239f67a3e045
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI22'
+		dataType: int64
+		formatString: 0
+		lineageTag: df511435-7de6-4b7b-83da-f9cb968b4f30
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI22
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: f0f5a583-b18e-4d21-bbae-4c1e9d3742b4
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI22'[¿Cumple?]="No",'Resumen KGI22'[Peso %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 8400f609-c08b-45eb-9c19-5f908669130c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Reabiertas'
+		dataType: double
+		formatString: 0
+		lineageTag: 03788ab4-f81b-4a77-b501-5208a1aaaf5e
+		summarizeBy: sum
+		sourceColumn: INCs Reabiertas
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI22-eb9da295-d46c-4818-af4b-24b8adeba48c' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA (NY y MAD)",
+				    
+				    //Total Incidencias
+				    #"Grouped Rows" = Table.Group(Source, {"Cerrado - Copy"}, {{"Total INCs", each Table.RowCount(_), type number}}),
+				 
+				    //Unir Total Incidencias Reabiertas
+				    #"Merged Queries" = Table.NestedJoin(#"Grouped Rows", {"Cerrado - Copy"}, #"PRO - Incidencias con SLA - Reabiertas", {"Cerrado - Copy"}, "PRO - Incidencias con SLA - Reabiertas", JoinKind.LeftOuter),
+				    #"Expanded PRO - Incidencias con SLA - Reabiertas" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Incidencias con SLA - Reabiertas", {"INCs Reabiertas"}, {"PRO - Incidencias con SLA - Reabiertas.INCs Reabiertas"}),
+				   
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded PRO - Incidencias con SLA - Reabiertas",{{"PRO - Incidencias con SLA - Reabiertas.INCs Reabiertas", "INCs Reabiertas"}}),
+				
+				    //Unir Tabla de Parámetros
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Cump. Objetivo %", each "0,10"),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Peso %", each "1"),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom1",{{"Peso %", Percentage.Type}, {"Cump. Objetivo %", Percentage.Type}}),
+				
+				    #"Added Custom2" = Table.AddColumn(#"Changed Type", "Puntos de KGI22", each 20),
+				    #"Replaced Value" = Table.ReplaceValue(#"Added Custom2",null,0,Replacer.ReplaceValue,{"INCs Reabiertas"}),
+				    #"Added Custom3" = Table.AddColumn(#"Replaced Value", "KGI", each "KGI2-2")
+				in
+				    #"Added Custom3"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

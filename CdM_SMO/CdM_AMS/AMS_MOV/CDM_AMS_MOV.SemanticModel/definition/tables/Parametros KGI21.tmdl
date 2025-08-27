@@ -1,0 +1,67 @@
+table 'Parametros KGI21'
+	excludeFromModelRefresh
+	lineageTag: 0a21f1a4-4890-4c09-bec8-796a6d2058e1
+
+	measure M_Controlsum = ```
+			sum('Parametros KGI21'[Pesos]) 
+			```
+		lineageTag: 73cbec96-678f-48ba-928d-45083608eabe
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Prioridad '
+		dataType: string
+		lineageTag: a22bc729-8ec1-45f8-83ab-550b9b2a8113
+		summarizeBy: none
+		sourceColumn: "Prioridad "
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo de Resolución N2 (Horas)'
+		dataType: int64
+		formatString: 0
+		lineageTag: eeae1f24-f85f-4260-98f6-3e081ac23214
+		summarizeBy: sum
+		sourceColumn: Tiempo de Resolución N2 (Horas)
+
+		annotation SummarizationSetBy = Automatic
+
+	column '% Cumplimiento'
+		dataType: double
+		lineageTag: 4a9bd58c-4cd3-4e35-a04c-f3f1ea30cbda
+		summarizeBy: sum
+		sourceColumn: % Cumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Pesos
+		dataType: double
+		lineageTag: 7d51173b-3044-4fe4-8ad8-dd4fe59769d2
+		summarizeBy: sum
+		sourceColumn: Pesos
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros KGI21-d8d182c8-aad2-4e18-a952-8d57205e7b59' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/" & AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    #"Parametros KGI2-1_Sheet" = Origen{[Item="Parametros KGI2-1",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Parametros KGI2-1_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Prioridad ", type text}, {"Tiempo de Resolución N2 (Horas)", Int64.Type}, {"% Cumplimiento", type number}, {"Pesos", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

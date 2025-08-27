@@ -1,0 +1,226 @@
+table 'PRO - Jira - Historias y Ejecuciones'
+	lineageTag: 59beb576-a957-447b-8cf0-fcdcce9bd543
+
+	column Components
+		dataType: string
+		lineageTag: 831360ae-f9d2-495e-bcd8-a4f8f26c58af
+		summarizeBy: none
+		sourceColumn: Components
+
+		annotation SummarizationSetBy = Automatic
+
+	column Project
+		dataType: string
+		lineageTag: ab23f131-36c8-4f8e-8de0-0ea68cecf69b
+		summarizeBy: none
+		sourceColumn: Project
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Type'
+		dataType: string
+		lineageTag: de652136-e2c7-4108-823d-1aeb99c4f237
+		summarizeBy: none
+		sourceColumn: Issue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key
+		dataType: string
+		lineageTag: b73da1a2-b8d2-48f9-b190-ae6bebfe70cd
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: 43f0fba3-032e-4eba-b60e-cbeee4b8ad3d
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignee
+		dataType: string
+		lineageTag: 40bdbd0d-4bb7-42ca-a1fa-6978dcf2c386
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reporter
+		dataType: string
+		lineageTag: b469be39-0279-4625-a8e5-72c845754721
+		summarizeBy: none
+		sourceColumn: Reporter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: 4ef53d6f-dc3c-40a0-8e92-8e76a89e5f1e
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 26cd16d5-7f77-4efb-a4c7-0dc0e0358954
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ce769a70-f586-4330-8892-8aab791c9562
+		summarizeBy: none
+		sourceColumn: Created
+
+		variation Variation
+			isDefault
+			relationship: 5b4a3f2a-71a1-4908-a947-54b5c402dcc2
+			defaultHierarchy: LocalDateTable_1eb112d1-0d96-4dd3-96ec-e50a1a711538.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de prueba'
+		dataType: string
+		lineageTag: 2cfbbc1e-bbfa-4c3a-b82f-332996b4e8e2
+		summarizeBy: none
+		sourceColumn: Tipo de prueba
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resolved
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5f47881e-3633-48d6-a67a-75f404679ac6
+		summarizeBy: none
+		sourceColumn: Resolved
+
+		variation Variation
+			isDefault
+			relationship: 0bf59bef-49bb-46be-b7f2-281158ab23f0
+			defaultHierarchy: LocalDateTable_2e830a12-93c5-491f-ab16-492eaca406ab.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Attribute
+		dataType: string
+		lineageTag: f7ec698b-671f-46ec-bc2f-d2b13b5a2bdf
+		summarizeBy: none
+		sourceColumn: Attribute
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value (Stories)'
+		dataType: string
+		lineageTag: 8d2e97da-1ba7-4cbd-860d-ba112c1d1c6b
+		summarizeBy: none
+		sourceColumn: Value (Stories)
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PRO - Jira - Ejecuciones.Status'
+		dataType: string
+		lineageTag: a4c37ae4-3937-40e3-b5dd-be4885c4830f
+		summarizeBy: none
+		sourceColumn: PRO - Jira - Ejecuciones.Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PRO - Jira - Ejecuciones.Tipo de prueba'
+		dataType: string
+		lineageTag: f4c78e50-3cd5-4061-a86b-8e1f249d5a59
+		summarizeBy: none
+		sourceColumn: PRO - Jira - Ejecuciones.Tipo de prueba
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Jira - Historias y Ejecuciones-33c519e4-031d-4815-94af-21c7f4c70f9a' = m
+		mode: import
+		queryGroup: KGIs_I
+		source = ```
+				let
+				    Source = #"PRO - Jira - Historias",
+				    
+				    //Separar Linked Issues de Historias, para relacionar a Sub-Test Exceutions
+				    #"Split Column by Delimiter" = Table.SplitColumn(Source, "Linked Issues", Splitter.SplitTextByDelimiter(";", QuoteStyle.Csv), {
+				        "Linked Issues.1",
+				        "Linked Issues.2",
+				        "Linked Issues.3",
+				        "Linked Issues.4",
+				        "Linked Issues.5",        
+				        "Linked Issues.6",        
+				        "Linked Issues.7",        
+				        "Linked Issues.8",       
+				        "Linked Issues.9",
+				        "Linked Issues.10", 
+				        "Linked Issues.11",         
+				        "Linked Issues.12",         
+				        "Linked Issues.13",         
+				        "Linked Issues.14",         
+				        "Linked Issues.15",         
+				        "Linked Issues.16",         
+				        "Linked Issues.17",         
+				        "Linked Issues.18",         
+				        "Linked Issues.19",         
+				        "Linked Issues.20"         
+				        }),
+				
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Split Column by Delimiter",{
+				        {"Linked Issues.1", type text}, 
+				        {"Linked Issues.2", type text}, 
+				        {"Linked Issues.3", type text},
+				        {"Linked Issues.4", type text},
+				        {"Linked Issues.5", type text},
+				        {"Linked Issues.6", type text},
+				        {"Linked Issues.7", type text},
+				        {"Linked Issues.8", type text},
+				        {"Linked Issues.9", type text},
+				        {"Linked Issues.10", type text},
+				        {"Linked Issues.11", type text},
+				        {"Linked Issues.12", type text},
+				        {"Linked Issues.13", type text},
+				        {"Linked Issues.14", type text},
+				        {"Linked Issues.15", type text},
+				        {"Linked Issues.16", type text},
+				        {"Linked Issues.17", type text},
+				        {"Linked Issues.18", type text},
+				        {"Linked Issues.19", type text},
+				        {"Linked Issues.20", type text}        
+				        }),
+				
+				    #"Split Column by Delimiter1" = Table.SplitColumn(#"Changed Type1", "Sub-tasks", Splitter.SplitTextByDelimiter(";", QuoteStyle.Csv), {
+				        "Sub-tasks.1",
+				        "Sub-tasks.2",
+				        "Sub-tasks.3",
+				        "Sub-tasks.4",
+				        "Sub-tasks.5"       
+				        }),
+				
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Split Column by Delimiter1",{
+				        {"Sub-tasks.1", type text}, 
+				        {"Sub-tasks.2", type text}, 
+				        {"Sub-tasks.3", type text},
+				        {"Sub-tasks.4", type text},
+				        {"Sub-tasks.5", type text}
+				        }),
+				
+				    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Changed Type2", {"Components","Project", "Issue Type", "Key", "Summary", "Assignee", "Reporter", "Priority", "Status", "Created", "Tipo de prueba", "Resolved"}, "Attribute", "Value (Stories)"),
+				
+				    //Une con Ejecuciones
+				    #"Merged Queries" = Table.NestedJoin(#"Unpivoted Columns", {"Value (Stories)"}, #"PRO - Jira - Ejecuciones", {"Key"}, "PRO - Jira - Ejecuciones", JoinKind.LeftOuter),
+				    #"Expanded PRO - Jira - Ejecuciones" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Jira - Ejecuciones", {"Status", "Tipo de prueba"}, {"PRO - Jira - Ejecuciones.Status", "PRO - Jira - Ejecuciones.Tipo de prueba"})
+				in
+				    #"Expanded PRO - Jira - Ejecuciones"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

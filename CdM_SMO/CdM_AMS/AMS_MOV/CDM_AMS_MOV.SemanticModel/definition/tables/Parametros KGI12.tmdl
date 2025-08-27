@@ -1,0 +1,61 @@
+table 'Parametros KGI12'
+	excludeFromModelRefresh
+	lineageTag: 2ccfd3bb-b5d3-4787-ba61-2c31945a2191
+
+	column 'Prioridad Hitos Evolutivos'
+		dataType: string
+		lineageTag: 1dd5ac0b-8f1a-477f-aac0-ece07efda863
+		summarizeBy: none
+		sourceColumn: Prioridad Hitos Evolutivos
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de Desviación Máxima'
+		dataType: double
+		lineageTag: 21bded67-0121-4896-a470-c0d6df58fa68
+		summarizeBy: sum
+		sourceColumn: Tasa de Desviación Máxima
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column '% cumplimiento Objetivo'
+		dataType: double
+		lineageTag: 17ace2e1-b8b3-4232-977c-c66ebae9897a
+		summarizeBy: sum
+		sourceColumn: % cumplimiento Objetivo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Pesos %'
+		dataType: double
+		lineageTag: 552dc492-ab6b-413c-98db-838353218410
+		summarizeBy: sum
+		sourceColumn: Pesos %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros KGI12-ec248a53-f3ac-4b15-b71a-8aa57e95b632' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/" & AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    #"Parametros KGI1-2_Sheet" = Origen{[Item="Parametros KGI1-2",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Parametros KGI1-2_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Prioridad Hitos Evolutivos", type text}, {"Tasa de Desviación Máxima", type number}, {"% cumplimiento Objetivo", type number}, {"Pesos %", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

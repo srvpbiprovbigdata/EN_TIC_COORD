@@ -1,0 +1,86 @@
+table 'Parametros Valores de Rendimiento'
+	excludeFromModelRefresh
+	lineageTag: b97f4953-7eb1-49bb-8ded-693cccc6ae58
+
+	measure 'Penalización del Periodo_M' =
+			
+			IF([Total de Puntos Obtenidos KGIs_M]>=90,0,
+			IF([Total de Puntos Obtenidos KGIs_M]>=50,(([Total de Puntos Obtenidos KGIs_M]-[Umbral Admisible_M])/([Umbral Crítico_M]-[Umbral Admisible_M]))*[Penalización máxima_M],0.15))
+		lineageTag: eddc982c-abb6-4a9e-b751-83a1f94146f9
+
+	measure 'Umbral Admisible_M' = MIN('Parametros Valores de Rendimiento'[Admisible])
+		formatString: 0
+		lineageTag: f70eda9c-791e-45f9-a79d-a76d15a5598b
+
+	measure 'Umbral Crítico_M' = MIN('Parametros Valores de Rendimiento'[Crítico])
+		formatString: 0
+		lineageTag: 2bcaa651-8ef6-4da5-ad07-d1e10b8b8f25
+
+	measure 'Penalización máxima_M' = MIN('Parametros Valores de Rendimiento'[Penalización Máxima])
+		lineageTag: afd7619a-e554-4658-9cde-365033079989
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Umbral de rendimiento'
+		dataType: string
+		lineageTag: 845584d5-6e24-4174-890c-83ff913060b9
+		summarizeBy: none
+		sourceColumn: Umbral de rendimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column Objetivo
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c6977c8-174f-40e3-af70-abd15e474f15
+		summarizeBy: sum
+		sourceColumn: Objetivo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Admisible
+		dataType: int64
+		formatString: 0
+		lineageTag: 344593d4-5994-46f9-9c43-3dcda940527a
+		summarizeBy: sum
+		sourceColumn: Admisible
+
+		annotation SummarizationSetBy = Automatic
+
+	column Crítico
+		dataType: int64
+		formatString: 0
+		lineageTag: dfed620f-6d2d-4086-9406-1495722daa19
+		summarizeBy: sum
+		sourceColumn: Crítico
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Penalización Máxima'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 72315b27-d983-4caf-9dc8-5ce96b66b319
+		summarizeBy: sum
+		sourceColumn: Penalización Máxima
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros Valores de Rendimiento-0ff8f2ac-8cd2-433f-9a20-8efcf1208fe3' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/" & AMS_IAR_CDM_ & "Parámetros KGIs" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    #"Valores de rendimiento_Sheet" = Origen{[Item="Valores de rendimiento",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Valores de rendimiento_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Umbral de rendimiento", type text}, {"Objetivo", Int64.Type}, {"Admisible", Int64.Type}, {"Crítico", Int64.Type}, {"Penalización Máxima", Percentage.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

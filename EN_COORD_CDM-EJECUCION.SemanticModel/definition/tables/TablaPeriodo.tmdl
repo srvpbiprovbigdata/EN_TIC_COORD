@@ -1,0 +1,40 @@
+table TablaPeriodo
+	lineageTag: cdb589b5-98ef-4ebd-96ea-b7be4a264615
+
+	measure Filtro_Periodo = ```
+			
+			VAR PeriodoSeleccionado = SELECTEDVALUE('TablaPeriodo'[Periodo])
+			RETURN
+			IF(
+			    PeriodoSeleccionado = "Última Semana",
+			    [ZMD_KPI_Coste_Evolutivo_CerradosUltimos7Dias],
+			    IF(
+			        PeriodoSeleccionado = "Último Mes",
+			        [ZMD_KPI_Coste_Evolutivo_CerradosUltimos30Dias],
+			        BLANK()
+			    )
+			)
+			
+			```
+		lineageTag: b7c1ec44-8305-4e09-a338-55555f0c31ef
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Periodo
+		lineageTag: 9a342356-184b-4373-9dbc-0f0fe18d27a2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Periodo]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TablaPeriodo = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Periodo", STRING,
+				    { {"Última Semana"}, {"Último Mes"} }
+				)
+
+	annotation PBI_Id = 0a3ccdb1a5964c71a1fdbce4a558d726
+

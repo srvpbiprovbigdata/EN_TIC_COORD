@@ -1,0 +1,39 @@
+table 'Incidencias relacionadas'
+	lineageTag: c5c12230-cd37-4ed1-8677-1d75a5a9d347
+
+	column Incidente
+		dataType: string
+		lineageTag: b98ec8b5-b0ba-4fc9-80e3-617bf1f0240b
+		summarizeBy: none
+		sourceColumn: Incidente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tarea
+		dataType: string
+		lineageTag: 38342fa3-385d-4afc-8ade-246c1439ddb8
+		summarizeBy: none
+		sourceColumn: Tarea
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Incidencias relacionadas-256c7c80-25f3-4ae1-b2bf-d1dce2c87a4a' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Entorno = Entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & Entorno & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_MOV/Ficheros del Servicio/" & AMS_IAR_CDM_ & "Incidencias_Relacionadas" & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Page 1_Sheet",{{"Column1", type text}, {"Column2", type text}}),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Tipo cambiado", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Incidente", type text}, {"Tarea", type text}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
