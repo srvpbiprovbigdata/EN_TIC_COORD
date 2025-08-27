@@ -1,0 +1,27 @@
+table 'TMR Incidencias'
+	lineageTag: da0cc8d2-80a0-48c6-bae7-c08beb96da9c
+
+	column 'Tiempo de resolución'
+		lineageTag: 26c60d6f-7bd4-4999-9cf7-91aec2218d01
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Tiempo de resolución]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Número
+		lineageTag: 5a83b5c8-957d-4b00-8a5a-5031bf3bc1c7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Incidencias consolidado[Número]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'TMR Incidencias-cfcb9099-1886-46cc-8fc3-526ccd64fe71' = calculated
+		mode: import
+		source = SUMMARIZE('Incidencias consolidado','Incidencias consolidado'[Número], "Tiempo de resolución", [Tiempo total acumulado Incidencias])
+
+	annotation PBI_Id = 88cbb06e20db4af39f465cf7bf0ac9e8
+

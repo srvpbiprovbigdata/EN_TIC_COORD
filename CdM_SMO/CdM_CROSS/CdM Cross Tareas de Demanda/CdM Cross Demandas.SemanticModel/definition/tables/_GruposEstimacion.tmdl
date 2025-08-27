@@ -1,0 +1,53 @@
+table _GruposEstimacion
+	lineageTag: 06187ce8-e8b7-4a0b-b2f5-ba38079421eb
+
+	column Grupo
+		dataType: string
+		lineageTag: 0b05d685-ad98-446d-9a2b-f2e143ddce4f
+		summarizeBy: none
+		sourceColumn: Grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Aplicación
+		dataType: string
+		lineageTag: 538409f3-a20e-4dea-8db7-b38e4377f336
+		summarizeBy: none
+		sourceColumn: Aplicación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción grupo'
+		dataType: string
+		lineageTag: e7d73f18-e136-487f-a71d-d658c78e5289
+		summarizeBy: none
+		sourceColumn: Descripción grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción grupo - Copia'
+		dataType: string
+		lineageTag: 006449c8-62df-4503-bd11-f29f71f1ccfb
+		summarizeBy: none
+		sourceColumn: Descripción grupo - Copia
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _GruposEstimacion-d3df7322-4a9b-43f1-921e-4c6f084d3330 = m
+		mode: import
+		source =
+				let
+				    Entorno = entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & entorno & "/Documentos compartidos/CdM_SMO/CdM_CROSS/Archivos comunes/GruposEstimacion.xlsx",
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Hoja1_Sheet, [PromoteAllScalars=true]),
+				    #"Columna duplicada" = Table.DuplicateColumn(#"Encabezados promovidos", "Descripción grupo", "Descripción grupo - Copia")
+				in
+				    #"Columna duplicada"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,104 @@
+table LocalDateTable_45f702e7-e398-4748-88f3-5dce52068dec
+	isHidden
+	showAsVariationsOnly
+	lineageTag: f7e91617-0a6e-4827-a76d-e6351c22b4e0
+
+	column Date
+		isHidden
+		lineageTag: 81ea0108-8af3-4a11-ab05-37a4d810ea6d
+		dataCategory: PaddedDateTableDates
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = User
+
+	column Año = YEAR([Date])
+		isHidden
+		lineageTag: 80c720b0-7387-49a3-815d-677e90b01b61
+		dataCategory: Years
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = Year
+
+	column NroMes = MONTH([Date])
+		isHidden
+		lineageTag: 36780c1e-78d7-482d-b0cb-df8fa3f129b9
+		dataCategory: MonthOfYear
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = MonthNumber
+
+	column Mes = FORMAT([Date], "MMMM")
+		isHidden
+		lineageTag: 82c9f0e6-5de2-40b8-b47d-69aa11ebc8cb
+		dataCategory: Months
+		summarizeBy: none
+		sortByColumn: NroMes
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = Month
+
+	column NroTrimestre = INT(([NroMes] + 2) / 3)
+		isHidden
+		lineageTag: 608dadfc-1727-47d9-a162-ca2cc4449b9c
+		dataCategory: QuarterOfYear
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = QuarterNumber
+
+	column Trimestre = "Trim. " & [NroTrimestre]
+		isHidden
+		lineageTag: c396c361-85fa-4d8e-a607-289a229ee2fe
+		dataCategory: Quarters
+		summarizeBy: none
+		sortByColumn: NroTrimestre
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = Quarter
+
+	column Día = DAY([Date])
+		isHidden
+		lineageTag: 42e0d1d1-e86a-48b7-90f4-c3989b269f03
+		dataCategory: DayOfMonth
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = Day
+
+	hierarchy 'Jerarquía de fechas'
+		lineageTag: 16aa7d73-2fa5-4b40-8a48-34e174ea1aa9
+
+		level Año
+			lineageTag: 36e0623d-fb63-4c32-94d8-cf9f03cce4ec
+			column: Año
+
+		level Trimestre
+			lineageTag: e6a739b7-0b29-4c7d-94bc-0f3cc6a9c513
+			column: Trimestre
+
+		level Mes
+			lineageTag: e19c7f40-a41e-4159-93b6-c4a3a99428eb
+			column: Mes
+
+		level Día
+			lineageTag: cf267ea6-7d3e-4fb9-a5c1-68dd954a4161
+			column: Día
+
+		annotation TemplateId = DateHierarchy
+
+	partition LocalDateTable_45f702e7-e398-4748-88f3-5dce52068dec-196fcdae-6ccd-43aa-93ed-6c509202a0c3 = calculated
+		mode: import
+		source = Calendar(Date(Year(MIN('PRO - Mejoras propuestas - Rechazadas'[Fecha de Medición KGI])), 1, 1), Date(Year(MAX('PRO - Mejoras propuestas - Rechazadas'[Fecha de Medición KGI])), 12, 31))
+
+	annotation __PBI_LocalDateTable = true
+

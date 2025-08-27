@@ -1,0 +1,69 @@
+table Fechas
+	lineageTag: 28c29a4f-89ff-423a-a972-530e0325dcae
+
+	measure Actual = IF( Fechas[Date] <TODAY(),1)
+		lineageTag: f9c4ec6a-31d0-4459-91b4-420282dd14f0
+
+	column Date
+		formatString: dd/mm/yyyy
+		lineageTag: bcc8c366-1e90-47f8-a803-6e9f59143637
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variation
+			isDefault
+			relationship: 2e924bb3-b7a2-4a04-9320-aa8e49d9a7ca
+			defaultHierarchy: LocalDateTable_8fdc721f-b8c4-45a0-961b-92178fa6dddd.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column MesNombreCorto = REPLACE(LEFT(Fechas[Date].[Mes],3),1,1,UPPER(LEFT(Fechas[Date].[Mes],1)))
+		lineageTag: 4974a27a-bb15-4f98-b0a7-74ef23a2c156
+		summarizeBy: none
+		sortByColumn: MesNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNumero = Fechas[Date].[NroMes]
+		formatString: 0
+		lineageTag: 01c631ff-000d-453a-ad76-338dabfa02d4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_1er_día_mes = STARTOFMONTH(Fechas[Date])
+		formatString: General Date
+		lineageTag: 272a8358-6c33-47cf-bfb1-041c68586410
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNombreComp = UPPER(LEFT(FORMAT(Fechas[Date],"MMMM"),10))
+		lineageTag: 64dcda97-b960-448b-b3fe-7f1bf3ae313c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column SERVICE_P = IF(Fechas[Date]>=DATE(2021,01,01) && Fechas[Date]<TODAY(),1,0)
+		formatString: 0
+		lineageTag: cf5e2214-bd92-4a07-ae2d-27f5beee9f50
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año = YEAR([Date_1er_día_mes])
+		formatString: 0
+		lineageTag: 449072ac-0b0d-4d18-aaa7-bf8c0ba4abac
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fechas-4d255649-a49d-4b3d-844c-89f20bea1cd2 = calculated
+		mode: import
+		source = CALENDAR(DATE(2020,01,01),MAX('PRO - Incidencias con SLA_P_y_A'[Cerrado].[Date]))
+

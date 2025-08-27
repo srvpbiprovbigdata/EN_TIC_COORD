@@ -1,0 +1,107 @@
+table 'Resumen KGI13_2_Medias'
+	lineageTag: a7ba86bd-10ed-402e-bd36-210df8f4a62c
+
+	column Prioridad
+		dataType: string
+		lineageTag: c87e1e57-d43f-4ba5-9e5e-5b35434b6b62
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierto - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d41edb83-e470-49e7-b283-1b361ca1f0d0
+		summarizeBy: none
+		sourceColumn: Abierto - Copy
+
+		variation Variation
+			isDefault
+			relationship: 9784d8fe-fe94-4a31-8cfa-5bf6680412b0
+			defaultHierarchy: LocalDateTable_374c8006-2d33-4765-a6fa-764d7a770036.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Total Incidencias'
+		dataType: double
+		formatString: 0
+		lineageTag: 7bb362c1-f547-4d22-b12f-91cdb919ca2d
+		summarizeBy: sum
+		sourceColumn: Total Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa máxima permitida %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 641b85aa-d013-4bd8-beb8-821c59e057f0
+		summarizeBy: sum
+		sourceColumn: Tasa máxima permitida %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 1f80de84-3216-4f09-a9d4-73f52342b9a4
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI13'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0c9f6f84-ddac-436a-bab5-f220ae8062a1
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI13
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: dfb8e0b6-7e07-4db1-86e5-171efd892d9c
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF(0.08<='Resumen KGI13_2_Medias'[Tasa máxima permitida %],"Si","No")
+		lineageTag: b9a1ee3f-5c57-407d-998b-ed2586c09202
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI13_2_Medias-8126b32c-4cab-4ebe-bb13-af46cb7636ac' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A_Abiertas",
+				    
+				    //Total Incidencias Abiertas por Prioridad
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Abierto - Copy"}, {{"Total Incidencias", each Table.RowCount(_), type number}}),
+				
+				  //Homologa las prioridades
+				    #"AllReplace" = [#"1 - Crítica" = "Alta", #"2 - Alta" = "Alta", #"3 - Moderada" = "Media",#"4 - Baja" = "Baja",#"5 - Muy Baja" = "Baja",#"Crítica" = "Alta"],    
+				    #"Replaced Value" = Table.TransformColumns( #"Grouped Rows",{{"Prioridad",each Record.FieldOrDefault(AllReplace,_,_)}}),
+				  
+				    //Unir Tabla de Parámetros
+				    #"Merged Queries" = Table.NestedJoin(#"Replaced Value", {"Prioridad"}, #"Parametros KGI13", {"Prioridad "}, "Parametros KGI1-3 (2)", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI1-3" = Table.ExpandTableColumn(#"Merged Queries", "Parametros KGI1-3 (2)", {"Tasa máxima permitida %", "Peso del KGI %", "Puntos de KGI13", "KGI"}, {"Parametros KGI1-3 (2).Tasa máxima permitida %", "Parametros KGI1-3 (2).Peso del KGI %", "Parametros KGI1-3 (2).Puntos de KGI13", "Parametros KGI1-3 (2).KGI"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded Parametros KGI1-3",{{"Parametros KGI1-3 (2).Tasa máxima permitida %", "Tasa máxima permitida %"}, {"Parametros KGI1-3 (2).Peso del KGI %", "Peso del KGI %"}, {"Parametros KGI1-3 (2).Puntos de KGI13", "Puntos de KGI13"}, {"Parametros KGI1-3 (2).KGI", "KGI"}}),
+				
+				    //Filtro por "Medias"
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Prioridad] = "Media")),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows",{{"Peso del KGI %", Percentage.Type}, {"Tasa máxima permitida %", Percentage.Type}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

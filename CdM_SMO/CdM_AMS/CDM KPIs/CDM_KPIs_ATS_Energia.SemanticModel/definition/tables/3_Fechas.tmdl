@@ -1,0 +1,135 @@
+table 3_Fechas
+	lineageTag: d9180bcc-d155-466d-9373-0e7f9457cae6
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9bb148bd-6cee-46ab-bd3a-16dd32d65a35
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variación
+			isDefault
+			relationship: 0da9706b-575c-438c-b676-b03fe2435b91
+			defaultHierarchy: LocalDateTable_144b09d5-71f5-4644-9907-5570f6282702.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Date_1er_día_mes
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 08f77e0b-3884-47ff-91b5-108d5bf43983
+		summarizeBy: none
+		sourceColumn: Date_1er_día_mes
+
+		variation Variación
+			isDefault
+			relationship: 67e2ed38-0494-4e34-a7e7-69493b1578ce
+			defaultHierarchy: LocalDateTable_691c26e5-e204-48f5-9660-fa25bf1cab98.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Date_ult_día_mes
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ce8b27ad-4e2e-48e4-a718-90914ccacbac
+		summarizeBy: none
+		sourceColumn: Date_ult_día_mes
+
+		variation Variación
+			isDefault
+			relationship: b5d129fc-bb94-4045-9279-c741d5de7548
+			defaultHierarchy: LocalDateTable_da392c2e-e11c-42f8-a484-c27f0fccd0f0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column MesNombreComp
+		dataType: string
+		lineageTag: 475f5676-cf89-4bee-b60c-4135417ccba9
+		summarizeBy: none
+		sourceColumn: MesNombreComp
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNombreCorto
+		dataType: string
+		lineageTag: aef4ce5c-5680-49d6-889b-5be3b45ba9a2
+		summarizeBy: none
+		sourceColumn: MesNombreCorto
+		sortByColumn: MesNumero
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNumero
+		dataType: int64
+		formatString: 0
+		lineageTag: ac85640b-e24f-4b04-ab14-9a1e7f9bad5c
+		summarizeBy: sum
+		sourceColumn: MesNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		dataType: string
+		lineageTag: 865d3c4e-035a-4560-9951-9f962d3e1e0b
+		summarizeBy: none
+		sourceColumn: Año
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesYAño
+		dataType: string
+		lineageTag: 2122cdb4-40fa-47cb-bdb2-9f070c2fdc9d
+		summarizeBy: none
+		sourceColumn: MesYAño
+		sortByColumn: Date_1er_día_mes
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes_anio
+		dataType: string
+		lineageTag: 84f5e6e6-751d-438f-a110-a7ddee461d28
+		summarizeBy: none
+		sourceColumn: Mes_anio
+		sortByColumn: Date_1er_día_mes
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 3_Fechas-68d0e422-137c-4974-a768-798382189842 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Duration.TotalDays (FF-FI) + 1,
+				    ListarFechas = List.Dates(FI,Origen,#duration(1,0,0,0)),
+				    TablaFechas = Table.FromList(ListarFechas, Splitter.SplitByNothing(), type table [Date = date], null, ExtraValues.Error),
+				    #"Inicio del mes insertado" = Table.AddColumn(TablaFechas, "Date_1er_día_mes", each Date.StartOfMonth([Date]), type date),
+				    #"Último día del mes" = Table.AddColumn(#"Inicio del mes insertado", "Date_ult_día_mes", each Date.EndOfMonth([Date]), type date),
+				    ColumnaMes = Table.AddColumn(#"Último día del mes","MesNombreComp", each Date.MonthName([Date]), type text),
+				    #"Poner En Mayúsculas Cada Palabra" = Table.TransformColumns(ColumnaMes,{{"MesNombreComp", Text.Proper, type text}}),
+				    #"Agregar columna personalizada" = Table.AddColumn(#"Poner En Mayúsculas Cada Palabra", "MesNombreCorto", each Text.Start(Text.Proper(Date.ToText([Date], "MMM")), 3), type text),
+				    ColumnaNroMes = Table.AddColumn(#"Agregar columna personalizada","MesNumero", each Date.Month([Date]), Int64.Type),
+				    ColumnaAño = Table.AddColumn(ColumnaNroMes,"Año", each Date.Year([Date]), Int64.Type),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(ColumnaAño,{{"Año", type text}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado", "MesYAño", each [MesNombreComp] & " " & [Año]),
+				    Personalizado1 = Table.AddColumn(#"Personalizada agregada", "MesYAño Corto", each [MesNombreCorto] & " " & [Año]),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(Personalizado1,{{"MesYAño Corto", "Mes_anio"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,80 @@
+table 'Parametros KGI21'
+	excludeFromModelRefresh
+	lineageTag: 02f03899-3f84-4608-9c9b-7959b0087d8e
+
+	measure M_Controlsum = ```
+			sum('Parametros KGI21'[Pesos]) 
+			```
+		lineageTag: db3c7df5-2288-493b-95a0-0d113f1f1ad4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Prioridad '
+		dataType: string
+		lineageTag: 37b4485c-e249-49ac-9400-547cf95d0f5c
+		summarizeBy: none
+		sourceColumn: "Prioridad "
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo de Resolución N2 (Horas)'
+		dataType: int64
+		formatString: 0
+		lineageTag: e1c31d3f-6a66-4136-b5ca-395d11ff8f57
+		summarizeBy: sum
+		sourceColumn: Tiempo de Resolución N2 (Horas)
+
+		annotation SummarizationSetBy = Automatic
+
+	column '% Cumplimiento'
+		dataType: double
+		lineageTag: cb5b212c-074e-492c-b076-66eb0e004d78
+		summarizeBy: sum
+		sourceColumn: % Cumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Pesos
+		dataType: double
+		lineageTag: e62b6578-b3b2-4bc8-bfc5-fe53856bc35c
+		summarizeBy: sum
+		sourceColumn: Pesos
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Puntos de KGI21'
+		dataType: string
+		lineageTag: 418a066f-0311-4d60-b0f0-a237405d4777
+		summarizeBy: none
+		sourceColumn: Puntos de KGI21
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: d4ccba41-8a41-435b-8c68-4e5e81745a6c
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI21-d8d182c8-aad2-4e18-a952-8d57205e7b59' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & parametros & xlsx), null, true),
+				    #"P_KGI21_Sheet" = Origen{[Item="P_KGI21",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"P_KGI21_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Prioridad ", type text}, {"Tiempo de Resolución N2 (Horas)", Int64.Type}, {"% Cumplimiento", type number}, {"Pesos", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

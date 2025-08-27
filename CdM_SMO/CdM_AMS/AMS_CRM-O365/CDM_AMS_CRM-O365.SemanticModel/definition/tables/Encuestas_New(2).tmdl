@@ -1,0 +1,131 @@
+table Encuestas_New(2)
+	lineageTag: caeb0df7-effb-423f-926d-29b8b2e79266
+
+	column Instancia
+		dataType: string
+		lineageTag: 308a42ca-6774-464f-a354-d0c5c9b80241
+		summarizeBy: none
+		sourceColumn: Instancia
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Valor real'
+		dataType: string
+		lineageTag: ebafa132-97ae-4e07-91e4-bf22879c1c84
+		summarizeBy: none
+		sourceColumn: Valor real
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pregunta
+		dataType: string
+		lineageTag: 78c10942-8b2d-46a8-ac46-71ecec03a2b4
+		summarizeBy: none
+		sourceColumn: Pregunta
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Valor de cadena'
+		dataType: string
+		lineageTag: f2bc6029-1b9a-4218-8008-e5bf4f4718e6
+		summarizeBy: none
+		sourceColumn: Valor de cadena
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2d2a3207-e824-4b71-90e8-1e408cfbf451
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		variation Variación
+			isDefault
+			relationship: eabda822-828b-4629-bb1c-8b982a50b1d9
+			defaultHierarchy: LocalDateTable_b312a72c-d694-4259-9df3-ada3317bdf30.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Actualizado
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8104dca8-4a2a-4d7c-8f94-d95ebf0aa8c9
+		summarizeBy: none
+		sourceColumn: Actualizado
+
+		variation Variación
+			isDefault
+			relationship: e7d6c50d-50a2-4334-82d6-5d149d895d75
+			defaultHierarchy: LocalDateTable_d1e5a8d0-2706-44b2-b139-5c2cc89b1a89.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Número
+		dataType: string
+		lineageTag: e1877ca6-f377-43de-9a27-12bd80473db8
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Número_1
+		dataType: string
+		lineageTag: dc01db5c-a26a-4c0e-9dbe-2aed263f4284
+		summarizeBy: none
+		sourceColumn: Número_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Elemento
+		dataType: string
+		lineageTag: 489ad6ea-d362-471f-ad9d-a9b7bb14d7e4
+		summarizeBy: none
+		sourceColumn: Elemento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de asignación'
+		dataType: string
+		lineageTag: 7e279943-6458-4e0f-88da-ce18544bfb61
+		summarizeBy: none
+		sourceColumn: Grupo de asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Elemento métrico'
+		dataType: string
+		lineageTag: c32e9064-9569-4b2d-81f0-4a40bf4a3bfe
+		summarizeBy: none
+		sourceColumn: Elemento métrico
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierto por'
+		dataType: string
+		lineageTag: 35d20608-0151-43ce-bfb7-c55624bbbb56
+		summarizeBy: none
+		sourceColumn: Abierto por
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Encuestas_New(2) = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & encuestas & xlsx), null, true),
+				    #"Page 1_Sheet" = Origen{[Name="Page 1"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Cerrado", type date}, {"Actualizado", type date}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

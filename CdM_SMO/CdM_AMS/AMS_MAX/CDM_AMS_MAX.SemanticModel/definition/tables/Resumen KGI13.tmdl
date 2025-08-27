@@ -1,0 +1,125 @@
+table 'Resumen KGI13'
+	lineageTag: 2755fda0-499b-4279-8f42-63aa4ccc50ee
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9f4252bf-0b46-418d-8f03-31bdd21923c5
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Prioridad
+		dataType: string
+		lineageTag: 0a268914-2657-4c6b-9e84-ec2a32ca4c09
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: 2e04137a-8185-414c-a5ac-6d363d8ec992
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Incidencias relacionadas'
+		dataType: double
+		lineageTag: 786ba1a6-faf9-4290-8d89-fd3ec39c4682
+		summarizeBy: sum
+		sourceColumn: Incidencias relacionadas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total sin Incidencias'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4196938b-1e96-4d89-bdfe-1edda5ee9c4e
+		summarizeBy: sum
+		sourceColumn: Total sin Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parametros KGI13.Tasa máxima permitida %'
+		dataType: double
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 0f8fa63d-5d56-4851-8d6f-bbad8e38eb61
+		summarizeBy: sum
+		sourceColumn: Parametros KGI13.Tasa máxima permitida %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parametros KGI13.Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 5584cac0-1b09-4c79-910e-fc3f2f1c4a6e
+		summarizeBy: sum
+		sourceColumn: Parametros KGI13.Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parametros KGI13.Puntos de KGI13'
+		dataType: int64
+		formatString: 0
+		lineageTag: 651bbc86-580d-4deb-8435-8334089f4ae1
+		summarizeBy: sum
+		sourceColumn: Parametros KGI13.Puntos de KGI13
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI13'[Tasa Real %] > 'Resumen KGI13'[Parametros KGI13.Tasa máxima permitida %], "No", "Sí")
+		lineageTag: 57ca9dfb-a8ea-4530-ac3a-835a670d9b28
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Peso_No_Obtenido = 'Resumen KGI13'[Parametros KGI13.Peso del KGI %] - 'Resumen KGI13'[Peso_Obtenido]
+		lineageTag: 3915a318-8dc5-45ba-9e01-61f6c78eec8d
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Peso_Obtenido = IF('Resumen KGI13'[¿Cumple?] = "Sí", 'Resumen KGI13'[Parametros KGI13.Peso del KGI %], 0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 2227cc12-d72a-410f-99e9-4cd5cd160c86
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Real %' = DIVIDE( 'Resumen KGI13'[Incidencias relacionadas], 'Resumen KGI13'[Recuento], 0)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 89512a0d-e21a-42c6-bb71-327984178988
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI13-9d6a6f58-a9b0-4184-852b-97ce079cf500' = m
+		mode: import
+		queryGroup: Resumen
+		source =
+				let
+				    Origen = #"PRO - Planificaciones PRJ y ENH con SLA",
+				    #"Filas agrupadas" = Table.Group(Origen, {"Fecha fin real - Copy", "Prioridad"}, {{"Recuento", each Table.RowCount(_), Int64.Type}}),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Filas agrupadas", {"Fecha fin real - Copy", "Prioridad"}, #"PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado", {"Fecha fin real - Copy", "Prioridad"}, "PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado", JoinKind.LeftOuter),
+				    #"Se expandió PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado" = Table.ExpandTableColumn(#"Consultas combinadas", "PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado", {"Recuento"}, {"PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado.Recuento"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Se expandió PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado",null,0,Replacer.ReplaceValue,{"PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado.Recuento"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Valor reemplazado",{{"PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado.Recuento", "Incidencias relacionadas"}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Total sin Incidencias", each [Recuento] - [Incidencias relacionadas]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Personalizada agregada",{{"Total sin Incidencias", Int64.Type}}),
+				    #"Consultas combinadas1" = Table.NestedJoin(#"Tipo cambiado", {"Prioridad"}, #"Parametros KGI13", {"Prioridad "}, "Parametros KGI13", JoinKind.LeftOuter),
+				    #"Se expandió Parametros KGI13" = Table.ExpandTableColumn(#"Consultas combinadas1", "Parametros KGI13", {"Tasa máxima permitida %", "Peso del KGI %", "Puntos de KGI13"}, {"Parametros KGI13.Tasa máxima permitida %", "Parametros KGI13.Peso del KGI %", "Parametros KGI13.Puntos de KGI13"})
+				in
+				    #"Se expandió Parametros KGI13"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

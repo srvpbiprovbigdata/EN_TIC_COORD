@@ -1,0 +1,174 @@
+table METRICAS_TareasDemanda
+	lineageTag: dc03fdb7-dab9-432a-ba2c-f046043bd332
+
+	measure NUM_TAREAS_SinREPETIR = DISTINCTCOUNT(METRICAS_TareasDemanda[Número])
+		formatString: 0
+		lineageTag: 0123bb7d-f2c0-4cb3-a093-2e0e46c5f6d2
+
+	measure _DuracionDias_TareasDemanda_SinREPETIR = (SUM('METRICAS_TareasDemanda'[_DuracionDias_TareasDemanda])/[NUM_TAREAS_SinREPETIR])+0
+		formatString: 0.00
+		lineageTag: c6800f0a-2abd-412a-9ae1-8de0c057c1ee
+
+	measure NUM_TAREASGRUPOS_SinREPETIR = DISTINCTCOUNTNOBLANK(METRICAS_TareasDemanda[TAREA_GRUPO])
+		formatString: 0
+		lineageTag: 08b28d53-cc96-4f49-ada5-c015b2f65e0f
+
+	measure _DuracionDias_TareasGrupos_SinREPETIR = (SUM('METRICAS_TareasDemanda'[_DuracionDias_TareasDemanda])/[NUM_TAREASGRUPOS_SinREPETIR])+0
+		formatString: 0.00
+		lineageTag: b7303a1d-b5a3-4c25-956d-a33a7bf11df1
+
+	column id
+		dataType: string
+		lineageTag: 210b4b59-7c07-4cfe-903f-a1a840ea1b36
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: 4b30215a-d46c-4f28-91f6-51ee5e534c0f
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 94be5dd8-d94c-427f-b731-bdfb3051b647
+		summarizeBy: none
+		sourceColumn: start
+
+		variation Variación
+			isDefault
+			relationship: 59d8f550-7a0f-431e-b776-d42cbaefbb6e
+			defaultHierarchy: LocalDateTable_2cc99e5d-ba0d-4ab5-bc5c-0c57ec959f90.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 63779228-0d48-4714-903c-b2295a02c44d
+		summarizeBy: none
+		sourceColumn: end
+
+		variation Variación
+			isDefault
+			relationship: 23ddbb2d-57f6-4fe9-8011-8f1d1b6f4320
+			defaultHierarchy: LocalDateTable_5c839624-98a9-4cba-9b09-c2916f8141fe.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column field
+		dataType: string
+		lineageTag: 22ab2150-b0f4-4305-9884-ecd648001856
+		summarizeBy: none
+		sourceColumn: field
+
+		annotation SummarizationSetBy = Automatic
+
+	column Número
+		dataType: string
+		lineageTag: 82b6205f-74ce-439e-b4b3-1183cb255bab
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Demandas_Tasks.number'
+		dataType: string
+		lineageTag: 720d12c4-5510-46c6-b7ea-7c2614140170
+		summarizeBy: none
+		sourceColumn: Demandas_Tasks.number
+
+		annotation SummarizationSetBy = Automatic
+
+	column _DuracionSeg_TareasDemanda = DATEDIFF('METRICAS_TareasDemanda'[start],'METRICAS_TareasDemanda'[end], SECOND)
+		formatString: 0
+		lineageTag: 73a6fd00-5bb7-4033-a7c7-581dd621ba16
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _DuracionHoras_TareasDemanda = DATEDIFF('METRICAS_TareasDemanda'[start],'METRICAS_TareasDemanda'[end], HOUR)
+		formatString: 0.00
+		lineageTag: 3be18648-024e-404e-814f-a2e368273717
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _DuracionDias_TareasDemanda = DATEDIFF('METRICAS_TareasDemanda'[start],'METRICAS_TareasDemanda'[end], DAY)
+		formatString: 0.00
+		lineageTag: 12461eda-eeb2-4ad3-b694-f01060ecbb7f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaFin = DATE(METRICAS_TareasDemanda[end].[Año], METRICAS_TareasDemanda[end].[NroMes], 1)
+		formatString: Short Date
+		lineageTag: 8c2851c3-59e3-41b6-b972-71185a4109d2
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 17d79f3f-0f82-4b11-9e41-2a14bc270bd3
+			defaultHierarchy: LocalDateTable_fbbee9a4-a34b-463f-ac9b-aaad5feb65c1.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _EstadoGeneral_MetricasTareasDemanda_Estados = if(and(METRICAS_TareasDemanda[field] = "Estado",'METRICAS_TareasDemanda'[value]= "Pendiente"),"En Espera", if (METRICAS_TareasDemanda[field] = "Grupo de Estimación", "N/A", "En Ejecución"))
+		lineageTag: 6f658351-8306-4527-a641-3625866b0d3e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _EsGrupoEstimacionSupply = LOOKUPVALUE('Demandas_Tasks'[_EsGrupoEstimacionSupply],'Demandas_Tasks'[number], [Número])
+		lineageTag: b66f90bd-86f1-4029-9d91-98dfc87e04eb
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column EstadoActual_EnTablaTareas = LOOKUPVALUE('Demandas_Tasks'[_dv_state - español],'Demandas_Tasks'[number], [Número])
+		lineageTag: a7666a04-27a6-4524-9622-309576d5bf78
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column PortfolioDemanda = LOOKUPVALUE('Demandas_Tasks'[PortfolioDemanda],'Demandas_Tasks'[number], [Número])
+		lineageTag: 7e3f93e5-8ec2-4ae7-a4d7-9f74e84535c2
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column TAREA_GRUPO = if ('METRICAS_TareasDemanda'[field] = "Grupo de Estimación", CONCATENATE('METRICAS_TareasDemanda'[Número], 'METRICAS_TareasDemanda'[Value]), "")
+		lineageTag: 69c89340-5b6a-4410-b989-792e678d6342
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition METRICAS_TareasDemanda-61e05db0-2ebe-46ad-bfcd-4df251e7d5e1 = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_metricas_TareasDemanda = Origen{[Schema="SERV_NOW",Item="metricas_TareasDemanda"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_metricas_TareasDemanda,{"sys_created_on", "sys_updated_on", "duration"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas quitadas","Open","Abierto",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Pending","Pendiente",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","Work in Progress","En curso",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Closed","Cerrado",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Reject","Rechazado",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado4","assignment_group","Grupo de Estimación",Replacer.ReplaceText,{"field"}),
+				    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","state","Estado",Replacer.ReplaceText,{"field"}),
+				    #"Filas filtradas2" = Table.SelectRows(#"Valor reemplazado6", each [end] <> null and [end] <> ""),
+				    #"Filas filtradas3" = Table.SelectRows(#"Filas filtradas2", each [Número] <> null and [Número] <> ""),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas3", {"id"}, Demandas_Tasks, {"sys_id"}, "Demandas_Tasks", JoinKind.LeftOuter),
+				    #"Se expandió Demandas_Tasks" = Table.ExpandTableColumn(#"Consultas combinadas", "Demandas_Tasks", {"number"}, {"Demandas_Tasks.number"}),
+				    #"Filas filtradas1" = Table.SelectRows(#"Se expandió Demandas_Tasks", each [Demandas_Tasks.number] <> null and [Demandas_Tasks.number] <> "")
+				in
+				    #"Filas filtradas1"
+
+	annotation PBI_ResultType = Table
+

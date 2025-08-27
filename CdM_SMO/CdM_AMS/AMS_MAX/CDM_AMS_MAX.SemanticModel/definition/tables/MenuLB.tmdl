@@ -1,0 +1,25 @@
+table MenuLB
+	lineageTag: 20984a4f-75b6-4a6e-a09e-52ee57d62a5e
+
+	column Menu
+		dataType: string
+		lineageTag: 30ffe310-61fd-4f4c-bd87-dd8b00baae38
+		summarizeBy: none
+		sourceColumn: Menu
+
+		annotation SummarizationSetBy = Automatic
+
+	partition MenuLB-7606df61-6f16-4e2c-9dbf-f50c3dca8a9d = m
+		mode: import
+		queryGroup: 'Línea Base'
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45W8jm8Ni81UcEpsThVIbSkWMG1LD+ntCSzLL9YKVYHU9o5v6goNRkqHwsA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Menu = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Menu", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

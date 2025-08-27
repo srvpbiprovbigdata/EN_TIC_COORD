@@ -1,0 +1,301 @@
+table KGI_III_Peticiones_Backlog
+	lineageTag: 1069815b-e032-4eb5-9367-c3e335aeb549
+
+	column Número
+		dataType: string
+		lineageTag: 7571004f-694d-4cf0-93ba-d6c35b1e1cde
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nombre
+		dataType: string
+		lineageTag: 6136eb6c-5c3a-4d8f-ad76-2d07dfa814b7
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: 2ddc313b-afdf-4910-afaf-4bf3c998b83a
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9812eba6-b2f2-4835-8877-3b39a0885b93
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		variation Variación
+			isDefault
+			relationship: d7165e68-3936-4a31-a579-e30c3fe629c5
+			defaultHierarchy: LocalDateTable_b294663b-844b-4183-89b6-6bfd8ac793fc.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Duración del negocio'
+		dataType: int64
+		lineageTag: d5f125d6-d504-4201-ab99-fd3c62c6d022
+		summarizeBy: sum
+		sourceColumn: Duración del negocio
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Porcentaje de negocio trascurrido'
+		dataType: double
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 8644c14b-4b79-4163-b7bc-fb68037fa10a
+		summarizeBy: sum
+		sourceColumn: Porcentaje de negocio trascurrido
+
+		annotation SummarizationSetBy = Automatic
+
+	column Alegación_aceptada
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6433b8c1-bbbc-4f18-b7d8-383a4039bda3
+		summarizeBy: none
+		sourceColumn: Alegación_aceptada
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Prioridad grupo'
+		dataType: string
+		lineageTag: 75fad956-a628-4725-815e-91d53581a967
+		summarizeBy: none
+		sourceColumn: Prioridad grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierto mes'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ba956abd-3673-4ff6-b694-4a428852068a
+		summarizeBy: none
+		sourceColumn: Abierto mes
+
+		variation Variación
+			isDefault
+			relationship: 83d2e578-2848-430f-8cf7-e4f516ea6b87
+			defaultHierarchy: LocalDateTable_0cdc0b06-5239-4a7d-be44-409991a6ee8f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Cerrado mes'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3a2db643-bd8c-40fb-bb59-8771b848fee0
+		summarizeBy: none
+		sourceColumn: Cerrado mes
+
+		variation Variación
+			isDefault
+			relationship: e901f4e2-35f4-4523-89e2-77074bdd11b6
+			defaultHierarchy: LocalDateTable_95482ba6-327a-4bee-a792-0c4495634e57.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Duración (h.)' = KGI_III_Peticiones_Backlog[Duración del negocio] / 3600
+		formatString: 0.00
+		lineageTag: 5d10550d-f915-4a72-96be-d4a70d3e4d48
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración tabla' = ```
+			
+			
+			VAR VDUR21_2 = KGI_III_Peticiones_Backlog[Duración del negocio]
+			VAR _duracCalculada = INT (VDUR21_2/86400)&" Día(s) "&
+			    RIGHT("0" & INT(MOD(VDUR21_2/3600,24)),2)&":"&
+			    RIGHT("0" & INT(MOD(VDUR21_2/60,60)),2)&":"&
+			    RIGHT("0" & INT(MOD(VDUR21_2,60)),2)
+			
+			RETURN 
+			
+			_duracCalculada
+			```
+		lineageTag: e009e699-05f6-4a0c-9354-31edf0b3e79e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Solicitar elemento'
+		dataType: string
+		lineageTag: a6517e30-600c-4bde-9ea9-0ee0c6d4aa67
+		summarizeBy: none
+		sourceColumn: Solicitar elemento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración excedida'
+		dataType: int64
+		formatString: 0
+		lineageTag: 68387688-3203-469a-b9ee-4de3c69f7cf7
+		summarizeBy: sum
+		sourceColumn: Duración excedida
+
+		annotation SummarizationSetBy = Automatic
+
+	column Infringido_alegaciones
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 14da7f57-aa05-4380-aa00-c1cf7b072a96
+		summarizeBy: none
+		sourceColumn: Infringido_alegaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column Duración_excedida_tabla = ```
+			
+			
+			VAR VDUR21_EX_2 = KGI_III_Peticiones_Backlog[Duración excedida]
+			VAR _duracCalculada = INT
+			    (VDUR21_EX_2/86400)&" Día(s) "&
+			    RIGHT("0" & INT(MOD(VDUR21_EX_2/3600,24)),2)&" HH"
+			
+			RETURN 
+			
+			_duracCalculada
+			```
+		lineageTag: 1bab860b-4872-4215-b882-8e3be8c23fc8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 6db15495-ea7f-46f6-a255-444f31f0ed65
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Extracción
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: aafead2e-88bf-45ff-adee-8b6c17eb2512
+		summarizeBy: none
+		sourceColumn: Extracción
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Estado_abierto
+		dataType: string
+		lineageTag: ff4dc31f-5cd9-482a-af77-a4736640a766
+		summarizeBy: none
+		sourceColumn: Estado_abierto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abierto
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 96368ff5-08e1-456c-98d7-01c9671176d1
+		summarizeBy: none
+		sourceColumn: Abierto
+
+		variation Variación
+			isDefault
+			relationship: 87c812d8-c9ba-4b6d-b4e7-f99f61670ebe
+			defaultHierarchy: LocalDateTable_cb0e207a-5026-432f-81ec-ada4bb9b024f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Abierto por'
+		dataType: string
+		lineageTag: a7acfbb8-516b-4fa9-aa49-eaaddccb46d1
+		summarizeBy: none
+		sourceColumn: Abierto por
+
+		annotation SummarizationSetBy = Automatic
+
+	column Alegaciones
+		dataType: string
+		lineageTag: 41a31807-c510-4036-b81a-327097fc7978
+		summarizeBy: none
+		sourceColumn: Alegaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID_KGI_3.3'
+		dataType: string
+		lineageTag: c3551a36-f509-48af-94f6-08f8db67eedc
+		summarizeBy: none
+		sourceColumn: ID_KGI_3.3
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asignado a'
+		dataType: string
+		lineageTag: 109de542-1a08-4110-be9b-1bd8b30f302d
+		summarizeBy: none
+		sourceColumn: Asignado a
+
+		annotation SummarizationSetBy = Automatic
+
+	partition KGI_III_Peticiones_Backlog-58eb1796-cac3-4079-9b85-274dbc70bc5a = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source = ```
+				let
+				    Origen = KGI_III_Peticiones_Actuales_Histórico,
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Abierto", type date}, {"Cerrado", type date}, {"Hora de inicio", type date}, {"Hora de finalización", type date},{"Infringido", type logical}}),
+				    #"Inicio de mes abierto" = Table.AddColumn(#"Tipo cambiado", "Abierto mes", each Date.StartOfMonth([Abierto]), type date),
+				    #"Inicio de mes cerrado" = Table.AddColumn(#"Inicio de mes abierto", "Cerrado mes", each Date.StartOfMonth([Cerrado]), type date),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Inicio de mes cerrado",{{"Extracción", type date}}),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Tipo cambiado1", "Estado_abierto", 
+				                  each if [Abierto mes] <= [Extracción] and (([Cerrado mes] > [Extracción] and [Cerrado mes] > [Abierto mes])
+				                                                              or ([Cerrado mes] = null)
+				                                                            )  then true 
+				                        else false),
+				    #"Filas filtradas" = Table.SelectRows(#"Columna condicional agregada", each ([Estado_abierto] = true)),
+				    ID_KGI_3.3 = Table.AddColumn(#"Filas filtradas", 
+				                 "ID_KGI_3.3", 
+				                    each if [Prioridad] = "1 - Crítica" then "3-3-4-1" 
+				                      else if [Prioridad] = "2 - Alta" then "3-3-4-1" 
+				                      else if [Prioridad] = "3 - Moderada" then "3-3-4-1" 
+				                      else if [Prioridad] = "4 - Baja" then "3-3-4-1"
+				                      else if [Prioridad] = "5 - Muy Baja" then "3-3-4-1" 
+				                      else null, 
+				                type text),
+				    #"Consultas combinadas" = Table.NestedJoin(ID_KGI_3.3, {"Solicitar elemento"}, T_Alegaciones_Resumen, {"ID"}, "T_Alegaciones_Resumen", JoinKind.LeftOuter),
+				    #"Se expandió T_Alegaciones" = Table.ExpandTableColumn(#"Consultas combinadas", "T_Alegaciones_Resumen", {"Alegaciones"}, {"Alegaciones"}),
+				    Alegación_aceptada = Table.AddColumn(#"Se expandió T_Alegaciones", "Alegación_aceptada", each if /*[Infringido] = true and*/ [Alegaciones] <> null and Text.Contains([Alegaciones],"3-3") then true else false, Logical.Type),
+				    Infringido_alegaciones = Table.AddColumn(Alegación_aceptada, "Infringido_alegaciones", each if [Infringido] = true and [Alegaciones] <> null and Text.Contains([Alegaciones],"3-1") then false else [Infringido], Logical.Type),
+				    #"Filas filtradas1" = Table.SelectRows(Infringido_alegaciones, each [Alegación_aceptada] = false),
+				    #"Transforma % de negocio" = Table.TransformColumns(#"Filas filtradas1", {{"Porcentaje de negocio trascurrido", each _ / 100, Percentage.Type}}),
+				
+				
+				    #"Duración excedida" = Table.AddColumn(#"Transforma % de negocio", "Duración excedida", 
+				    each if ([Duración real]-[Duración])<0 then 0 else 
+				    ([Duración real]-[Duración])),
+				    #"Otras columnas quitadas" = Table.SelectColumns(#"Duración excedida",{"Extracción", "Solicitar elemento", "Número", "Abierto", "Abierto por", "Cerrado", "Duración del negocio", "Estado", "Porcentaje de negocio trascurrido", "Nombre", "Prioridad", "Abierto mes", "Cerrado mes", "Estado_abierto", "ID_KGI_3.3", "Alegaciones", "Alegación_aceptada", "Infringido_alegaciones",  "Duración excedida", "Asignado a"}),
+				    #"Prioridad grupo" = Table.AddColumn(#"Otras columnas quitadas", "Prioridad grupo", each if [Prioridad] = "1 - Crítica" then "P1" else if [Prioridad] = "2 - Alta" then "P1" else if [Prioridad] = "3 - Moderada" then "P1" else "P1", type text),
+				    #"Tipo cambiado2" = Table.TransformColumnTypes(#"Prioridad grupo",{{"Duración del negocio", Int64.Type}, {"Duración excedida", Int64.Type}})
+				in
+				    #"Tipo cambiado2"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

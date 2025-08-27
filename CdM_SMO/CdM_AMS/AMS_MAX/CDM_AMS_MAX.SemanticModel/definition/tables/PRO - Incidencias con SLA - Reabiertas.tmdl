@@ -1,0 +1,55 @@
+table 'PRO - Incidencias con SLA - Reabiertas'
+	lineageTag: 40e1c421-6820-4eeb-b609-adb4970102c3
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8ff33f76-067a-4fbc-9777-ffe23ba1bdf2
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: 1bccabf6-2ae0-4d75-8bbc-0c7a57e3e2b6
+			defaultHierarchy: LocalDateTable_c8a922c2-e840-43de-ac9d-ac1315bf27b0.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Reabierta
+		dataType: string
+		lineageTag: ad4e0c8c-f3ff-4da7-b8a2-520434b1a544
+		summarizeBy: none
+		sourceColumn: Reabierta
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Reabiertas'
+		dataType: double
+		lineageTag: 474b620c-1ae5-4b24-9d36-076df716db4f
+		summarizeBy: sum
+		sourceColumn: INCs Reabiertas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'PRO - Incidencias con SLA - Reabiertas-c7aaf3f5-587a-428e-acb3-1c83def8b4c3' = m
+		mode: import
+		queryGroup: KGIs_II
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Cerrado - Copy", "Reabierta"}, {{"INCs Reabiertas", each Table.RowCount(_), type number}}),
+				    
+				    #"Filtered Rows" = Table.SelectRows(#"Grouped Rows",   each ([Reabierta] = true))
+				in
+				    #"Filtered Rows"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

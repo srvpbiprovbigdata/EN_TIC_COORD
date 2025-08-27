@@ -1,0 +1,65 @@
+table 'Parametros KGI16'
+	excludeFromModelRefresh
+	lineageTag: 2a9dce16-627c-4fd7-a745-165616d42980
+
+	column Prioridad
+		dataType: string
+		lineageTag: f3d8ef27-d3c9-4c20-8723-86de4b0476d5
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI16'
+		dataType: int64
+		formatString: 0
+		lineageTag: 945250da-eb7d-472d-b486-6916017f6a91
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI16
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: ade24d59-cf28-46d4-894b-2efe3564b98b
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de desviación máxima %'
+		dataType: double
+		lineageTag: e60e91ea-af5c-4445-ae58-08fed30a7331
+		summarizeBy: sum
+		sourceColumn: Tasa de desviación máxima %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Peso del KGI %'
+		dataType: double
+		lineageTag: dbf15132-face-435e-953d-dab41cdab8a4
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros KGI16-af3fb681-3afd-4353-ae5e-511fc84ee722' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & parametros & xlsx), null, true),
+				    #"P_KGI16_Sheet" = Source{[Item="P_KGI16",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"P_KGI16_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Prioridad", type text}, {"Tasa de desviación máxima %", type number}, {"Peso del KGI %", type number}, {"Puntos de KGI16", Int64.Type}, {"KGI", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

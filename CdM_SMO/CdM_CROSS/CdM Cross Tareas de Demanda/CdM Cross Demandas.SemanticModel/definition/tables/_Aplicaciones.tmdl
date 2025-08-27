@@ -1,0 +1,38 @@
+table _Aplicaciones
+	lineageTag: 38060d95-2ae7-4dc8-838e-d4ee3a863446
+
+	column 'Aplicación identificada por Energía'
+		dataType: string
+		lineageTag: 70592c06-96f3-4b8d-9f7d-45f80d1efe93
+		summarizeBy: none
+		sourceColumn: Aplicación identificada por Energía
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Aplicación de Negocio'
+		dataType: string
+		lineageTag: b567409b-fa9d-4b50-b50e-5009cd08fb91
+		summarizeBy: none
+		sourceColumn: Aplicación de Negocio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Aplicaciones-e8f2e4ed-2670-4951-8f04-7fa7ff9fd0f7 = m
+		mode: import
+		source =
+				let
+				    Entorno = entorno,
+				    BaseUrl = "https://acciona365.sharepoint.com",
+				    RelativePath ="/sites/EN_TIC_COORD_" & entorno & "/Documentos compartidos/CdM_SMO/CdM_CROSS/Archivos comunes/Aplicaciones.xlsx",
+				    Origen = Excel.Workbook(Web.Contents(BaseUrl & RelativePath), null, true),
+				    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data],
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Hoja1_Sheet,{{"Column1", type text}, {"Column2", type text}}),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Tipo cambiado", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Aplicación identificada por Energía", type text}, {"Aplicación de Negocio", type text}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

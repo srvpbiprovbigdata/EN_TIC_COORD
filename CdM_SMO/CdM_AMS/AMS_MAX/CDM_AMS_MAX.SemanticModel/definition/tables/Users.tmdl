@@ -1,0 +1,39 @@
+table Users
+	lineageTag: 118f09ea-9f8e-4c5f-9863-e21749ba69cb
+
+	measure Roles = LOOKUPVALUE(Users[Rol], Users[User], USERNAME())
+		lineageTag: 2e5f51da-9b53-4bd1-84d6-f0089c577d73
+
+	measure NavigationAction = IF([Roles] = "Admin", SELECTEDVALUE(MenuLB[Menu]), "Sin permiso")
+		lineageTag: 2e3cb8b2-8f6b-4a7c-bfcc-9d26854bdd2e
+
+	column User
+		dataType: string
+		lineageTag: 6a6b8e61-1f92-46b5-8c0c-223b1c230930
+		summarizeBy: none
+		sourceColumn: User
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rol
+		dataType: string
+		lineageTag: 32764863-4f67-4e33-9873-e3f91a3c537c
+		summarizeBy: none
+		sourceColumn: Rol
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Users-771d560d-b54f-4ea5-9842-7763af9c36f9 = m
+		mode: import
+		queryGroup: 'Línea Base'
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("fc5BDsMgDETRu7COcob2HCSKRhglrmqDDEQ9flm2C1jP0+h774rdR5F0ECoeCIGTYg1J3OKeJKxuX7yTyobcfvfNNv0zVGDG7YTVuMZPHZ9lVtiUwARKae2wgz6bRR7nGS4mvM+Uh+QF6WGsF4+76I5am2GaRqylTcj+BQ==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [User = _t, Rol = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"User", type text}, {"Rol", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

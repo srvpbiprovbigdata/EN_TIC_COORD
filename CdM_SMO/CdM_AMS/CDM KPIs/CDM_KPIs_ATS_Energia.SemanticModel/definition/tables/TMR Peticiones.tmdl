@@ -1,0 +1,28 @@
+table 'TMR Peticiones'
+	lineageTag: f541bc4f-eb5b-4f17-b591-768aee978205
+
+	column Número
+		lineageTag: fa6b7053-dc33-4cda-85f2-f6c60920d3a8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Peticiones consolidado[Número]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo de resolución'
+		formatString: 0.0
+		lineageTag: 3300dbc0-5f14-4276-ba6c-cfa425ec2ee1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Tiempo de resolución]
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = User
+
+	partition 'TMR Peticiones-3796a885-8f63-440f-a3e9-81fda3071682' = calculated
+		mode: import
+		source = SUMMARIZE('Peticiones consolidado','Peticiones consolidado'[Número], "Tiempo de resolución", [Tiempo total acumulado Peticiones])
+
+	annotation PBI_Id = 2d39fd40809147f19658533c9cec0eb4
+

@@ -1,0 +1,185 @@
+table 'Peticiones consolidado'
+	lineageTag: 553db4c1-2aa7-49c3-ac40-d466e7eaed7e
+
+	column Número
+		dataType: string
+		lineageTag: 29a1017e-4f86-406a-95da-6ad916c8404f
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Elemento
+		dataType: string
+		lineageTag: 90fac8bb-9c48-4d4a-872c-a03b51c16694
+		summarizeBy: none
+		sourceColumn: Elemento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de asignación'
+		dataType: string
+		lineageTag: bf605a50-66f5-4082-9f37-296a7aa09457
+		summarizeBy: none
+		sourceColumn: Grupo de asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: 406f4e24-9a80-4946-afd7-0765af6dfd36
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Valor
+		dataType: string
+		lineageTag: f70e2cfe-db1c-4732-af0c-f54c88ebabc4
+		summarizeBy: none
+		sourceColumn: Valor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Inicio
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 62dcd2f5-6122-47a6-9ec9-6295a2b4364a
+		summarizeBy: none
+		sourceColumn: Inicio
+
+		variation Variación
+			isDefault
+			relationship: 38fcea35-8267-44f9-adbd-03d336d6018b
+			defaultHierarchy: LocalDateTable_33244a2e-6ea6-4969-b9ec-e5bd1ebab7cc.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fin
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 243ec36d-4fe0-4053-bf80-85086b355591
+		summarizeBy: none
+		sourceColumn: Fin
+
+		variation Variación
+			isDefault
+			relationship: a05cbefa-58dc-4eb9-89e9-9fefe68e2674
+			defaultHierarchy: LocalDateTable_52470bc9-f279-4f4d-9a5c-1dc1be6cb435.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Duración
+		dataType: int64
+		formatString: 0
+		lineageTag: 62ae2562-87af-4e4b-814c-802140124eea
+		summarizeBy: sum
+		sourceColumn: Duración
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración por horas'
+		dataType: double
+		lineageTag: 22644986-9df6-46a9-b2be-7b949f461b21
+		summarizeBy: sum
+		sourceColumn: Duración por horas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Inicio sin hora'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d26273c9-d76f-4fda-8516-045a439b73ba
+		summarizeBy: none
+		sourceColumn: Inicio sin hora
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Fin sin hora'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a561fa61-da47-45f4-a95e-ec25e2624bc5
+		summarizeBy: none
+		sourceColumn: Fin sin hora
+
+		variation Variación
+			isDefault
+			relationship: 2d7eae0e-7dba-4721-a306-852bb0e50454
+			defaultHierarchy: LocalDateTable_6684bf28-c2c9-4957-a420-ce71ee8fb4c0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Último estado' =
+			
+			
+			VAR _lastdate = CALCULATE(MAX('Peticiones consolidado'[Inicio]), ALLEXCEPT('Peticiones consolidado','Peticiones consolidado'[Número]))
+			
+			RETURN
+			    CALCULATE(DISTINCT('Peticiones consolidado'[Valor final]),'Peticiones consolidado'[Inicio] = _lastdate)
+		lineageTag: fafce8e5-a034-4a43-8807-db8d0ce999fa
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Motivo espera'
+		dataType: string
+		lineageTag: dae7ab20-a76a-4526-9f46-9a5851a013df
+		summarizeBy: none
+		sourceColumn: Motivo espera
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Valor final' = IF(NOT(ISBLANK('Peticiones consolidado'[Motivo espera])), 'Peticiones consolidado'[Valor] & " - " & 'Peticiones consolidado'[Motivo espera], 'Peticiones consolidado'[Valor])
+		lineageTag: b0caeecb-893b-4679-86bb-71d6304f7bb0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Servicio TIC'
+		dataType: string
+		lineageTag: 083fd1f3-dc3d-4cfd-ba76-f50035c0b6a0
+		summarizeBy: none
+		sourceColumn: Servicio TIC
+
+		annotation SummarizationSetBy = Automatic
+
+	column Concatenado
+		dataType: string
+		lineageTag: afc770e4-8182-4742-86c7-45542e1ee311
+		summarizeBy: none
+		sourceColumn: Concatenado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Elemento de solicitud'
+		dataType: string
+		lineageTag: fbc35d9c-d448-4c23-a7c5-27d926ca64d9
+		summarizeBy: none
+		sourceColumn: Elemento de solicitud
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Peticiones consolidado-40fec2c1-c370-4a8f-ba0f-297a737ec13a' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = #"Peticiones",
+				    #"Consultas combinadas" = Table.NestedJoin(Origen, {"Grupo de asignación"}, #"Relación grupo asignación", {"Grupo de asignación"}, "Relación grupo asignación", JoinKind.LeftOuter),
+				    #"Se expandió Relación grupo asignación" = Table.ExpandTableColumn(#"Consultas combinadas", "Relación grupo asignación", {"Servicio TIC"}, {"Servicio TIC"}),
+				    Personalizado1 = Table.AddColumn(#"Se expandió Relación grupo asignación", "Concatenado", each if [Servicio TIC] is null then [Elemento] else [Elemento] & " - " & [Servicio TIC])
+				in
+				    Personalizado1
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

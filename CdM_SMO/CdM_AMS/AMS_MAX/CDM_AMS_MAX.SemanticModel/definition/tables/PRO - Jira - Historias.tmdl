@@ -1,0 +1,150 @@
+table 'PRO - Jira - Historias'
+	lineageTag: a737fd50-997b-4413-b9fb-1ad2e12b6f3b
+
+	column Components
+		dataType: string
+		lineageTag: d1121eb7-6937-4926-8f29-f974d3318607
+		summarizeBy: none
+		sourceColumn: Components
+
+		annotation SummarizationSetBy = Automatic
+
+	column Project
+		dataType: string
+		lineageTag: e2e8de13-8664-4001-a87d-8c0d37f249b5
+		summarizeBy: none
+		sourceColumn: Project
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Type'
+		dataType: string
+		lineageTag: af1ba439-df60-470d-923c-dd04f9441a24
+		summarizeBy: none
+		sourceColumn: Issue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key
+		dataType: string
+		lineageTag: 8c498554-d769-4d03-a5b9-3aab0c902eb7
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: 06744a90-9e58-48d9-9755-22c7383c8a94
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignee
+		dataType: string
+		lineageTag: 62df5a17-710d-49a1-90ce-8bd1078827b7
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reporter
+		dataType: string
+		lineageTag: 15636d09-5c48-4aa5-86a0-0ec6a66c4567
+		summarizeBy: none
+		sourceColumn: Reporter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: 6503d2cc-906e-4b85-ade3-cc03422a709d
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 7550f372-20c0-4812-b302-0335c15949bc
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d8bfd1a8-103e-4025-ab11-95b3f10e4027
+		summarizeBy: none
+		sourceColumn: Created
+
+		variation Variation
+			isDefault
+			relationship: 8431216c-b400-4b54-93d4-87289f7ebf98
+			defaultHierarchy: LocalDateTable_5b346fa8-0020-46db-a02b-29456f43359c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Linked Issues'
+		dataType: string
+		lineageTag: 832febb1-a5a6-46c9-8e05-6505d79494ce
+		summarizeBy: none
+		sourceColumn: Linked Issues
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-tasks
+		dataType: string
+		lineageTag: ce588ef0-257e-4ee4-a89b-b5b3c0ac8528
+		summarizeBy: none
+		sourceColumn: Sub-tasks
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de prueba'
+		dataType: string
+		lineageTag: c734d200-a38c-4f3a-a04e-705d1976059b
+		summarizeBy: none
+		sourceColumn: Tipo de prueba
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resolved
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2bfd756e-53a9-425b-be1b-39f313c684ba
+		summarizeBy: none
+		sourceColumn: Resolved
+
+		variation Variation
+			isDefault
+			relationship: 5a663a0c-1db2-4fee-aa05-6d8c95fb4e6f
+			defaultHierarchy: LocalDateTable_02358946-bcd1-421d-967b-a0ad14b50b3e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Jira - Historias-c7523024-d4f7-4501-9d3e-67879c622ea8' = m
+		mode: import
+		queryGroup: KGIs_I
+		source = ```
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & entregables & xlsx), null, true),
+				    Stories_Sheet = Source{[Item="Stories",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Stories_Sheet, [PromoteAllScalars=true]),
+				
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Components", type text}, {"Project", type text}, {"Issue Type", type text}, {"Key", type text}, {"Summary", type text}, {"Assignee", type text}, {"Reporter", type text}, {"Priority", type text}, {"Status", type text}, {"Created", type datetime}, {"Linked Issues", type text}, {"Sub-tasks", type text}, {"Tipo de prueba", type text}, {"Resolved", type datetime}}),
+				
+				    //Filtra por aplicaciones correspondientes a Máximo
+				    #"Filtered Rows" = Table.SelectRows(#"Changed Type", each ([Components] 
+				        = "MAXIMO: MAXIMO"))
+				    
+				in
+				    #"Filtered Rows"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

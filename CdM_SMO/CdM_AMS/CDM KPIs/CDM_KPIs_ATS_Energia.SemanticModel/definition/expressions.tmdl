@@ -1,0 +1,359 @@
+expression xlsx = ".xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 575a389a-8734-42c2-bc9e-d446b53b07a5
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression FF = #date(2023, 12, 31) meta [IsParameterQuery=true, Type="Date", IsParameterQueryRequired=true]
+	lineageTag: 9490bce1-929f-4322-a3c6-bdf33638f04b
+	queryGroup: 'Párametros temporales'
+
+	annotation PBI_ResultType = Date
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression globalPath = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRE/Documentos compartidos/CdM_SMO/CDM KPIs/Ficheros del Servicio/4.Incidencias/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 7e79480f-7e61-4e24-8470-f736e6c94b6b
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'Incidencias 2020 - Energía' = ```
+		let
+		    URL = sharepointSource & Entorno & sharepointSource2 & incidencias,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Incidencias Portfolio energía-2020" & xlsx), null, true),
+		    #"Se expandió Data" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Se expandió Data", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Número", type text}, {"Descripción", type text}, {"Elemento de configuración", type text}, {"Estado de la incidencia", type text}, {"Motivo de espera", type text}, {"Grupo de asignación", type text}, {"Prioridad", type text}, {"Valor", type text}, {"Inicio", type datetime}, {"Fin", type datetime}, {"Duración", Int64.Type}, {"Nombre", type text}, {"Subcategoría", type text}, {"Volver a abrir recuento", Int64.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(
+		#"Tipo cambiado", 
+		each [Valor],
+		each if [Valor] = "New" then "Nuevo" 
+		else if [Valor] = "In progress" then "En curso"
+		else if [Valor] = "On hold" then "En espera"
+		else if [Valor] = "Canceled" then "Cancelado"
+		else if [Valor] = "Closed" then "Cerrado"
+		else if [Valor] = "Resolved" then "Resuelto"
+		else [Valor],
+		Replacer.ReplaceValue,{"Valor"}
+		),
+		    #"Duración por horas" = Table.AddColumn(#"Valor reemplazado", "Duración por horas", each [Duración]/3600),
+		    #"Inicio sin horas" = Table.AddColumn(#"Duración por horas", "Inicio sin hora", each [Inicio]),
+		    #"Fin sin horas" = Table.AddColumn(#"Inicio sin horas", "Fin sin hora", each [Fin]),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Fin sin horas",{{"Duración por horas", type number}, {"Inicio sin hora", type date}, {"Fin sin hora", type date}}),
+		    Reabierto = Table.AddColumn(#"Tipo cambiado1", "Incidencia reabierta", each if [Volver a abrir recuento] = 0 then "No" else if [Volver a abrir recuento] > 0 then "Sí" else null),
+		    #"Columnas quitadas" = Table.RemoveColumns(Reabierto,{"Volver a abrir recuento"}),
+		    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each ([Nombre] = "Aplicaciones" or [Nombre] = "Aplicaciones de Negocio (Ingeniería, Operación, Ventas...)")),
+		    #"Motivo espera" = Table.AddColumn(#"Filas filtradas", "Motivo espera", each if [Valor] = "En espera" then [Motivo de espera] else null),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Motivo espera",{"Motivo de espera"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas quitadas1","",null,Replacer.ReplaceValue,{"Motivo espera"}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Valor reemplazado1", "Valor final", each [Valor] & "" & [Motivo espera]),
+		    #"Columnas quitadas2" = Table.RemoveColumns(#"Personalizada agregada",{"Valor final"})
+		in
+		    #"Columnas quitadas2"
+		```
+	lineageTag: 5589a693-8fc4-4dd5-ab72-e986ce09af74
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Incidencias 2021 - Energía' = ```
+		let
+		    URL = sharepointSource & Entorno & sharepointSource2 & incidencias,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Incidencias Portfolio energía-2021" & xlsx), null, true),
+		    #"Se expandió Data" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Se expandió Data", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Número", type text}, {"Descripción", type text}, {"Elemento de configuración", type text}, {"Estado de la incidencia", type text}, {"Motivo de espera", type text}, {"Grupo de asignación", type text}, {"Prioridad", type text}, {"Valor", type text}, {"Inicio", type datetime}, {"Fin", type datetime}, {"Duración", Int64.Type}, {"Nombre", type text}, {"Subcategoría", type text}, {"Volver a abrir recuento", Int64.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(
+		#"Tipo cambiado", 
+		each [Valor],
+		each if [Valor] = "New" then "Nuevo" 
+		else if [Valor] = "In progress" then "En curso"
+		else if [Valor] = "On hold" then "En espera"
+		else if [Valor] = "Canceled" then "Cancelado"
+		else if [Valor] = "Closed" then "Cerrado"
+		else if [Valor] = "Resolved" then "Resuelto"
+		else [Valor],
+		Replacer.ReplaceValue,{"Valor"}
+		),
+		    #"Duración por horas" = Table.AddColumn(#"Valor reemplazado", "Duración por horas", each [Duración]/3600),
+		    #"Inicio sin horas" = Table.AddColumn(#"Duración por horas", "Inicio sin hora", each [Inicio]),
+		    #"Fin sin horas" = Table.AddColumn(#"Inicio sin horas", "Fin sin hora", each [Fin]),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Fin sin horas",{{"Duración por horas", type number}, {"Inicio sin hora", type date}, {"Fin sin hora", type date}}),
+		    Reabierto = Table.AddColumn(#"Tipo cambiado1", "Incidencia reabierta", each if [Volver a abrir recuento] = 0 then "No" else if [Volver a abrir recuento] > 0 then "Sí" else null),
+		    #"Columnas quitadas" = Table.RemoveColumns(Reabierto,{"Volver a abrir recuento"}),
+		    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each ([Nombre] = "Aplicaciones" or [Nombre] = "Aplicaciones de Negocio (Ingeniería, Operación, Ventas...)")),
+		    #"Motivo espera" = Table.AddColumn(#"Filas filtradas", "Motivo espera", each if [Valor] = "En espera" then [Motivo de espera] else null),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Motivo espera",{"Motivo de espera"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas quitadas1","",null,Replacer.ReplaceValue,{"Motivo espera"})
+		in
+		    #"Valor reemplazado1"
+		```
+	lineageTag: dae58e2d-7e9c-41af-a8ac-a6ec9b3650ee
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Incidencias 2022 - Energía' = ```
+		let
+		    URL = sharepointSource & Entorno & sharepointSource2 & incidencias,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Incidencias Portfolio energía-2022" & xlsx), null, true),
+		    #"Se expandió Data" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Se expandió Data", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Número", type text}, {"Descripción", type text}, {"Elemento de configuración", type text}, {"Estado de la incidencia", type text}, {"Motivo de espera", type text}, {"Grupo de asignación", type text}, {"Prioridad", type text}, {"Valor", type text}, {"Inicio", type datetime}, {"Fin", type datetime}, {"Duración", Int64.Type}, {"Nombre", type text}, {"Subcategoría", type text}, {"Volver a abrir recuento", Int64.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(
+		#"Tipo cambiado", 
+		each [Valor],
+		each if [Valor] = "New" then "Nuevo" 
+		else if [Valor] = "In progress" then "En curso"
+		else if [Valor] = "On hold" then "En espera"
+		else if [Valor] = "Canceled" then "Cancelado"
+		else if [Valor] = "Closed" then "Cerrado"
+		else if [Valor] = "Resolved" then "Resuelto"
+		else [Valor],
+		Replacer.ReplaceValue,{"Valor"}
+		),
+		    #"Duración por horas" = Table.AddColumn(#"Valor reemplazado", "Duración por horas", each [Duración]/3600),
+		    #"Inicio sin horas" = Table.AddColumn(#"Duración por horas", "Inicio sin hora", each [Inicio]),
+		    #"Fin sin horas" = Table.AddColumn(#"Inicio sin horas", "Fin sin hora", each [Fin]),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Fin sin horas",{{"Duración por horas", type number}, {"Inicio sin hora", type date}, {"Fin sin hora", type date}}),
+		    Reabierto = Table.AddColumn(#"Tipo cambiado1", "Incidencia reabierta", each if [Volver a abrir recuento] = 0 then "No" else if [Volver a abrir recuento] > 0 then "Sí" else null),
+		    #"Columnas quitadas" = Table.RemoveColumns(Reabierto,{"Volver a abrir recuento"}),
+		    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each ([Nombre] = "Aplicaciones")),
+		    #"Motivo espera" = Table.AddColumn(#"Filas filtradas", "Motivo espera", each if [Valor] = "En espera" then [Motivo de espera] else null),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Motivo espera",{"Motivo de espera"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas quitadas1","",null,Replacer.ReplaceValue,{"Motivo espera"})
+		in
+		    #"Valor reemplazado1"
+		```
+	lineageTag: a98a5fb1-6bfb-4dfe-8e93-03bcefc39113
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Maestro (staging)' =
+		let
+		        URL = sharepointSource & Entorno & sharepointSource2,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Maestro Aplicaciones Servicios TIC Proveedor v4" & xlsx), null, true),
+		    Maestro_Sheet = Origen{[Item="Maestro",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(Maestro_Sheet, [PromoteAllScalars=true]),
+		    #"Filas filtradas" = Table.SelectRows(#"Encabezados promovidos", each ([Incidencias] <> null)),
+		    #"Duplicados quitados" = Table.Distinct(#"Filas filtradas", {"Incidencias"})
+		in
+		    #"Duplicados quitados"
+	lineageTag: 1ffedcdb-3c9a-493c-b8ae-bd53b1ec9e44
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Peticiones = ```
+		let
+		    URL = sharepointSource & Entorno & sharepointSource2,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Request type support and Energy v2" & xlsx), null, true),
+		    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Elemento de solicitud", type text}, {"Número", type text}, {"Elemento", type text}, {"Grupo de asignación", type text}, {"Prioridad", type text}, {"Valor", type text}, {"Inicio", type datetime}, {"Fin", type datetime}, {"Duración", Int64.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(
+		#"Tipo cambiado", 
+		each [Valor],
+		each if [Valor] = "Closed Skipped" then "Cerrado omitido" 
+		else if [Valor] = "Work in Progress" then "En curso"
+		else if [Valor] = "On hold" then "En espera"
+		else if [Valor] = "Canceled" then "Cancelado"
+		else if [Valor] = "Closed Complete" then "Cerrado completo"
+		else if [Valor] = "Closed Incomplete" then "Cerrado incompleto"
+		else if [Valor] = "Open" then "Abierto"
+		else [Valor],
+		Replacer.ReplaceValue,{"Valor"}
+		),
+		    #"Duración por horas" = Table.AddColumn(#"Valor reemplazado", "Duración por horas", each [Duración]/3600),
+		    #"Inicio sin hora" = Table.AddColumn(#"Duración por horas", "Inicio sin hora", each [Inicio]),
+		    #"Fin sin hora" = Table.AddColumn(#"Inicio sin hora", "Fin sin hora", each [Fin]),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Fin sin hora",{{"Inicio sin hora", type date}, {"Fin sin hora", type date}, {"Duración por horas", type number}}),
+		    #"Motivo espera" = Table.AddColumn(#"Tipo cambiado1", "Motivo espera", each if [Valor] = "En espera" then [Motivo pendiente] else null),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Motivo espera",{"Motivo pendiente"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas quitadas","",null,Replacer.ReplaceValue,{"Motivo espera"})
+		in
+		    #"Valor reemplazado1"
+		```
+	lineageTag: d136a103-49f1-4f9c-bdcd-5f5a019f4cb7
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Incidencias 2020 - ATS' = ```
+		let
+		    URL = sharepointSource & Entorno & sharepointSource2,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Incidencias Portfolio ATS-2020" & xlsx), null, true),
+		    #"Se expandió Data" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Se expandió Data", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Número", type text}, {"Descripción", type text}, {"Elemento de configuración", type text}, {"Estado del incidente", type text}, {"Motivo de espera", type text}, {"Grupo de asignación", type text}, {"Prioridad", type text}, {"Valor", type text}, {"Inicio", type datetime}, {"Fin", type datetime}, {"Duración", Int64.Type}, {"Nombre", type text}, {"Subcategoría", type text}, {"Volver a abrir recuento", Int64.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(
+		#"Tipo cambiado", 
+		each [Valor],
+		each if [Valor] = "New" then "Nuevo" 
+		else if [Valor] = "In progress" then "En curso"
+		else if [Valor] = "On hold" then "En espera"
+		else if [Valor] = "Canceled" then "Cancelado"
+		else if [Valor] = "Closed" then "Cerrado"
+		else if [Valor] = "Resolved" then "Resuelto"
+		else [Valor],
+		Replacer.ReplaceValue,{"Valor"}
+		),
+		    #"Duración por horas" = Table.AddColumn(#"Valor reemplazado", "Duración por horas", each [Duración]/3600),
+		    #"Inicio sin horas" = Table.AddColumn(#"Duración por horas", "Inicio sin hora", each [Inicio]),
+		    #"Fin sin horas" = Table.AddColumn(#"Inicio sin horas", "Fin sin hora", each [Fin]),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Fin sin horas",{{"Duración por horas", type number}, {"Inicio sin hora", type date}, {"Fin sin hora", type date}}),
+		    Reabierto = Table.AddColumn(#"Tipo cambiado1", "Incidencia reabierta", each if [Volver a abrir recuento] = 0 then "No" else if [Volver a abrir recuento] > 0 then "Sí" else null),
+		    #"Columnas quitadas" = Table.RemoveColumns(Reabierto,{"Volver a abrir recuento"}),
+		    #"Motivo espera" = Table.AddColumn(#"Columnas quitadas", "Motivo espera", each if [Valor] = "En espera" then [Motivo de espera] else null),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Motivo espera",{"Motivo de espera"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas quitadas1","",null,Replacer.ReplaceValue,{"Motivo espera"})
+		in
+		    #"Valor reemplazado1"
+		```
+	lineageTag: e72b073b-d494-41d8-ae78-7b95284c6c8b
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Incidencias 2021 - ATS' = ```
+		let
+		    URL = sharepointSource & Entorno & sharepointSource2,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Incidencias Portfolio ATS-2021" & xlsx), null, true),
+		    #"Se expandió Data" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Se expandió Data", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Número", type text}, {"Descripción", type text}, {"Elemento de configuración", type text}, {"Estado del incidente", type text}, {"Motivo de espera", type text}, {"Grupo de asignación", type text}, {"Prioridad", type text}, {"Valor", type text}, {"Inicio", type datetime}, {"Fin", type datetime}, {"Duración", Int64.Type}, {"Nombre", type text}, {"Subcategoría", type text}, {"Volver a abrir recuento", Int64.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(
+		#"Tipo cambiado", 
+		each [Valor],
+		each if [Valor] = "New" then "Nuevo" 
+		else if [Valor] = "In progress" then "En curso"
+		else if [Valor] = "On hold" then "En espera"
+		else if [Valor] = "Canceled" then "Cancelado"
+		else if [Valor] = "Closed" then "Cerrado"
+		else if [Valor] = "Resolved" then "Resuelto"
+		else [Valor],
+		Replacer.ReplaceValue,{"Valor"}
+		),
+		    #"Duración por horas" = Table.AddColumn(#"Valor reemplazado", "Duración por horas", each [Duración]/3600),
+		    #"Inicio sin horas" = Table.AddColumn(#"Duración por horas", "Inicio sin hora", each [Inicio]),
+		    #"Fin sin horas" = Table.AddColumn(#"Inicio sin horas", "Fin sin hora", each [Fin]),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Fin sin horas",{{"Duración por horas", type number}, {"Inicio sin hora", type date}, {"Fin sin hora", type date}}),
+		    Reabierto = Table.AddColumn(#"Tipo cambiado1", "Incidencia reabierta", each if [Volver a abrir recuento] = 0 then "No" else if [Volver a abrir recuento] > 0 then "Sí" else null),
+		    #"Columnas quitadas" = Table.RemoveColumns(Reabierto,{"Volver a abrir recuento"}),
+		    #"Motivo espera" = Table.AddColumn(#"Columnas quitadas", "Motivo espera", each if [Valor] = "En espera" then [Motivo de espera] else null),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Motivo espera",{"Motivo de espera"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas quitadas1","",null,Replacer.ReplaceValue,{"Motivo espera"})
+		in
+		    #"Valor reemplazado1"
+		```
+	lineageTag: b548cfc7-117f-4452-8003-42ddbf3dabcf
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Incidencias 2022 - ATS' = ```
+		let
+		    URL = sharepointSource & Entorno & sharepointSource2,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Incidencias Portfolio ATS-2022" & xlsx), null, true),
+		    #"Se expandió Data" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Se expandió Data", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Número", type text}, {"Descripción", type text}, {"Elemento de configuración", type text}, {"Estado del incidente", type text}, {"Motivo de espera", type text}, {"Grupo de asignación", type text}, {"Prioridad", type text}, {"Valor", type text}, {"Inicio", type datetime}, {"Fin", type datetime}, {"Duración", Int64.Type}, {"Nombre", type text}, {"Subcategoría", type text}, {"Volver a abrir recuento", Int64.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(
+		#"Tipo cambiado", 
+		each [Valor],
+		each if [Valor] = "New" then "Nuevo" 
+		else if [Valor] = "In progress" then "En curso"
+		else if [Valor] = "On hold" then "En espera"
+		else if [Valor] = "Canceled" then "Cancelado"
+		else if [Valor] = "Closed" then "Cerrado"
+		else if [Valor] = "Resolved" then "Resuelto"
+		else [Valor],
+		Replacer.ReplaceValue,{"Valor"}
+		),
+		    #"Duración por horas" = Table.AddColumn(#"Valor reemplazado", "Duración por horas", each [Duración]/3600),
+		    #"Inicio sin horas" = Table.AddColumn(#"Duración por horas", "Inicio sin hora", each [Inicio]),
+		    #"Fin sin horas" = Table.AddColumn(#"Inicio sin horas", "Fin sin hora", each [Fin]),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Fin sin horas",{{"Duración por horas", type number}, {"Inicio sin hora", type date}, {"Fin sin hora", type date}}),
+		    Reabierto = Table.AddColumn(#"Tipo cambiado1", "Incidencia reabierta", each if [Volver a abrir recuento] = 0 then "No" else if [Volver a abrir recuento] > 0 then "Sí" else null),
+		    #"Columnas quitadas" = Table.RemoveColumns(Reabierto,{"Volver a abrir recuento"}),
+		    #"Motivo espera" = Table.AddColumn(#"Columnas quitadas", "Motivo espera", each if [Valor] = "En espera" then [Motivo de espera] else null),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Motivo espera",{"Motivo de espera"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas quitadas1","",null,Replacer.ReplaceValue,{"Motivo espera"})
+		in
+		    #"Valor reemplazado1"
+		```
+	lineageTag: da50ca69-f987-40e6-a73d-c8a6d6236b67
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Relación grupo asignación' =
+		let
+		    URL = sharepointSource & Entorno & sharepointSource2,
+		    Origen = Excel.Workbook(Web.Contents(URL & "Relacion Grupo Asignacion" & xlsx), null, true),
+		    Maestro_Sheet = Origen{[Item="Maestro",Kind="Sheet"]}[Data],
+		    #"Tipo cambiado" = Table.TransformColumnTypes(Maestro_Sheet,{{"Column1", type text}, {"Column2", type text}}),
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Tipo cambiado", [PromoteAllScalars=true])
+		in
+		    #"Encabezados promovidos"
+	lineageTag: eb976f68-81dc-4cf3-8f7b-dc3a7dd911ee
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Entorno = "PRE" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 45f58fc5-7222-4c41-90b8-099fe5532969
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: e9bcd485-19b5-4295-ae44-6708352a03bb
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource2 = "/Documentos compartidos/CdM_SMO/CdM_AMS/CDM KPIs/Ficheros del Servicio/" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 45d672b9-14bb-49b8-8516-23405d9b1585
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression incidencias = "4.Incidencias/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b9ab9570-bdf8-4c19-bcc6-5dc1ea7f5076
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+

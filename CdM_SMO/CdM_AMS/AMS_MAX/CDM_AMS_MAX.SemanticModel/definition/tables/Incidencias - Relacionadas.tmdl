@@ -1,0 +1,36 @@
+table 'Incidencias - Relacionadas'
+	lineageTag: 1a482a46-701c-4c24-b746-c79637105ca4
+
+	column Incidente
+		dataType: string
+		lineageTag: 1f1039e6-1274-46d4-9baa-0d927463e1f1
+		summarizeBy: none
+		sourceColumn: Incidente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tarea
+		dataType: string
+		lineageTag: 04276333-dab1-404f-8dda-83ba3141a71c
+		summarizeBy: none
+		sourceColumn: Tarea
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Incidencias - Relacionadas-bc03688f-1302-4c2e-90ce-4751531bf1fc' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & increlated & xlsx), null, true),
+				    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Page 1_Sheet",{{"Column1", type text}, {"Column2", type text}}),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Tipo cambiado", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Incidente", type text}, {"Tarea", type text}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

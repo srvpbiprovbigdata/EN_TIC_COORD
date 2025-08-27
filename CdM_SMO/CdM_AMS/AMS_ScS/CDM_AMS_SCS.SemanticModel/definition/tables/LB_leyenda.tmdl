@@ -1,0 +1,33 @@
+table LB_leyenda
+	lineageTag: f32baefb-b763-44b1-889d-e0838435fb3c
+
+	column LB
+		dataType: string
+		lineageTag: 979cb219-1fcc-4a75-b9c5-8dfb699a101b
+		summarizeBy: none
+		sourceColumn: LB
+
+		annotation SummarizationSetBy = Automatic
+
+	column Color
+		dataType: string
+		lineageTag: 6383cc74-68e0-4c34-a9bd-b8024e1c435f
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	partition LB_leyenda-c15a9d31-6d99-42d4-927f-02dc149c92e3 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45W8nFSiCk1MDBOVnAtLkgtSkxJVNJRUnZzdjI3NFGK1QErQJaxMEkySYTL+CdlpZZkluUrGIDkTC0sLRItMOQMIXKmFuaYckZguWRTCxNMM30PL6zIzM0HqTBKNk0GqYgFAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [LB = _t, Color = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"LB", type text}, {"Color", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

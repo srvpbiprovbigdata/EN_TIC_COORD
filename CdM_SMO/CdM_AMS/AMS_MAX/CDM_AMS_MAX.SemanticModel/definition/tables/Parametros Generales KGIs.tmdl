@@ -1,0 +1,51 @@
+table 'Parametros Generales KGIs'
+	lineageTag: 67ccd1ca-dece-4ab1-9447-c9f487d6fa89
+
+	column KGI
+		dataType: string
+		lineageTag: fc64990b-78de-40be-892e-893fa18d7f3c
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: 55087ec7-c9da-4a73-a695-65d09f3ac1ed
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos por KGI'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0cde6507-8fb5-48dd-9ccf-000acc8c252d
+		summarizeBy: sum
+		sourceColumn: Puntos por KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos Obtenidos' = ('Parametros Generales KGIs'[Puntos por KGI]*1)
+		formatString: 0
+		lineageTag: 43c73ec3-bcd5-4d81-82fe-ea2b4072c8d9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros Generales KGIs-0a9d686e-8b1f-4685-94bc-a1c8ecae7c87' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & parametros & xlsx), null, true),
+				    #"P_GS_KGIS_Sheet" = Source{[Item="P_GS_KGIS",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"P_GS_KGIS_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"KGI", type text}, {"Descripción", type text}, {"Puntos por KGI", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

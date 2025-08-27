@@ -1,0 +1,66 @@
+table 'Parametros KGI17'
+	excludeFromModelRefresh
+	lineageTag: ef23d4e0-88ab-41f7-b38d-cc642d1801a0
+
+	column 'Peso del KGI %'
+		dataType: double
+		lineageTag: e042cc3b-4db7-493c-b429-bae48e914c6a
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Puntos de KGI17'
+		dataType: int64
+		formatString: 0
+		lineageTag: ff5faf7a-8157-4e63-a440-32f9afe5f3c9
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI17
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: ab485faf-5ad1-4ae5-987c-52b4ef57edff
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de aprobación objetivo %'
+		dataType: double
+		lineageTag: 92f6c686-8b7a-4da5-8e49-899e68407757
+		summarizeBy: sum
+		sourceColumn: Tasa de aprobación objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'No. Mínimo de propuestas por trimestre'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8df2e69e-4dc1-405b-b805-77e2cd9d1316
+		summarizeBy: sum
+		sourceColumn: No. Mínimo de propuestas por trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI17-1a7af5b9-e27d-4477-b400-b3039eafa313' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & parametros & xlsx), null, true),
+				    #"P_KGI17_Sheet" = Source{[Item="P_KGI17",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"P_KGI17_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Tasa de aprobación objetivo %", Percentage.Type}, {"No. Mínimo de propuestas por trimestre", Int64.Type}, {"Peso del KGI %", Percentage.Type}, {"Puntos de KGI17", Int64.Type}, {"KGI", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

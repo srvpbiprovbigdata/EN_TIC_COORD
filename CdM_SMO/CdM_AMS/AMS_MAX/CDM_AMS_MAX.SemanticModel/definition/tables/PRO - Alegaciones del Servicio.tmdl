@@ -1,0 +1,126 @@
+table 'PRO - Alegaciones del Servicio'
+	lineageTag: 3951d4ae-7686-4981-b36e-9dcbc1319a49
+
+	column ID
+		dataType: string
+		lineageTag: 73981bb3-50c4-4bf5-b961-33f706558c7b
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Entrada alegada'
+		dataType: string
+		lineageTag: b2c18be7-7ffb-4415-b7a3-b93342ae1ca0
+		summarizeBy: none
+		sourceColumn: Entrada alegada
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo de Medida del ANS alegado'
+		dataType: string
+		lineageTag: b54675c8-e932-42d0-9a21-b77702f7bcf6
+		summarizeBy: none
+		sourceColumn: Periodo de Medida del ANS alegado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clasificación
+		dataType: string
+		lineageTag: a3e294a8-44f9-4027-b3d0-0f9e001bbb23
+		summarizeBy: none
+		sourceColumn: Clasificación
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANS
+		dataType: string
+		lineageTag: 1c9cb584-3fb3-453b-885e-c0baac3b7f9e
+		summarizeBy: none
+		sourceColumn: ANS
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha
+		dataType: string
+		lineageTag: ea859693-0f0f-48e2-8f8f-47f0ca367e09
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 099d6fb8-bcf0-4b76-b3b0-241079ab2ddc
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comentarios
+		dataType: string
+		lineageTag: 50ca9868-6393-46fc-8911-df85e4df4bb1
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo de Medida del ANS alegado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 14cf5c74-e1aa-466a-9f11-b47eb8722089
+		summarizeBy: none
+		sourceColumn: Periodo de Medida del ANS alegado - Copy
+
+		variation Variation
+			isDefault
+			relationship: ba4df146-3cbb-401b-9e21-443328fe658d
+			defaultHierarchy: LocalDateTable_070c756a-8fc0-436c-9e2b-284c7b3599b3.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'ID Alegación'
+		dataType: string
+		lineageTag: a8668f11-19d3-4731-a6ef-4f0b363fe62c
+		summarizeBy: none
+		sourceColumn: ID Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sistema Afectado'
+		dataType: string
+		lineageTag: f471f6d2-2ac5-47f7-ae59-2efa8078b8a4
+		summarizeBy: none
+		sourceColumn: Sistema Afectado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Comentarios AE'
+		dataType: string
+		lineageTag: 4f386dc2-e634-4d06-8254-e07dbbcf05e6
+		summarizeBy: none
+		sourceColumn: Comentarios AE
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Alegaciones del Servicio-46568dad-504f-4217-812b-f6f3a4b450bd' = m
+		mode: import
+		queryGroup: Alegaciones
+		source = ```
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & alegaciones & xlsx), null, true),
+				    T_Alegaciones_Table = Source{[Item="T_Alegaciones",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(T_Alegaciones_Table,{{"ID", type text}, {"Entrada alegada", type any}, {"Periodo de Medida del ANS alegado", type any}, {"Clasificación", type any}, {"ANS", type any}, {"Fecha", type any}, {"Estado", type any}, {"Comentarios", type any}}),
+				    
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Changed Type", "Periodo de Medida del ANS alegado", "Periodo de Medida del ANS alegado - Copy"),
+				    #"Extracted Date" = Table.TransformColumns(#"Duplicated Column",{{"Periodo de Medida del ANS alegado - Copy", Date.StartOfMonth, type date}})
+				in
+				    #"Extracted Date"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,140 @@
+table 'Resumen KGI14'
+	lineageTag: df06fe2c-ff5c-47ad-bce0-9a7e4fbb9fe6
+
+	column Cumplidos = 'Resumen KGI14'[Total]-'Resumen KGI14'[Rechazados]
+		formatString: 0
+		lineageTag: b8ef08ec-381d-4838-a164-a003febc9dd7
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Real %' = ('Resumen KGI14'[Total]-'Resumen KGI14'[Cumplidos])/'Resumen KGI14'[Total]
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: b6df7e8f-33c3-457c-93c2-c1dc33c7a24a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI14'[Tasa Real %]<='Resumen KGI14'[Tasa de desviación máxima %],"Si","No")
+		lineageTag: 5f2262ee-4224-451a-b992-262ca96c7dc3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI14'[¿Cumple?]="Si",'Resumen KGI14'[Peso del KGI %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: c9a1ca0a-7640-474e-a578-6ddeaa66ecd3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI14'[¿Cumple?]="No",'Resumen KGI14'[Peso del KGI %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 9f56e088-291f-414d-b840-8a5b82dbb3db
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3c6278fc-e022-49ee-8fdd-c84092a84198
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: 4024dc2b-ca1d-45a8-bc0b-f460cadedde0
+			defaultHierarchy: LocalDateTable_512e22e8-be3c-4daf-a936-ad80f76b906f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Tasa de desviación máxima %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: aba0c990-d1b7-4c2d-813d-4b7de58b7616
+		summarizeBy: sum
+		sourceColumn: Tasa de desviación máxima %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: e456f1dd-2469-4f7e-bcbb-b60b74f4b2cf
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI14'
+		dataType: int64
+		formatString: 0
+		lineageTag: 71216e8c-fc56-4e2c-a3f3-f0f9f39a360d
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI14
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: f6c84971-f8a8-47bc-af03-62e6788be227
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column Total
+		dataType: double
+		formatString: 0
+		lineageTag: 13c7ce2e-7f1d-444e-87a6-127e8a1a87aa
+		summarizeBy: sum
+		sourceColumn: Total
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo
+		dataType: string
+		lineageTag: fd1fd79a-ebc8-4c27-ae81-bb4ce300b564
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rechazados
+		dataType: double
+		formatString: 0
+		lineageTag: 4b8ab6c1-7c98-46de-817a-c25cfc3235f1
+		summarizeBy: sum
+		sourceColumn: Rechazados
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI14-00c2f80e-991b-4396-97c0-095933bdc507' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Jira - Entregables con SLA",
+				
+				    #"Renamed Columns" = Table.RenameColumns(Source,{{"Resolved - Copy", "Cerrado - Copy"}}),
+				    
+				    #"Grouped Rows" = Table.Group(#"Renamed Columns", {"Cerrado - Copy","Tipo"}, {{"Total", each Table.RowCount(_), type number}}),
+				
+				    #"Merged Queries" = Table.NestedJoin(#"Grouped Rows", {"Cerrado - Copy", "Tipo"}, #"PRO - Jira - Entregables con SLA - Incumplidos", {"Cerrado - Copy", "Tipo"}, "PRO - Jira - Entregables con SLA - Incumplidos", JoinKind.LeftOuter),
+				    #"Expanded PRO - Jira - Entregables con SLA - Incumplidos" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Jira - Entregables con SLA - Incumplidos", {"Total Rechazados"}, {"PRO - Jira - Entregables con SLA - Incumplidos.Total Rechazados"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded PRO - Jira - Entregables con SLA - Incumplidos",{{"PRO - Jira - Entregables con SLA - Incumplidos.Total Rechazados", "Rechazados"}}),
+				
+				    #"Merged Queries1" = Table.NestedJoin(#"Renamed Columns1", {"Tipo"}, #"Parametros KGI14", {"Tipo de incumplimiento"}, "Parametros KGI1-4", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI1-4" = Table.ExpandTableColumn(#"Merged Queries1", "Parametros KGI1-4", {"Tasa de desviación máxima %", "Pesos %", "Puntos de KGI14", "KGI"}, {"Parametros KGI1-4.Tasa de desviación máxima %", "Parametros KGI1-4.Pesos %", "Parametros KGI1-4.Puntos de KGI14", "Parametros KGI1-4.KGI"}),
+				    #"Renamed Columns2" = Table.RenameColumns(#"Expanded Parametros KGI1-4",{{"Parametros KGI1-4.Tasa de desviación máxima %", "Tasa de desviación máxima %"}, {"Parametros KGI1-4.Pesos %", "Peso del KGI %"}, {"Parametros KGI1-4.Puntos de KGI14", "Puntos de KGI14"}, {"Parametros KGI1-4.KGI", "KGI"}})
+				in
+				    #"Renamed Columns2"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

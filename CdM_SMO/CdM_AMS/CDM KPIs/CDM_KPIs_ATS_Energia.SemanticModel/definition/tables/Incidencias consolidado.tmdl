@@ -1,0 +1,447 @@
+table 'Incidencias consolidado'
+	lineageTag: 6f9cb7f8-e47a-40b5-bc3a-fad4d4f6eddd
+
+	column Número
+		dataType: string
+		lineageTag: 57873a6d-877e-48be-9770-e3264e06a3ba
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: 17fe491e-e353-4592-bb8d-a1269b2d9d49
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Elemento de configuración'
+		dataType: string
+		lineageTag: 369f1632-5198-443e-a3e6-6bbce1bc010e
+		summarizeBy: none
+		sourceColumn: Elemento de configuración
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado de la incidencia'
+		dataType: string
+		lineageTag: 4a4947f0-050f-4b6e-aff0-39e62a1e5c09
+		summarizeBy: none
+		sourceColumn: Estado de la incidencia
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de asignación'
+		dataType: string
+		lineageTag: 63b3e4bb-26b0-4fc1-a6d4-6db507f7e561
+		summarizeBy: none
+		sourceColumn: Grupo de asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: 4ab5b1a1-e98a-4cd3-a2bf-54ebc18625be
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Valor
+		dataType: string
+		lineageTag: ecca3555-89ef-4b3d-b7dc-df5af110acfc
+		summarizeBy: none
+		sourceColumn: Valor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Inicio
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3c870d7f-ed93-4cca-ae0f-9454f8c0b67d
+		summarizeBy: none
+		sourceColumn: Inicio
+
+		variation Variación
+			isDefault
+			relationship: f87f8b65-65cb-45de-ac6f-ef560d46695f
+			defaultHierarchy: LocalDateTable_2a1e9185-ca21-4bd7-988c-4ea5cdbc3aa8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fin
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f442e096-bb49-4de1-a1f4-54b92cc76487
+		summarizeBy: none
+		sourceColumn: Fin
+
+		variation Variación
+			isDefault
+			relationship: b2cc617b-8684-4333-be82-c736a72e0e80
+			defaultHierarchy: LocalDateTable_252a561f-fb1a-4d6d-92cf-a485cb65278d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Duración
+		dataType: int64
+		formatString: 0
+		lineageTag: c248200f-e4f7-4b00-ba40-9564d4944e19
+		summarizeBy: sum
+		sourceColumn: Duración
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nombre
+		dataType: string
+		lineageTag: ed73f8bd-087e-496f-bae9-2d888a17dd3a
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subcategoría
+		dataType: string
+		lineageTag: 15093bed-6657-4fc0-83a1-2d31d82a1898
+		summarizeBy: none
+		sourceColumn: Subcategoría
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración por horas'
+		dataType: double
+		lineageTag: 4505e7bd-e785-421e-a50c-88224ee30f5b
+		summarizeBy: sum
+		sourceColumn: Duración por horas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Inicio sin hora'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8d4d5cf1-e5ab-4979-8e38-427dc851b129
+		summarizeBy: none
+		sourceColumn: Inicio sin hora
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Fin sin hora'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2c23ae6a-5a3b-4362-9bb6-0c111d07c21f
+		summarizeBy: none
+		sourceColumn: Fin sin hora
+
+		variation Variación
+			isDefault
+			relationship: de6e733b-a1c4-4dfb-8903-51fe0ac1aae9
+			defaultHierarchy: LocalDateTable_5f503aec-8f2c-4e62-a9b6-59fef034a5a5.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Incidencia reabierta'
+		dataType: string
+		lineageTag: ff092c41-cf62-4506-9bec-979af0c6fd8c
+		summarizeBy: none
+		sourceColumn: Incidencia reabierta
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Último estado' =
+			
+			
+			VAR _lastdate = CALCULATE(MAX('Incidencias consolidado'[Inicio]), ALLEXCEPT('Incidencias consolidado','Incidencias consolidado'[Número]))
+			
+			RETURN
+			    CALCULATE(DISTINCT('Incidencias consolidado'[Valor final]),'Incidencias consolidado'[Inicio] = _lastdate)
+		lineageTag: 68b8ff96-8f0d-40f6-bdb5-35d2f1bbb2be
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Motivo espera'
+		dataType: string
+		lineageTag: 06efe829-505e-4d35-b80f-2aad5fe6a053
+		summarizeBy: none
+		sourceColumn: Motivo espera
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Valor final' = IF(NOT(ISBLANK('Incidencias consolidado'[Motivo espera])), 'Incidencias consolidado'[Valor] & " - " & 'Incidencias consolidado'[Motivo espera], 'Incidencias consolidado'[Valor])
+		lineageTag: 8940e727-68d6-4b22-87bb-0d5a6ca88c11
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Catálogo
+		dataType: string
+		lineageTag: 5cfda841-74c7-47be-99ec-e124462c7109
+		summarizeBy: none
+		sourceColumn: Catálogo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Servicio TIC'
+		dataType: string
+		lineageTag: d9d8f583-5918-4d59-91ad-ecf5fe084797
+		summarizeBy: none
+		sourceColumn: Servicio TIC
+
+		annotation SummarizationSetBy = Automatic
+
+	column Concatenado
+		dataType: string
+		lineageTag: a54f04d2-0034-4d51-9b08-3fe1b8919476
+		summarizeBy: none
+		sourceColumn: Concatenado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado del incidente'
+		dataType: string
+		lineageTag: d89188ec-5b27-437f-882d-d5083dafa0e0
+		summarizeBy: none
+		sourceColumn: Estado del incidente
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierto por'
+		dataType: string
+		lineageTag: 2c70d323-5e65-438a-995a-d6b659d37520
+		summarizeBy: none
+		sourceColumn: Abierto por
+
+		annotation SummarizationSetBy = Automatic
+
+	column Empresa
+		dataType: string
+		lineageTag: 57079909-aee4-47ab-9a95-d906f4236347
+		summarizeBy: none
+		sourceColumn: Empresa
+
+		annotation SummarizationSetBy = Automatic
+
+	column Solicitante
+		dataType: string
+		lineageTag: 5c706d4a-8efb-453b-8f32-0a34b30cc490
+		summarizeBy: none
+		sourceColumn: Solicitante
+
+		annotation SummarizationSetBy = Automatic
+
+	column Empresa_1
+		dataType: string
+		lineageTag: 35066512-1218-4df9-b2b5-535f841bd1cc
+		summarizeBy: none
+		sourceColumn: Empresa_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Catálogo_2
+		dataType: string
+		lineageTag: d815d3e3-5378-4c4e-a6cf-f8616c330aa7
+		summarizeBy: none
+		sourceColumn: Catálogo_2
+
+		annotation SummarizationSetBy = Automatic
+
+	column Urgencia
+		dataType: string
+		lineageTag: c2a0a61a-66ea-41d6-bc32-58a4a1716358
+		summarizeBy: none
+		sourceColumn: Urgencia
+
+		annotation SummarizationSetBy = Automatic
+
+	column Impacto
+		dataType: string
+		lineageTag: 24758c46-26a1-4a8f-a2fd-bb515ae46c3c
+		summarizeBy: none
+		sourceColumn: Impacto
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de contacto'
+		dataType: string
+		lineageTag: eb940169-ee72-4393-90cc-73d6940d6d5d
+		summarizeBy: none
+		sourceColumn: Tipo de contacto
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Breve descripción'
+		dataType: string
+		lineageTag: c8c12d4b-f8ed-4561-bd9d-c982a83cd320
+		summarizeBy: none
+		sourceColumn: Breve descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Observaciones adicionales'
+		dataType: string
+		lineageTag: d1f903ee-4b0d-4606-86dc-1194706d8cae
+		summarizeBy: none
+		sourceColumn: Observaciones adicionales
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asignado a'
+		dataType: string
+		lineageTag: ac54d91d-4ddf-4b82-8751-d9f92aa68168
+		summarizeBy: none
+		sourceColumn: Asignado a
+
+		annotation SummarizationSetBy = Automatic
+
+	column Catálogo_3
+		dataType: string
+		lineageTag: d2c832d9-2b41-4dea-9e69-18db57e2bedb
+		summarizeBy: none
+		sourceColumn: Catálogo_3
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Incidente principal'
+		dataType: string
+		lineageTag: b729f676-831e-428d-90eb-14d9b57c5428
+		summarizeBy: none
+		sourceColumn: Incidente principal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID de correlación'
+		dataType: string
+		lineageTag: 241577ea-4fdb-4128-b2a5-232320ebba80
+		summarizeBy: none
+		sourceColumn: ID de correlación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Principal
+		dataType: string
+		lineageTag: 36613980-e285-4e47-bacb-f5da5ccef866
+		summarizeBy: none
+		sourceColumn: Principal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Solicitud de cambio'
+		dataType: string
+		lineageTag: ed840d76-76ea-4555-bb3c-fa32df54c8bd
+		summarizeBy: none
+		sourceColumn: Solicitud de cambio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Causada por Cambio'
+		dataType: string
+		lineageTag: 1f3361ac-da54-4168-8165-cd07dfdf20c2
+		summarizeBy: none
+		sourceColumn: Causada por Cambio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Notas de trabajo'
+		dataType: string
+		lineageTag: 3468b8f5-d9e4-4c94-850c-96c1ec760e0a
+		summarizeBy: none
+		sourceColumn: Notas de trabajo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Módulo de Subcategoría'
+		dataType: string
+		lineageTag: a705fac9-69b2-4059-8379-090df927fc41
+		summarizeBy: none
+		sourceColumn: Módulo de Subcategoría
+
+		annotation SummarizationSetBy = Automatic
+
+	column Diagnóstico
+		dataType: string
+		lineageTag: 7256da2e-fec4-4319-aa3b-f45ae19d97e2
+		summarizeBy: none
+		sourceColumn: Diagnóstico
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de Solución'
+		dataType: string
+		lineageTag: 8091c7ab-8b03-473d-9c33-05c0c64391e7
+		summarizeBy: none
+		sourceColumn: Tipo de Solución
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Código de resolución'
+		dataType: string
+		lineageTag: 22d9de72-306c-410d-af24-e8ddf45fffd1
+		summarizeBy: none
+		sourceColumn: Código de resolución
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Notas de resolución'
+		dataType: string
+		lineageTag: e5426f4c-4678-40e1-a05d-479d09022d78
+		summarizeBy: none
+		sourceColumn: Notas de resolución
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resueltos por'
+		dataType: string
+		lineageTag: fc336197-0a3d-48a9-8036-a398191cf3da
+		summarizeBy: none
+		sourceColumn: Resueltos por
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resuelto
+		dataType: string
+		lineageTag: 7fa706fa-ff4c-44c0-931c-1b76e271566a
+		summarizeBy: none
+		sourceColumn: Resuelto
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Incidentes secundarios'
+		dataType: string
+		lineageTag: 127c4b29-8588-466b-b196-3a8eb0001c42
+		summarizeBy: none
+		sourceColumn: Incidentes secundarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo de trabajo'
+		dataType: string
+		lineageTag: 4a522453-385a-4d13-8866-4b06bab33d0e
+		summarizeBy: none
+		sourceColumn: Tiempo de trabajo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Incidencias consolidado-1e376c73-a892-41bb-a173-948a7f4f0725' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Table.Combine({#"Incidencias 2020 - Energía", #"Incidencias 2021 - Energía", #"Incidencias 2022 - Energía", #"Incidencias 2020 - ATS", #"Incidencias 2021 - ATS", #"Incidencias 2022 - ATS"}),
+				    #"Consultas combinadas" = Table.NestedJoin(Origen, {"Grupo de asignación"}, #"Relación grupo asignación", {"Grupo de asignación"}, "Relación grupo asignación", JoinKind.LeftOuter),
+				    #"Se expandió Relación grupo asignación" = Table.ExpandTableColumn(#"Consultas combinadas", "Relación grupo asignación", {"Servicio TIC"}, {"Servicio TIC"}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Se expandió Relación grupo asignación", "Concatenado", each if [Servicio TIC] is null then [Subcategoría] else [Subcategoría] & " - " & [Servicio TIC])
+				in
+				    #"Personalizada agregada"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

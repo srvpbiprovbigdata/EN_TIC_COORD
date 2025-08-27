@@ -1,0 +1,99 @@
+table _backlogDemandasTasks
+	lineageTag: edcf7f71-7047-44b8-974e-fbd4c2a19c22
+
+	measure AcumuladoDT =
+			
+			CALCULATE(
+			    Sum(_backlogDemandasTasks[abDT]),
+			    FILTER(ALLSELECTED(_backlogDemandasTasks), _backlogDemandasTasks[fecha]<=MAX(_backlogDemandasTasks[fecha]))
+			)
+		formatString: 0
+		lineageTag: 5a6685c4-3989-44c5-b771-8b30b01b9fa2
+
+	column NroMes
+		formatString: 0
+		lineageTag: 3a16d43a-6b47-41d1-9467-a988de167530
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_c91a5589-5941-4f90-9e1f-0ea18708135a[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 838d69cc-4117-4195-b70d-3cf70f74d7a7
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_c91a5589-5941-4f90-9e1f-0ea18708135a[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abiertas
+		formatString: 0
+		lineageTag: ce6f3cd4-607c-4e97-80f4-7c9713dd54d4
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Abiertas]
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesAño
+		lineageTag: 262b734c-4a3e-4cf2-9d40-17019f1ac893
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Demandas_Tasks[MesAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha = DATE(_backlogDemandasTasks[Año],_backlogDemandasTasks[NroMes],1)
+		formatString: d-m-yy
+		lineageTag: aa6ef152-9444-43fc-9e4e-7e352853a6f5
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 1bd45d49-ba64-4b91-b86d-47cb81541e0d
+			defaultHierarchy: LocalDateTable_dadf9aea-6fb8-43a7-8bf6-6faebba81ae8.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column abDT = if(_backlogDemandasTasks[Abiertas]=BLANK(), 0, _backlogDemandasTasks[Abiertas])
+		formatString: 0
+		lineageTag: a3e343f4-a24c-4b10-ba7b-438a633dba48
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column abMesesPasadosDT = [AcumuladoDT]-_backlogDemandasTasks[abDT]
+		formatString: 0
+		lineageTag: ae30f6ce-78aa-4e29-81ff-78d6bb9a2aef
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerradas = CALCULATE(COUNTROWS(Demandas_Tasks),filter(Demandas_Tasks, and(Demandas_Tasks[_Util]="Si",and(_backlogDemandasTasks[MesAño]=Demandas_Tasks[MesAñoCerrada],Demandas_Tasks[dv_state]="Closed"))))+0
+		formatString: 0
+		lineageTag: a09bc32e-7fbf-46c0-a9da-306bac16c53d
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _backlogDemandasTasks-539c8d4f-1731-4001-8c04-d7b98ca322f3 = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'Demandas_Tasks',
+				    Demandas_Tasks[MesAño],
+				    Demandas_Tasks[opened_at].[NroMes], 
+				    Demandas_Tasks[opened_at].[Año],
+				    "Abiertas", CALCULATE(COUNT(Demandas_Tasks[MesAño]),FILTER(Demandas_Tasks,and(Demandas_Tasks[_Util]="Si",Demandas_Tasks[EstadoGeneral]="Abierta")))+0
+				    )
+				```
+
+	annotation PBI_Id = f99e9014b4b44a8fa41c3aa815027c01
+

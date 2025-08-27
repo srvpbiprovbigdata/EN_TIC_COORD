@@ -1,0 +1,53 @@
+table 'PRO - Planificaciones PRJ y ENH con SLA - Incumplidas'
+	lineageTag: 7d64149c-c59c-488f-b3a7-aba41c5fdb43
+
+	column Prioridad
+		dataType: string
+		lineageTag: 0dfdb376-dfd2-4953-a8c5-ccfdee901572
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7572701a-16bc-411f-8f18-ff549cfea723
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		variation Variation
+			isDefault
+			relationship: ed40dea1-9f23-462b-9c96-83482be26a80
+			defaultHierarchy: LocalDateTable_78257d1d-f0f2-4de7-b37f-1b1a24dfb4eb.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Estimación Incumplida'
+		dataType: double
+		lineageTag: 2aaa0b09-1220-40e6-85a4-c8d3fc676a4a
+		summarizeBy: sum
+		sourceColumn: Estimación Incumplida
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'PRO - Planificaciones PRJ y ENH con SLA - Incumplidas-897bbd85-3dae-4c27-b0ca-b3e8fa06d500' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Source = #"PRO - Planificaciones PRJ y ENH con SLA",
+				
+				    #"Filtered Rows" = Table.SelectRows(Source, each ([Estimación incumplida] = true)),
+				    #"Grouped Rows" = Table.Group(#"Filtered Rows", {"Prioridad", "Fecha fin real - Copy"}, {{"Estimación Incumplida", each Table.RowCount(_), type number}})
+				in
+				    #"Grouped Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

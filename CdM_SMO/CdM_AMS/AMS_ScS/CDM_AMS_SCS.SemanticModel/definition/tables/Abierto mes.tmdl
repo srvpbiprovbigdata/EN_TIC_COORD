@@ -1,0 +1,27 @@
+table 'Abierto mes'
+	lineageTag: 096b8d24-90cc-4786-80c7-e2a9d98f09d5
+
+	column 'Abierto mes'
+		dataType: string
+		lineageTag: 5cdeaaa7-bca5-41c8-b328-32d484e39643
+		summarizeBy: none
+		sourceColumn: Abierto mes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Abierto mes-9b11df4a-b55d-4e09-8c6b-82e5d46acf53' = m
+		mode: import
+		queryGroup: 'Parámetros / Listas\Parámetros globales'
+		source =
+				let
+				    Origen = Table.Combine({KGI_II_Incidencias,KGI_II_Incidencias_Previas}),
+				    #"Inicio del mes insertado" = Table.AddColumn(Origen, "Abierto_mes", each Date.StartOfMonth([Abierto]), type datetime),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Inicio del mes insertado",{{"Abierto_mes", type date}}),
+				    #"Otras columnas quitadas" = Table.SelectColumns(#"Tipo cambiado",{"Número", "Abierto", "Abierto_mes", "Cerrado", "Prioridad", "Duración del negocio"}),
+				    #"Abierto mes1" = #"Otras columnas quitadas"[Abierto_mes],
+				    #"Duplicados quitados1" = List.Distinct(#"Abierto mes1")
+				in
+				    #"Duplicados quitados1"
+
+	annotation PBI_ResultType = List
+

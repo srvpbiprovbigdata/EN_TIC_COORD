@@ -1,0 +1,25 @@
+table 'Estado actual incidencias'
+	lineageTag: 8ad14cd9-2e41-41af-86a8-f2a2830fc0b2
+
+	column Número
+		lineageTag: 1268a8fe-2867-4ce2-b6f5-6e6eda5e1287
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Incidencias consolidado[Número]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Último estado'
+		lineageTag: 5c4a5800-126a-49a5-b384-254f59ab74c9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Incidencias consolidado[Último estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Estado actual incidencias-116bb632-3eb4-4c77-9de6-6b604de6af6d' = calculated
+		mode: import
+		source = CALCULATETABLE((SUMMARIZE('Incidencias consolidado','Incidencias consolidado'[Número],'Incidencias consolidado'[Último estado])), NOT(ISBLANK('Incidencias consolidado'[Último estado])))
+
+	annotation PBI_Id = 116c385925694cc880b2f1a0f3c9d115
+

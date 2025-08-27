@@ -1,0 +1,147 @@
+table 'Resumen KGI11'
+	lineageTag: 804933b5-646b-45a4-ab0b-793d523dd7b8
+
+	column Prioridad
+		dataType: string
+		lineageTag: 37b24da4-1bda-4dab-ab83-50d7768e9695
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Start of Month'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2d5414e8-7d29-42fd-8b55-5a635b899f14
+		summarizeBy: none
+		sourceColumn: Start of Month
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Cump. Objetivo %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 29bcb77a-9a6c-4a78-a58b-d646f949f5e8
+		summarizeBy: sum
+		sourceColumn: Cump. Objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 801b1f47-b1b7-4c8b-b007-a5518a0a3f02
+		summarizeBy: sum
+		sourceColumn: Peso %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estimaciones Cumplidas' = ('Resumen KGI11'[Total Estimaciones]-'Resumen KGI11'[Estimaciones Incumplidas])
+		formatString: 0
+		lineageTag: c77bd1d0-6c1e-4776-8e65-fd5edba51d3d
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cump. Real %' = ('Resumen KGI11'[Estimaciones Cumplidas]/'Resumen KGI11'[Total Estimaciones])
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 460015d0-9377-4e6d-8eeb-ee28299c3310
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI11'[Cump. Real %]>='Resumen KGI11'[Cump. Objetivo %],"Si","No")
+		lineageTag: 22c2e56c-a7a0-4a3e-8a92-a25d9cf8681a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI11'[¿Cumple?]="Si",'Resumen KGI11'[Peso %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: b65ad4ce-81f4-4035-95e8-44cb929a21ff
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: d6b6d699-ea91-49c8-800a-3c2157b38a3b
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI11'[¿Cumple?]="No",'Resumen KGI11'[Peso %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 5c65fbbc-8313-4a43-a19b-b57fe73f55d4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos No Obtenidos' = ('Resumen KGI11'[Puntos de KGI11]*'Resumen KGI11'[Peso No Obtenido %])
+		lineageTag: b004856e-6f49-457a-b55c-1d304638eb04
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total Estimaciones'
+		dataType: double
+		formatString: 0
+		lineageTag: 8d4a1f71-110f-4eae-8c9a-d5bd80ad7b8d
+		summarizeBy: sum
+		sourceColumn: Total Estimaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI11'
+		dataType: string
+		lineageTag: cb34d24d-8bf9-4ea3-897e-00a0e809100e
+		summarizeBy: none
+		sourceColumn: Puntos de KGI11
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estimaciones Incumplidas'
+		dataType: double
+		formatString: 0
+		lineageTag: 77a447ef-f5a2-4f13-b945-79b99a64b721
+		summarizeBy: sum
+		sourceColumn: Estimaciones Incumplidas
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI11-419a83c0-3b05-4194-a9a8-703a3711608d' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Estimaciones con SLA",
+				    
+				    //Agrupar por Prioridad. No. de Estimaciones por mes
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Start of Month"}, {{"Total Estimaciones", each Table.RowCount(_), type number}}),
+				    
+				    //Unir con Estimaciones Incumplidas
+				    #"Merged Queries" = Table.NestedJoin(#"Grouped Rows", {"Prioridad", "Start of Month"}, #"PRO - Estimaciones con SLA - Incumplidas", {"Prioridad", "Start of Month"}, "PRO - Estimaciones con SLA - Incumplidas", JoinKind.LeftOuter),
+				    #"Expanded PRO - Estimaciones con SLA - Incumplidas" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Estimaciones con SLA - Incumplidas", {"Count"}, {"PRO - Estimaciones con SLA - Incumplidas.Count"}),
+				
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded PRO - Estimaciones con SLA - Incumplidas",{{"PRO - Estimaciones con SLA - Incumplidas.Count", "Estimaciones Incumplidas"}}),
+				    
+				    //Unir con Tabla de Parámetros
+				    #"Merged Queries1" = Table.NestedJoin(#"Renamed Columns", {"Prioridad"}, #"Parametros KGI11", {"Prioridad"}, "Parametros KGI1-1", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI1-1" = Table.ExpandTableColumn(#"Merged Queries1", "Parametros KGI1-1", {"% cumplimiento Objetivo", "Pesos %"}, {"Parametros KGI1-1.% cumplimiento Objetivo", "Parametros KGI1-1.Pesos %"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded Parametros KGI1-1",{{"Parametros KGI1-1.% cumplimiento Objetivo", "Cump. Objetivo %"}, {"Parametros KGI1-1.Pesos %", "Peso %"}}),
+				   
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns1", "KGI", each "KGI1-1"),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Puntos de KGI11", each 10)
+				in
+				    #"Added Custom1"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

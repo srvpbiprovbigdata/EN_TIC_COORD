@@ -1,0 +1,55 @@
+table 'Parametros KGI22'
+	excludeFromModelRefresh
+	lineageTag: 111a27d1-402f-4c3c-8144-9ae0b47002e5
+
+	column '% Cumplimiento INCs Reabiertas'
+		dataType: double
+		lineageTag: 3b3927a3-f64f-4c21-8662-a92648422016
+		summarizeBy: sum
+		sourceColumn: % Cumplimiento INCs Reabiertas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Peso
+		dataType: int64
+		formatString: 0
+		lineageTag: 94bee046-12f3-4c3e-8ee5-30a996baee29
+		summarizeBy: sum
+		sourceColumn: Peso
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI22'
+		dataType: string
+		lineageTag: 1f22bb75-15b1-47ae-8e4b-28c7ed98e70d
+		summarizeBy: none
+		sourceColumn: Puntos de KGI22
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 0081cfc9-e193-4590-993c-3122f97ce9b3
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI22-a18c8a43-36f9-4286-a845-5a64420c2e3a' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & parametros & xlsx), null, true),
+				    #"P_KGI2-2_Sheet" = Source{[Item="P_KGI22",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"P_KGI2-2_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"% Cumplimiento INCs Reabiertas", type number}, {"Peso", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

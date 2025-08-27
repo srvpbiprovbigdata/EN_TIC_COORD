@@ -1,0 +1,873 @@
+table Medidas
+	lineageTag: 5205735a-3099-4516-b55f-8c202af0a133
+
+	measure 'KGI21 INCs Infringidas_M' = SUM('PRO - Incidencias con SLA_P_y_A'[Infringidos Numérico])
+		formatString: 0
+		lineageTag: 75aafc15-6eb1-4199-9fa8-5a9b06843151
+
+	measure 'KGI21 INCs_No Infringidas_M' = ```
+			SUM('PRO - Incidencias con SLA_P_y_A'[No Infringidos Numerico]) 
+			```
+		formatString: 0
+		lineageTag: 4f6f084a-53b2-4982-a75f-f92f66e4d680
+
+	measure 'Total INCs cerradas del Periodo_M' = COUNTROWS('PRO - Incidencias con SLA_P_y_A_KGI22')
+		formatString: 0
+		lineageTag: 746bdf14-0bfe-4026-a4ec-fc573145b452
+
+	measure 'KGI22 Total INCs Reabiertas del Periodo_M' = SUM('PRO - Incidencias con SLA_P_y_A_KGI22'[N_Reabierta])
+		formatString: 0
+		lineageTag: 83d86ce7-9ef6-4f1e-9144-5929ceffb0e8
+
+	measure 'KGI22 % INCs Reabiertas del Periodo' = ```
+			
+			VAR __BASELINE_VALUE = [Total INCs cerradas del Periodo_M]
+			VAR __VALUE_TO_COMPARE = [KGI22 Total INCs Reabiertas del Periodo_M]
+			RETURN
+				IF(
+					NOT ISBLANK(__VALUE_TO_COMPARE),
+					DIVIDE(__VALUE_TO_COMPARE, __BASELINE_VALUE),0
+				)   
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: db7cdff0-c499-4af8-a719-f9caee41cc16
+
+		extendedProperty MeasureTemplate =
+				{
+				  "version": 0,
+				  "daxTemplateName": "MathematicalPercentageDifference"
+				}
+
+	measure 'KGI23 Media INCs Trim Anterior_M' = ```
+			
+			(CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-1,MONTH)) + 
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-2,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-3,MONTH)))/3
+			```
+		formatString: 0.0
+		lineageTag: b91e4e02-fc56-483d-a86e-006e034dfccf
+
+	measure KGI21_Final =
+			if(((1- calculate(count('PRO - Incidencias con SLA_P_y_A'[Número]),'PRO - Incidencias con SLA_P_y_A'[Infringido]=TRUE(),'PRO - Incidencias con SLA_P_y_A'[Prioridad]="Crítica")/CALCULATE(count('PRO - Incidencias con SLA_P_y_A'[Número]),'PRO - Incidencias con SLA_P_y_A'[Prioridad]="Crítica"))-CALCULATE(SUM('Parametros KGI21'[% Cumplimiento]),'Parametros KGI21'[Prioridad ]="Crítica"))<0,0,calculate(sum('Parametros KGI21'[Pesos]),'Parametros KGI21'[Prioridad ]="Crítica"))+
+			if(((1- calculate(count('PRO - Incidencias con SLA_P_y_A'[Número]),'PRO - Incidencias con SLA_P_y_A'[Infringido]=TRUE(),'PRO - Incidencias con SLA_P_y_A'[Prioridad]="Alta")/CALCULATE(count('PRO - Incidencias con SLA_P_y_A'[Número]),'PRO - Incidencias con SLA_P_y_A'[Prioridad]="Alta"))-CALCULATE(SUM('Parametros KGI21'[% Cumplimiento]),'Parametros KGI21'[Prioridad ]="Alta"))<0,0,calculate(sum('Parametros KGI21'[Pesos]),'Parametros KGI21'[Prioridad ]="Alta"))+
+			
+			if(((1- calculate(count('PRO - Incidencias con SLA_P_y_A'[Número]),'PRO - Incidencias con SLA_P_y_A'[Infringido]=TRUE(),'PRO - Incidencias con SLA_P_y_A'[Prioridad]="Media")/CALCULATE(count('PRO - Incidencias con SLA_P_y_A'[Número]),'PRO - Incidencias con SLA_P_y_A'[Prioridad]="Media"))-CALCULATE(SUM('Parametros KGI21'[% Cumplimiento]),'Parametros KGI21'[Prioridad ]="Media"))<0,0,calculate(sum('Parametros KGI21'[Pesos]),'Parametros KGI21'[Prioridad ]="Media"))+
+			
+			if(((1- calculate(count('PRO - Incidencias con SLA_P_y_A'[Número]),'PRO - Incidencias con SLA_P_y_A'[Infringido]=TRUE(),'PRO - Incidencias con SLA_P_y_A'[Prioridad]="Baja")/CALCULATE(count('PRO - Incidencias con SLA_P_y_A'[Número]),'PRO - Incidencias con SLA_P_y_A'[Prioridad]="Baja"))-CALCULATE(SUM('Parametros KGI21'[% Cumplimiento]),'Parametros KGI21'[Prioridad ]="Baja"))<0,0,calculate(sum('Parametros KGI21'[Pesos]),'Parametros KGI21'[Prioridad ]="Baja"))
+		lineageTag: 3b144e43-01f1-4b67-95d4-2d43bf5bb075
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'KGI13 Media INCs Año Anterior_M' =
+			
+			(CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-1,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-2,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-3,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-4,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-5,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-6,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-7,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-8,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-9,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-10,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-11,MONTH)) +
+			CALCULATE([Total INCs abiertas del Periodo_M],PARALLELPERIOD(Fechas[Date],-12,MONTH)))/12
+		lineageTag: e6e74eee-adc1-4ee7-9066-01523428d2d5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'KGI13 Tasa de Incremento de INCs_M' = ([KGI13 INCs Abiertas del periodo_M]-[KGI13 Media INCs Año Anterior_M])/[KGI13 Media INCs Año Anterior_M]
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: fdffcb44-d6df-4d10-9caa-8272f4bc8837
+
+	measure 'KGI23 Tasa de Reducción de INCs_M' = ([KGI23 Media INCs Trim Anterior_M]-[KGI13 INCs Abiertas del periodo_M])/[KGI23 Media INCs Trim Anterior_M]
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 965551b3-7aee-4c50-af27-6bbdc0c5f928
+
+	measure 'KGI11 ESTs Infringidas_M' = COUNTAX(FILTER('PRO - Estimaciones con SLA','PRO - Estimaciones con SLA'[Infringido]=TRUE()),[Infringido])
+		formatString: 0
+		lineageTag: 0579760c-28a0-44ae-8159-f0ca1acdc1fa
+
+	measure 'KGI11 ESTs No_Infringidas_M' = COUNTAX(FILTER('PRO - Estimaciones con SLA','PRO - Estimaciones con SLA'[Infringido]=FALSE()),[Infringido])
+		formatString: 0
+		lineageTag: fb83be01-bcc8-41f0-948e-9f415dbaa0c8
+
+	measure 'KGI24 INCs C Sem Anterior Inicial_M' =
+			(
+			CALCULATE([KGI24 INCs C del Periodo_M],PARALLELPERIOD(Fechas[Date],-1,MONTH))+
+			CALCULATE([KGI24 INCs C del Periodo_M],PARALLELPERIOD(Fechas[Date],-2,MONTH))+
+			CALCULATE([KGI24 INCs C del Periodo_M],PARALLELPERIOD(Fechas[Date],-3,MONTH))+
+			CALCULATE([KGI24 INCs C del Periodo_M],PARALLELPERIOD(Fechas[Date],-4,MONTH))+
+			CALCULATE([KGI24 INCs C del Periodo_M],PARALLELPERIOD(Fechas[Date],-5,MONTH))+
+			CALCULATE([KGI24 INCs C del Periodo_M],PARALLELPERIOD(Fechas[Date],-6,MONTH))
+			)
+		formatString: 0
+		lineageTag: d0100f6a-6d95-4c2f-abea-934feccf85a4
+
+	measure 'KGI24 INCs C del Periodo_M' = COUNTROWS('PRO - Incidencias con SLA - Críticas')
+		formatString: 0
+		lineageTag: e5715bbf-a15f-4a21-bbb1-1cb6d6757119
+
+	measure 'KGI24 INCs C Sem Anterior A PEN_M' =
+			
+			IF([KGI24 INCs C Sem Anterior Inicial_M]>=2,[KGI24 INCs C del Periodo_M],
+			([KGI24 INCs C Sem Anterior Inicial_M]+[KGI24 INCs C del Periodo_M]))
+		formatString: 0
+		lineageTag: b2833e61-17de-4765-92cb-63ffb0ab9612
+
+	measure 'KGI13 INCs Abiertas del periodo_M' = SUM('Resumen KGI13_1_Críticas/Altas'[Total Incidencias])+SUM('Resumen KGI13_2_Medias'[Total Incidencias])+SUM('Resumen KGI13_3_Bajas'[Total Incidencias])
+		formatString: 0
+		lineageTag: 7d6174db-1108-4d77-b6c8-460e305519ca
+
+	measure 'KGI13 Media INCs "Altas" Año Anterior_M' =
+			
+			(CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-1,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-2,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-3,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-4,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-5,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-6,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-7,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-8,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-9,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-10,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-11,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 1"Altas" del periodo_M],PARALLELPERIOD(Fechas[Date],-12,MONTH)))/12
+		formatString: 0.0
+		lineageTag: 5b79801c-1d82-45da-b986-bfaae02bf9ff
+
+	measure 'KGI13 Media INCs "Medias" Año Anterior_M' =
+			
+			(CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-1,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-2,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-3,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-4,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-5,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-6,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-7,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-8,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-9,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-10,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-11,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 2"Medias" del periodo_M],PARALLELPERIOD(Fechas[Date],-12,MONTH)))/12
+		formatString: 0.0
+		lineageTag: e68dac99-64ac-44a5-bbac-915c0f62c038
+
+	measure 'KGI13 Media INCs "Bajas" Año Anterior_M' =
+			
+			(CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-1,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-2,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-3,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-4,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-5,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-6,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-7,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-8,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-9,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-10,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-11,MONTH)) +
+			CALCULATE([KGI13 INCs Abiertas 3"Bajas" del periodo_M],PARALLELPERIOD(Fechas[Date],-12,MONTH)))/12
+		formatString: 0.0
+		lineageTag: e369421b-0dda-4ca4-97c5-e8b0466b3797
+
+	measure 'KGI13 INCs Abiertas 1"Altas" del periodo_M' = SUM('Resumen KGI13_1_Críticas/Altas'[Total Incidencias])
+		formatString: 0
+		lineageTag: 430b12fe-f8c2-4eb8-8f78-ad94569dceda
+
+	measure 'KGI13 INCs Abiertas 2"Medias" del periodo_M' = SUM('Resumen KGI13_2_Medias'[Total Incidencias])
+		formatString: 0
+		lineageTag: 6498f348-50c3-41ed-b519-33dbc4802928
+
+	measure 'KGI13 Tasa de Incremento de INCs "Medias"_M' = ([KGI13 INCs Abiertas 2"Medias" del periodo_M]-[KGI13 Media INCs "Medias" Año Anterior_M])/[KGI13 Media INCs "Medias" Año Anterior_M]
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 3c34f58c-bd5a-46b1-a1d0-b950a88d3c75
+
+	measure 'KGI13 Tasa de Incremento de INCs "Altas"_M' = ([KGI13 INCs Abiertas 1"Altas" del periodo_M]-[KGI13 Media INCs "Altas" Año Anterior_M])/[KGI13 Media INCs "Altas" Año Anterior_M]
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 7cf83e2a-695e-4dd6-93a5-eccb62fc4768
+
+	measure 'KGI13 INCs Abiertas 3"Bajas" del periodo_M' = SUM('Resumen KGI13_3_Bajas'[Total Incidencias])
+		formatString: 0
+		lineageTag: 38d47847-ad45-43ca-951e-8b651bada790
+
+	measure 'KGI13 Tasa de Incremento de INCs "Bajas"_M' = ([KGI13 INCs Abiertas 3"Bajas" del periodo_M]-[KGI13 Media INCs "Bajas" Año Anterior_M])/[KGI13 Media INCs "Bajas" Año Anterior_M]
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 15d1b70c-c89e-4d60-a99d-4ad39958577c
+
+	measure 'KGI13_PT Peso Obtenido %_M' =
+			IF(MAX(Fechas[SERVICE_P])=0,"N/A",
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2022,04,01), 0.2,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,01,01), 0.7,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,02,01), 0.7,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,03,01), 0.3,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,04,01), 0.5,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,05,01), 0.5,
+			 1- SUM('Resumen KGI13'[Peso_No_Obtenido]))))))))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 9f9d584e-5464-43a1-a75d-b0b5fd68bcbe
+
+	measure 'KGI15 Peso Obtenido %_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",1-SUM('Resumen KGI15'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 45ec0869-ad49-4823-a97b-01701303fb6e
+
+	measure 'KGI16 Peso Obtenido %_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", 1-SUM('Resumen KGI16'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 4f209d65-d6c1-49b3-8679-b6f900d85928
+
+	measure 'KGI11 Peso Obtenido_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", 1 - SUM('Resumen KGI11'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 350cd142-a887-409a-828c-126f4f27085e
+
+	measure 'KGI11 Puntos_M' =
+			
+			var _KGI11_V = MIN('Resumen KGI11'[Puntos de KGI11])
+			return
+			IF(ISBLANK(_KGI11_V),10,_KGI11_V)
+		formatString: 0
+		lineageTag: cb59694c-f51e-4bfd-8bd8-e9fcaa8bb52a
+
+	measure 'KGI11 Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[KGI11 Peso Obtenido_M]*[KGI11 Puntos_M])
+		formatString: 0
+		lineageTag: 6c113946-94e7-47b9-9bf7-bf10b8b0350c
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGI12 Puntos_M' =
+			
+			var _KGI12_V = MIN('Resumen KGI12'[Puntos de KGI12])
+			return
+			IF(ISBLANK(_KGI12_V),30,_KGI12_V)
+		formatString: 0
+		lineageTag: 276721b9-8087-461d-80a1-bef0ae206a97
+
+	measure 'KGI12 Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[KGI12 Peso Obtenido_M]*[KGI12 Puntos_M])
+		formatString: 0
+		lineageTag: 6da26696-f91f-450e-8fc8-c4ef40d89c34
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGI12 Peso Obtenido_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", 1-SUM('Resumen KGI12'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 13be46a7-039c-49fd-ba45-37ec8bd7f706
+
+	measure 'KGI13_P1 Peso Obtenido %_M' = IF([KGI13_P1 ¿Cumple?_M]="Si",0.50,0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 8381a4e8-3320-41d3-836b-b0fc9a5d3e03
+
+	measure 'KGI13_P1 ¿Cumple?_M' = IF([KGI13 Tasa de Incremento de INCs "Altas"_M]<=[KGI13 Tasa máxima permitida %_P1_M],"Si","No")
+		lineageTag: caa75b09-c1d1-4f46-8204-12d0078ba610
+
+	measure 'KGI13 Tasa máxima permitida %_P1_M' = MIN('Resumen KGI13_1_Críticas/Altas'[Tasa máxima permitida %])
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: a7cee729-2273-4207-8cd5-e54a2e7ab3e0
+
+	measure 'KGI13_P2 Tasa máxima permitida %_M' = MIN('Resumen KGI13_2_Medias'[Tasa máxima permitida %])
+		lineageTag: 03fe33ca-f151-4edb-925f-32eed41be3df
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'KGI13_P2 Peso Obtenido %_M' = IF([KGI13_P2 ¿Cumple?_M]="Si",0.30,0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 8cc2a72a-5b7a-4946-9227-adda3cf15147
+
+	measure 'KGI13_P2 ¿Cumple?_M' = IF([KGI13 Tasa de Incremento de INCs "Medias"_M]<=[KGI13_P2 Tasa máxima permitida %_M],"Si","No")
+		lineageTag: c8818fd4-0dd7-4051-8ab8-5fd838ec571f
+
+	measure 'KGI13_P3 Tasa máxima permitida %_M' = MIN('Resumen KGI13_3_Bajas'[Tasa máxima permitida %])
+		lineageTag: 794e1251-c900-4031-b015-62003b5238cf
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'KGI13_P3 Peso Obtenido %_M' = IF([KGI13_P3 ¿Cumple?_M]="Si",0.20,0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 2aa8c6d2-5461-4bae-bea7-6cb2c1775358
+
+	measure 'KGI13_P3 ¿Cumple?_M' = IF([KGI13 Tasa de Incremento de INCs "Bajas"_M]<=[KGI13_P3 Tasa máxima permitida %_M],"Si","No")
+		lineageTag: 7766c144-1e0f-47a0-8b81-c1cd78c19e14
+
+	measure 'KGI13_PT Puntos_M' =
+			
+			var _KGI13_V = MIN('Resumen KGI13_1_Críticas/Altas'[Puntos de KGI13])
+			return
+			IF(ISBLANK(_KGI13_V),15,_KGI13_V)
+		formatString: 0
+		lineageTag: 12e197e7-4e77-4f8c-a926-2b4156198923
+
+	measure 'KGI13_PT Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[KGI13_PT Peso Obtenido %_M]*[KGI13_PT Puntos_M])
+		formatString: 0
+		lineageTag: 4dfbd9d4-e9a1-44d4-b2d8-965973a8a024
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGI14 Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[KGI14 Peso Obtenido %_M]*[KGI14 Puntos_M])
+		formatString: 0
+		lineageTag: e4fe6d26-c033-4fc8-849b-15f49f361230
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGI14 Peso Obtenido %_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",1-SUM('Resumen KGI14'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 7bf5da71-0809-49c9-b761-522ba02b4f48
+
+	measure 'KGI14 Puntos_M' =
+			
+			var _KGI14_V = MIN('Resumen KGI14'[Puntos de KGI14])
+			return
+			IF(ISBLANK(_KGI14_V),10,_KGI14_V)
+		formatString: 0
+		lineageTag: 9d78e5a9-c385-495b-b677-2f639fe0786f
+
+	measure 'KGI15 Puntos_M' =
+			
+			var _KGI15_V = MIN('Resumen KGI15'[Puntos de KGI15])
+			return
+			IF(ISBLANK(_KGI15_V),20,_KGI15_V)
+		formatString: 0
+		lineageTag: c651c064-afba-4c31-a1d2-4e2131f109cc
+
+	measure 'KGI15 Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[KGI15 Peso Obtenido %_M]*[KGI15 Puntos_M])
+		formatString: 0
+		lineageTag: fdf5b459-a48a-4716-9940-bcb22a492754
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGI16 Puntos_M' =
+			
+			var _KGI16_V = MIN('Resumen KGI16'[Puntos de KGI16])
+			return
+			IF(ISBLANK(_KGI16_V),15,_KGI16_V)
+		formatString: 0
+		lineageTag: 3f340bc8-85e4-4e6b-a3a2-fcd4e8febcfe
+
+	measure 'KGI16 Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[KGI16 Peso Obtenido %_M]*[KGI16 Puntos_M])
+		formatString: 0
+		lineageTag: 2dadb70b-91b4-4ea3-b05c-dff651045005
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGI21 Peso Obtenido %_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", 1-SUM('Resumen KGI21'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: e581ebf9-a33d-4f99-bb43-0fcb451b48cf
+
+	measure 'KGI21 Puntos Obtenidos %_M' = [KGI21 Peso Obtenido %_M]*[KGI21 Puntos_M]
+		formatString: 0.0
+		lineageTag: 103f48e2-d16f-4e8c-bbde-e86859fa55a4
+
+	measure 'KGI21 Puntos_M' =
+			
+			var _KGI21_V = MIN('Resumen KGI21'[Puntos de KGI21])
+			return
+			IF(ISBLANK(_KGI21_V),50,_KGI21_V)
+		formatString: 0
+		lineageTag: 6d876ef0-3cfb-40b9-baf3-fc2c6cdc33ae
+
+	measure 'KGI22 Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[KGI22 Peso Obtenido %_M]*[KGI22 Puntos_M])
+		formatString: 0
+		lineageTag: 6bb99149-91fd-479a-bee8-eef5a26ccc59
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGI22 Peso Obtenido %_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", 1-SUM('Resumen KGI22'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: cb579827-e2e9-42a3-97b3-bd000b49ff00
+
+	measure 'KGI22 Puntos_M' =
+			
+			var _KGI22_V = MIN('Resumen KGI22'[Puntos de KGI22])
+			return
+			IF(ISBLANK(_KGI22_V),20,_KGI22_V)
+		formatString: 0
+		lineageTag: 1bd98dd8-7dd2-43bf-b73b-50e8c827c8d8
+
+	measure 'KGI23 Peso Obtenido %_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", [KGI23 Peso Obtenido])
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: d6902df0-2aa9-416b-85e3-b466aa3cc2e5
+
+	measure 'KGI23 Puntos_M' = "N/A"
+		lineageTag: 7c1477d9-20a0-4cf8-92ba-3528f7ed571b
+
+	measure 'KGI23 Puntos Obtenidos_M' = "N/A"
+		lineageTag: 4e40e9b4-a812-48f7-99b8-777816865246
+
+	measure 'KGI24 Peso Obtenido %_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",1-SUM('Resumen KGI24'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 1cf6d9df-318c-4cfa-b361-3894b92b9f34
+
+	measure 'KGI24 Puntos_M' =
+			
+			var _KGI24_V = MIN('Resumen KGI24'[Puntos de KGI24])
+			return
+			IF(ISBLANK(_KGI24_V),30,_KGI24_V)
+		formatString: 0
+		lineageTag: b8cd5d6d-b2f8-4328-be91-862370c640d7
+
+	measure 'KGI24 Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", [KGI24 Peso Obtenido %_M]*[KGI24 Puntos_M])
+		formatString: 0
+		lineageTag: 0d2eee59-9347-4f9a-b751-dcb48d1eea8c
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGI21 Puntos Obtenidos_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", [KGI21 Peso Obtenido %_M]*[KGI21 Puntos_M])
+		formatString: 0
+		lineageTag: 3346bfae-98b5-4c69-b2bc-d0826f00e93d
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'KGIs T Puntos Obtenidos_M' =
+			IF(MAX(Fechas[SERVICE_P])=0,"N/A", (
+			[KGI11 Puntos Obtenidos_M]+
+			[KGI12 Puntos Obtenidos_M]+
+			[KGI13_PT Puntos Obtenidos_M]+
+			[KGI14 Puntos Obtenidos_M]+
+			[KGI15 Puntos Obtenidos_M]+
+			[KGI16 Puntos Obtenidos_M])*0.60+
+			(
+			[KGI21 Puntos Obtenidos_M]+
+			[KGI22 Puntos Obtenidos_M]+
+			[KGI24 Puntos Obtenidos_M])*0.40)
+		formatString: 0.0
+		lineageTag: 71dd68ae-6615-4e0c-b00c-09a5c2764d69
+
+	measure 'KGIs T Umbral Alcanzado' = IF (MAX(Fechas[SERVICE_P])=0,"N/A", IF([KGIs T Puntos Obtenidos_M]>=90,"Objetivo",IF([KGIs T Puntos Obtenidos_M]>=50,"Admisible","Crítico")))
+		lineageTag: 256e8f2f-3ebd-431e-8363-51699bb6cb93
+
+	measure 'KGIs T Umbral Objetivo_M' = MIN('Parametros Valores de Rendimiento'[Objetivo])
+		formatString: 0
+		lineageTag: 9c556e98-a43f-473b-b28e-4b773993d7b6
+
+	measure 'KGIs T Penalización Periodo_M' =
+			IF(MAX(Fechas[SERVICE_P])=0,"N/A",
+			(IF([KGIs T Puntos Obtenidos_M]>=90,
+			    0
+			,
+			IF([KGIs T Puntos Obtenidos_M]>=50,
+			    -(([KGIs T Puntos Obtenidos_M]-[KGIs T Umbral Admisible_M])/([KGIs T Umbral Crítico_M]-[KGIs T Umbral Admisible_M]))*[KGIs T Penalización Máxima_M]
+			,
+			    -0.15
+			))))
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 53f2f826-5b8a-4e2d-b9fa-00b74e12bd7d
+
+	measure 'KGIs T Penalización Máxima_M' = MIN('Parametros Valores de Rendimiento'[Penalización Máxima])
+		lineageTag: 5ad5707e-a987-4a57-b64f-a1c2f1f788dc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'KGIs T Umbral Admisible_M' = MIN('Parametros Valores de Rendimiento'[Admisible])
+		formatString: 0
+		lineageTag: 9de76ba0-6cb7-434a-b1dc-4d2dc78de24e
+
+	measure 'KGIs T Umbral Crítico_M' = MIN('Parametros Valores de Rendimiento'[Crítico])
+		formatString: 0
+		lineageTag: fd150307-2816-413f-8b19-27161e1df664
+
+	measure 'Total INCs abiertas del Periodo_M' = COUNTROWS('PRO - Incidencias con SLA_P_y_A_Abiertas')
+		formatString: 0
+		lineageTag: dea341e2-537f-4c69-af92-ea80c7dc6f10
+
+	measure 'KGI17 Peso Obtenido %_M' =
+			
+			var KGI17_PO = SUM('Resumen KGI17'[Peso Obtenido %])
+			return
+			IF(ISBLANK(KGI17_PO),"N/A",KGI17_PO)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 7698c235-c0d8-445d-b407-69cc502b1bb7
+
+	measure 'KGI17 Puntos_M' = "N/A"
+		lineageTag: bd76e66e-2297-4922-ad56-a70fb016f94a
+
+	measure 'KGI17 Puntos Obtenidos_M' = "N/A"
+		lineageTag: 2468dbae-2d00-4875-8764-7c11e696d469
+
+	measure 'KGIs T Facturacion Periodo_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[KGIs T Penalización Periodo_M]+[KGIs T Bonificación_P_M])
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 999fe6df-3f90-4c94-8079-b37a54c71a7d
+
+	measure 'KGIs T Bonificación_P_M' =
+			IF(MAX(Fechas[SERVICE_P])=0,"N/A",
+			(IF([KGI17 Peso Obtenido %_M]=1,0.05,0))
+			+
+			(IF([KGI23 Peso Obtenido %_M]=1,0.05,0)))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 4ac50cc2-ca4e-4925-8027-07777607abc9
+
+	measure 'KGIs T Puntos Obtenidos_M Actual' =
+			IF( [KGIs T Puntos Obtenidos_M]="N/A",[KGIs T Puntos Obtenidos_M]=0,
+			[KGIs T Puntos Obtenidos_M])
+		formatString: 0.0
+		lineageTag: 457bdb3a-695b-4766-995a-b537376cf8bb
+
+		extendedProperty MeasureTemplate =
+				{
+				  "version": 0,
+				  "daxTemplateName": "MathematicalMultiplication"
+				}
+
+	measure 'KGI21 Peso Obtenido %_M average per MesNombreCorto' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI21 Peso Obtenido %_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 2c53b41b-b3bb-4837-9009-805ccf0c6f75
+
+		extendedProperty MeasureTemplate =
+				{
+				  "version": 0,
+				  "daxTemplateName": "AveragePerCategory"
+				}
+
+	measure 'KGI21 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI21 Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: 1a36b186-3c3a-47ed-ac37-3c82b7c995c9
+
+		extendedProperty MeasureTemplate =
+				{
+				  "version": 0,
+				  "daxTemplateName": "AveragePerCategory"
+				}
+
+	measure 'KGI22 Peso Obtenido %_M average per MesNombreCorto' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI22 Peso Obtenido %_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: e426b29f-5bb7-4fec-a210-3ceeb5b7ccff
+
+	measure 'KGI23 Peso Obtenido %_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI23 Peso Obtenido %_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 6877244b-d8ac-4492-a416-aae0b51f03b7
+
+	measure 'KGI11 Peso Obtenido %_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI11 Peso Obtenido_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 5554cc12-0b0b-4e1c-bcd1-bf2b7edab75b
+
+	measure 'KGI12 Peso Obtenido %_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI12 Peso Obtenido_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: a5da9e41-79bb-42c2-82f0-9fae17efc0c4
+
+	measure 'KGI14 Peso Obtenido %_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI14 Peso Obtenido %_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: c4bdd1a5-71c9-4094-b73a-674b7f3d831f
+
+	measure 'KGI15 Peso Obtenido %_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI15 Peso Obtenido %_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 4e443770-6918-4cbf-910a-b4cf1e3b9e46
+
+	measure 'KGI16 Peso Obtenido %_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI16 Peso Obtenido %_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 0781f880-a4ab-4b8a-842e-34c886dc1717
+
+	measure 'KGI17 Peso Obtenido %_M average' = "N/A"
+		lineageTag: 0798b48b-0e43-48f3-9135-d42d49bab1ab
+
+	measure 'KGI22 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI22 Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: c8902a9b-5561-42b4-869e-de375034aeb0
+
+	measure 'KGI23 Puntos Obtenidos_M average' = "N/A"
+		lineageTag: b68145db-26c6-497a-9431-766ae47e442c
+
+	measure 'KGI24 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI24 Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: f2f40c89-7a96-4335-9e57-23211ba0420a
+
+	measure 'KGI24 Peso Obtenido %_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI24 Peso Obtenido %_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: f3f5964a-0229-4dbc-86b3-b1a643edc0e0
+
+	measure 'KGI11 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI11 Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: cdea71d1-3e37-4cde-b4cc-db6098511ddb
+
+	measure 'KGI12 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI12 Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: 50631e0e-4e22-456b-9adc-92ea112b6bf2
+
+	measure 'KGI14 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI14 Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: fbefeac0-8b26-4b59-a83e-2f361778b380
+
+	measure 'KGI15 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI15 Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: eb14d990-8c09-4a3b-a72a-65ce6de321a5
+
+	measure 'KGI16 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI16 Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: 75e51c3f-1682-4f59-a514-d1eb4794262b
+
+	measure 'KGI17 Puntos Obtenidos_M average' = "N/A"
+		lineageTag: ffbb7b1a-b4da-4a06-9bd3-f30f1693543f
+
+	measure 'KGI13 Puntos Obtenidos_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI13_PT Puntos Obtenidos_M])
+			)
+		formatString: 0.0
+		lineageTag: 49440113-8422-4788-aa60-58140c463772
+
+	measure 'KGI13 Peso Obtenido %_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGI13_PT Peso Obtenido %_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 5fa22bcd-df34-4c87-b4ec-24a8de81248f
+
+	measure 'KGIs T Puntos Obtenidos_AV_M' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGIs T Puntos Obtenidos_M]))
+		lineageTag: ad05a7ad-b258-4355-ba58-603917a9185b
+
+	measure 'KGIs T Penalización del Periodo_M_AV' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGIs T Penalización Periodo_M]))
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 94a5423b-80b2-43c7-912a-b0f017517026
+
+	measure 'KGIs T Bonificación Periodo_M_AV' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([KGIs T Bonificación_P_M]))
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: a5b456bf-e940-4a95-b4a0-46a5300ecf77
+
+	measure 'KGI23 Cumple?' = IF([KGI23 Tasa de Reducción de INCs_M] >= 0.05, "Si", "No")
+		lineageTag: 69699107-cece-4453-98de-a5af795a4c65
+
+	measure 'KGI23 Peso Obtenido' = IF([KGI23 Cumple?]="Si",1,0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: a68d043b-8cb5-4d1e-b1bb-0dfb564fb511
+
+	measure 'KGI23 Peso No Obtenido' = 1- [KGI23 Peso Obtenido]
+		formatString: 0
+		lineageTag: a3dfdaa3-5188-49de-8ac9-2f4524feb2ed
+
+	/// This measure is the sum of column 'Resumen KGI11'[Total Estimaciones]
+	measure 'Resumen KGI11_T' = SUM('Resumen KGI11'[Total Estimaciones])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 9f0d3bac-0acf-4bce-bb6c-c49f3de3c479
+
+	/// This measure is the sum of column 'Resumen KGI12'[Total Planificaciones]
+	measure 'Resumen KGI12_T' = SUM('Resumen KGI12'[Total Planificaciones])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 7ca744b9-d3af-4a45-b766-6ec1d9dbf2dc
+
+	/// This measure is the sum of column 'Resumen KGI13_1_Críticas/Altas'[Total Incidencias]
+	measure 'Resumen KGI13_1_Críticas/Altas_T' = SUM('Resumen KGI13_1_Críticas/Altas'[Total Incidencias])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 2dccee47-c71e-4f8b-8352-ddcd850cc6e5
+
+	/// This measure is the sum of column 'Resumen KGI13_2_Medias'[Total Incidencias]
+	measure 'Resumen KGI13_2_Medias_T' = SUM('Resumen KGI13_2_Medias'[Total Incidencias])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: bbb5ea5e-3286-424e-be39-0a7b369f60d9
+
+	/// This measure is the sum of column 'Resumen KGI13_3_Bajas'[Total Incidencias]
+	measure 'Resumen KGI13_3_Bajas_T' = SUM('Resumen KGI13_3_Bajas'[Total Incidencias])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 1708a0c4-a720-4940-a48c-9e5ad357a0f4
+
+	/// This measure is the sum of column 'Resumen KGI14'[Total]
+	measure 'Resumen KGI14_T' = SUM('Resumen KGI14'[Total])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: ebdb4b7e-11cb-4c72-9ae6-8bee3140224b
+
+	/// This measure is the sum of column 'Resumen KGI15'[Pruebas UAT]
+	measure 'Resumen KGI15_T' = SUM('Resumen KGI15'[Pruebas UAT])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 72e81332-ec04-4fe5-8943-ebce0ae876bf
+
+	/// This measure is the sum of column 'Resumen KGI16'[Pruebas Funcionales]
+	measure 'Resumen KGI16_T' = SUM('Resumen KGI16'[Pruebas Funcionales])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: e96f990e-42db-4a03-ad73-8270bfd77c2c
+
+	/// This measure is the sum of column 'Resumen KGI17'[Total Propuestas]
+	measure 'Resumen KGI17_T' = SUM('Resumen KGI17'[Total Propuestas])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 87811d7f-0bed-40ed-885d-0ceb0bed4cad
+
+	/// This measure is the sum of column 'Resumen KGI21'[Total INCs]
+	measure 'Resumen KGI21_T' = SUM('Resumen KGI21'[Total INCs])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: fe785db3-6f70-4fad-a9ee-514ef969681d
+
+	/// This measure is the sum of column 'Resumen KGI22'[Total INCs]
+	measure 'Resumen KGI22_T' = SUM('Resumen KGI22'[Total INCs])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 5bf60bae-d376-49b9-8f9b-7a2fef62e0a4
+
+	/// This measure is the sum of column 'Resumen KGI23'[Total Incidencias]
+	measure 'Resumen KGI23_T' = SUM('Resumen KGI23'[Total Incidencias])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 483d73ff-6011-460b-b8f2-afefc07b0dc9
+
+	/// This measure is the sum of column 'Resumen KGI24'[Total INCs Críticas]
+	measure 'Resumen KGI24_T' = SUM('Resumen KGI24'[Total INCs Críticas])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 77b85d66-241f-4705-ba89-9972e4b26068
+
+	/// This measure is the sum of column 'Resumen KGI22'[INCs Reabiertas]
+	measure 'Resumen KGI22_Incum' = SUM('Resumen KGI22'[INCs Reabiertas])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 726190fa-1e98-4919-8b33-22a94ff2b0e2
+
+	/// This measure is the sum of column 'Resumen KGI21'[INCs Imcumplidas]
+	measure 'Resumen KGI21_Incum' = SUM('Resumen KGI21'[INCs Imcumplidas])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: ebe5259c-a75a-4e96-8c41-a44d1213196d
+
+	/// This measure is the sum of column 'Resumen KGI17'[Propuestas rechazadas]
+	measure 'Resumen KGI17_Incum' = SUM('Resumen KGI17'[Propuestas rechazadas])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: ed8473fd-ad5a-4561-a48c-73eb184910ea
+
+	/// This measure is the sum of column 'Resumen KGI16'[Defectos Funcionales]
+	measure 'Resumen KGI16_Incum' = SUM('Resumen KGI16'[Defectos Funcionales])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 4b52c848-fe0f-4482-b8ef-4031961c7320
+
+	/// This measure is the sum of column 'Resumen KGI15'[Defectos UAT]
+	measure 'Resumen KGI15_Incum' = SUM('Resumen KGI15'[Defectos UAT])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 2ba99e32-fd79-4def-9cf0-eb8e36adab88
+
+	/// This measure is the sum of column 'Resumen KGI14'[Rechazados]
+	measure 'Resumen KGI14_Incum' = SUM('Resumen KGI14'[Rechazados])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 9919b20c-ae36-4eec-80a5-d70096263559
+
+	/// This measure is the sum of column 'Resumen KGI12'[Planificaciones Incumplidas]
+	measure 'Resumen KGI12_Incum' = SUM('Resumen KGI12'[Planificaciones Incumplidas])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: 40deeb1e-a448-478b-9be0-c1b1794dddbe
+
+	/// This measure is the sum of column 'Resumen KGI11'[Estimaciones Incumplidas]
+	measure 'Resumen KGI11_Incum' = SUM('Resumen KGI11'[Estimaciones Incumplidas])
+		formatString: 0
+		displayFolder: Medidas Integral
+		lineageTag: a66abd5d-43ec-49bc-b1de-8915b251aed9
+
+	column Columna
+		isHidden
+		formatString: 0
+		lineageTag: fee45ac8-5504-41ba-a0b5-29cfa7aa160c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Columna]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Medidas-0ac6c386-83a0-4636-a7db-d40dfd30c842 = calculated
+		mode: import
+		source = Row("Columna", BLANK())
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

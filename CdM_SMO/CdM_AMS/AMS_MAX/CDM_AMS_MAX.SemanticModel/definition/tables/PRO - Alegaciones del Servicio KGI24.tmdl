@@ -1,0 +1,121 @@
+table 'PRO - Alegaciones del Servicio KGI24'
+	lineageTag: 39406692-f916-4f02-a92f-7366974179b8
+
+	column 'ID Alegación'
+		dataType: string
+		lineageTag: 485c19b6-3001-4b28-abbd-0a2d93473ff2
+		summarizeBy: none
+		sourceColumn: ID Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: string
+		lineageTag: 136e384b-3260-45fb-9188-3dcf0a5fb0b6
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Entrada alegada'
+		dataType: string
+		lineageTag: 21f09e0f-14e0-4a19-82bd-dcaba9625fc2
+		summarizeBy: none
+		sourceColumn: Entrada alegada
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sistema Afectado'
+		dataType: string
+		lineageTag: 938a6cea-7fa4-4ee1-a45f-7ce62bddf9af
+		summarizeBy: none
+		sourceColumn: Sistema Afectado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo de Medida del ANS alegado'
+		dataType: string
+		lineageTag: da79c4e0-9bca-4cbc-b3fb-bf96520475b2
+		summarizeBy: none
+		sourceColumn: Periodo de Medida del ANS alegado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clasificación
+		dataType: string
+		lineageTag: c70d17b1-ef26-4d10-bfa8-f1a78d34882e
+		summarizeBy: none
+		sourceColumn: Clasificación
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANS
+		dataType: string
+		lineageTag: 97670701-ee69-4ac5-b1a8-a607b3295d97
+		summarizeBy: none
+		sourceColumn: ANS
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha
+		dataType: string
+		lineageTag: 177ae257-3aad-4846-bf28-a2c1fd298e04
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: ae10ed60-c5c6-458f-ad03-46afb15ef7c6
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comentarios
+		dataType: string
+		lineageTag: 27d57af5-58de-4683-a4d6-3b7cc3b5e3ea
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo de Medida del ANS alegado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3530b806-b84a-4526-b9b7-30b4fbd8dcfd
+		summarizeBy: none
+		sourceColumn: Periodo de Medida del ANS alegado - Copy
+
+		variation Variación
+			isDefault
+			relationship: 30e52f16-a79b-48e5-9126-8f73d45f0e7c
+			defaultHierarchy: LocalDateTable_acb4ecf6-b85c-4566-9263-8eae4db29203.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Comentarios AE'
+		dataType: string
+		lineageTag: 4f9782d6-d0c3-406d-9319-2f9b89bf0e23
+		summarizeBy: none
+		sourceColumn: Comentarios AE
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Alegaciones del Servicio KGI24-cf443284-1583-4b3f-bcca-529ee2a0ce62' = m
+		mode: import
+		queryGroup: Alegaciones
+		source =
+				let
+				    Source = #"PRO - Alegaciones del Servicio",
+				    #"Filtered Rows" = Table.SelectRows(Source, each ([ANS] = "KGI 2-4"))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

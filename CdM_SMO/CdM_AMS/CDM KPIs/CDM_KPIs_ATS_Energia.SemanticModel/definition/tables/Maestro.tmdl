@@ -1,0 +1,98 @@
+table Maestro
+	lineageTag: 2fbf1486-6bdc-48f8-b332-6d75bbbc5063
+
+	column Incidencias
+		dataType: string
+		lineageTag: 56398449-5579-4fb4-8375-578cedb99fc9
+		summarizeBy: none
+		sourceColumn: Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column Aplicación
+		dataType: string
+		lineageTag: 79864e7a-731c-418f-bec8-88f6d7e49867
+		summarizeBy: none
+		sourceColumn: Aplicación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Area '
+		dataType: string
+		lineageTag: 56de004a-d29a-4976-9367-70bffd4697b4
+		summarizeBy: none
+		sourceColumn: "Area "
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subarea
+		dataType: string
+		lineageTag: 031dceed-73b5-438b-bfb9-9ff5b739570d
+		summarizeBy: none
+		sourceColumn: Subarea
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Servicio TIC'
+		dataType: string
+		lineageTag: 3a3b3ec6-5cf4-4176-ad52-3adad5eda1fe
+		summarizeBy: none
+		sourceColumn: Servicio TIC
+
+		annotation SummarizationSetBy = Automatic
+
+	column Proveedor
+		dataType: string
+		lineageTag: 36ec01e2-7a52-413d-a657-3f090cee7dd9
+		summarizeBy: none
+		sourceColumn: Proveedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Peticiones
+		dataType: string
+		lineageTag: 6dd7d697-1bd9-46a7-ab1c-e86c8a385b87
+		summarizeBy: none
+		sourceColumn: Peticiones
+
+		annotation SummarizationSetBy = Automatic
+
+	column Indicador
+		dataType: string
+		lineageTag: a2874a56-dbf9-4809-b363-e3cc270b8ded
+		summarizeBy: none
+		sourceColumn: Indicador
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Inc - Concatenado'
+		dataType: string
+		lineageTag: 436e1419-eabb-4134-b683-7eb3fc7f2471
+		summarizeBy: none
+		sourceColumn: Inc - Concatenado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Pet - Concatenado'
+		dataType: string
+		lineageTag: 6684d8a3-c3ce-49ea-838a-fcc280c686a5
+		summarizeBy: none
+		sourceColumn: Pet - Concatenado
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Maestro-4e7c38aa-6453-4c8f-87be-0867312f0d77 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = #"Maestro (staging)",
+				    #"Columna condicional agregada" = Table.AddColumn(Origen, "Inc - Concatenado", each if [Servicio TIC] = null then [Incidencias] else [Incidencias] & " - " & [Servicio TIC]),
+				    #"Columna condicional agregada1" = Table.AddColumn(#"Columna condicional agregada", "Pet - Concatenado", each if [Servicio TIC] = null then [Peticiones] else [Peticiones] & " - " & [Servicio TIC])
+				in
+				    #"Columna condicional agregada1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,156 @@
+table KGI_II_Incidencias_Estado_Abierto
+	lineageTag: fde7e1b2-8a0b-4c69-ace3-d1d6b768ae7e
+
+	column Número
+		dataType: string
+		lineageTag: 169aca67-901a-4f95-a9df-2b4325c8487f
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abierto
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9cebabc3-2d56-411a-8be9-058adbe31ce4
+		summarizeBy: none
+		sourceColumn: Abierto
+
+		variation Variación
+			isDefault
+			relationship: 640eb5ad-6556-40b4-8a07-90d84e00ccbd
+			defaultHierarchy: LocalDateTable_3a25bede-ea00-4e3a-99c3-bcb10ca9b126.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierto mes'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5d87ded6-0e6c-4bbc-8f05-e43dc9d586af
+		summarizeBy: none
+		sourceColumn: Abierto mes
+
+		variation Variación
+			isDefault
+			relationship: 7f57fcba-6158-43c7-8834-40fb8f253cc5
+			defaultHierarchy: LocalDateTable_513c7037-5f86-4739-927d-210058b57d06.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Cerrado
+		dataType: string
+		lineageTag: 1ca37d2d-ec80-46c3-9185-3f7698ca8cbe
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cerrado mes'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6b6891df-54c3-4290-b039-8266bae8f59c
+		summarizeBy: none
+		sourceColumn: Cerrado mes
+
+		variation Variación
+			isDefault
+			relationship: ce769e32-b95f-4925-a260-e0b6cc5cace7
+			defaultHierarchy: LocalDateTable_9c88d5ee-27fe-403b-842b-a241db603546.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Prioridad grupo ANS1.3'
+		dataType: string
+		lineageTag: c1fcf75e-829d-41d7-bd1c-69bd1c06be6d
+		summarizeBy: none
+		sourceColumn: Prioridad grupo ANS1.3
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subcategoría
+		dataType: string
+		lineageTag: 2e772262-6b52-48e7-b6a0-e4aadcae29e7
+		summarizeBy: none
+		sourceColumn: Subcategoría
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración del negocio'
+		dataType: int64
+		formatString: 0
+		lineageTag: 308bd0d7-9ab0-4fc8-98a5-024c1575c088
+		summarizeBy: sum
+		sourceColumn: Duración del negocio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_abierta
+		dataType: string
+		lineageTag: a7a82a4c-e4f8-4a1c-9c50-dc5156ac196b
+		summarizeBy: none
+		sourceColumn: Estado_abierta
+
+		annotation SummarizationSetBy = Automatic
+
+	column Lista_meses
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fb269f31-e440-4278-9d54-b71233c4768e
+		summarizeBy: none
+		sourceColumn: Lista_meses
+
+		variation Variación
+			isDefault
+			relationship: 9c1a717f-a9d2-4578-b3af-5bcfa6ba0b32
+			defaultHierarchy: LocalDateTable_e097c4d2-c455-47f1-8e18-ada11eeed9bc.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Activos por mes'
+		dataType: string
+		lineageTag: f728cc30-2d00-4310-afff-03c70b0bb136
+		summarizeBy: none
+		sourceColumn: Activos por mes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition KGI_II_Incidencias_Estado_Abierto = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Table.Combine({KGI_II_Incidencias, KGI_II_Incidencias_Previas}),
+				    #"Filas filtradas" = Table.SelectRows(Origen, each true),
+				    #"Columnas renombradas" = Table.RenameColumns(#"Filas filtradas",{{"Volver a abrir recuento", "Reabierta"},  {"Código de resolución", "Código de cierre"}, {"Duración_1", "Duración SLA"}, /*{"Duración del negocio", "Duración real"},*/ {"Etapa", "Estado SLA"}, {"Resuelto", "Fecha de resolución"}}),
+				    #"Inicio del mes insertado" = Table.AddColumn(#"Columnas renombradas", "Inicio del mes", each Date.StartOfMonth([Abierto]), type datetime),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Inicio del mes insertado",{{"Inicio del mes", "Abierto mes"}}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{{"Abierto mes", type date}, {"Reabierta", Int16.Type}, {"Duración del negocio", Int64.Type}, {"Infringido", Logical.Type}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado",null,#date(2100, 1, 1),Replacer.ReplaceValue,{"Cerrado"}),
+				    #"Inicio del mes insertado1" = Table.AddColumn(#"Valor reemplazado", "Inicio del mes", each Date.StartOfMonth([Cerrado]), type datetime),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Inicio del mes insertado1",{{"Inicio del mes", "Cerrado mes"}}),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Columnas con nombre cambiado1",{{"Cerrado mes", type date},{"Cerrado", type date},{"Abierto", type date}}),
+				     #"Transforma Porcentaje negocio" = Table.TransformColumns(#"Valor reemplazado", {{"Porcentaje de negocio trascurrido", each _ / 100, Percentage.Type}}),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Transforma Porcentaje negocio", "Prioridad grupo ANS1.3", each if [Prioridad] = "1 - Crítica" then "Crítica" else if [Prioridad] = "2 - Alta" then "Alta" else if [Prioridad] = "3 - Moderada" then "Media" else "Baja", type text),
+				    #"Columna condicional agregada1" = Table.AddColumn(#"Columna condicional agregada", "Estado_abierta", each if Date.Month([Cerrado]) > Date.Month([Abierto]) or Date.Year([Cerrado]) > Date.Year([Abierto]) then true else false),
+				    #"Cerrado mes" = Table.AddColumn(#"Columna condicional agregada1", "Cerrado mes", each Date.StartOfMonth([Cerrado]), type date),
+				    #"Otras columnas quitadas" = Table.SelectColumns(#"Cerrado mes",{"Número", "Abierto", "Abierto mes", "Cerrado", "Cerrado mes", "Prioridad grupo ANS1.3", "Subcategoría","Duración del negocio", "Estado_abierta"}),
+				    #"Filas filtradas1" = Table.SelectRows(#"Otras columnas quitadas", each ([Estado_abierta] = true)),
+				    #"Columna condicional agregada2" = Table.AddColumn(#"Filas filtradas1", "Lista_meses", each if [Estado_abierta] = true then #"Abierto mes" else null),
+				    #"Valores extraídos" = Table.TransformColumns(#"Columna condicional agregada2", {"Lista_meses", each Text.Combine(List.Transform(_, Text.From), ","), type text}),
+				    #"Dividir columna por delimitador" = Table.ExpandListColumn(Table.TransformColumns(#"Valores extraídos", {{"Lista_meses", Splitter.SplitTextByDelimiter(",", QuoteStyle.None), let itemType = (type nullable text) meta [Serialized.Text = true] in type {itemType}}}), "Lista_meses"),
+				    #"Tipo cambiado3" = Table.TransformColumnTypes(#"Dividir columna por delimitador",{{"Lista_meses", type date},{"Cerrado mes", type date}}),
+				    #"Columna condicional agregada3" = Table.AddColumn(#"Tipo cambiado3", "Activos por mes", each if [Lista_meses] >= [Abierto mes] and [Lista_meses] < [Cerrado mes]  then true else null),
+				    #"Filas filtradas2" = Table.SelectRows(#"Columna condicional agregada3", each ([Activos por mes] = true))
+				in
+				    #"Filas filtradas2"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

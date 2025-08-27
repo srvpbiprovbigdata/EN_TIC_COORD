@@ -1,0 +1,133 @@
+table 'Resumen KGI21'
+	lineageTag: 65620623-b9f0-4f8b-9181-ce7ee3f351ef
+
+	column Prioridad
+		dataType: string
+		lineageTag: 11e717aa-01fd-44ea-8102-80bb3853f610
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a8d0a9a1-9191-4093-aaa6-69dfe39cd766
+		summarizeBy: none
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Cump. Objetivo %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 631009f3-dbd1-4ed9-ac21-ff519451a20e
+		summarizeBy: sum
+		sourceColumn: Cump. Objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 502fe6fd-407f-4d1d-99ed-9c958a351e0e
+		summarizeBy: sum
+		sourceColumn: Peso %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Cumplidas' = ('Resumen KGI21'[Total INCs]-'Resumen KGI21'[INCs Imcumplidas])
+		formatString: 0
+		lineageTag: f19c5f22-ee61-4f4e-a747-6e57377708b9
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cump. Real %' = ('Resumen KGI21'[INCs Cumplidas]/'Resumen KGI21'[Total INCs])
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 6beecafe-26e0-4174-adf8-7e00ace16ec9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI21'[Cump. Real %]>='Resumen KGI21'[Cump. Objetivo %],"Si","No")
+		lineageTag: d4633167-6cd3-4d0c-b4e8-63c598c2eecb
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI21'[¿Cumple?]="SI",'Resumen KGI21'[Peso %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 4af7bf54-2ee2-4e6e-badd-a67d91d2a6f1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI21'
+		dataType: string
+		lineageTag: 60fc44fb-9706-437f-af07-cbcf1651e5f4
+		summarizeBy: none
+		sourceColumn: Puntos de KGI21
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI21'[¿Cumple?]="No",'Resumen KGI21'[Peso %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: a004571d-de12-44a7-9545-ca1730654c72
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total INCs'
+		dataType: int64
+		formatString: 0
+		lineageTag: dbe38f01-4192-4cb9-9d39-715de6cf865c
+		summarizeBy: sum
+		sourceColumn: Total INCs
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Imcumplidas'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3f8826a0-7346-44ec-a943-8bcfeacb4953
+		summarizeBy: sum
+		sourceColumn: INCs Imcumplidas
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI21-7663bc70-32d9-4466-9524-9c1876b8ffc2' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A",
+				    
+				    //Total Incidencias Cerradas por Prioridad
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Cerrado - Copy"}, {{"Total INCs", each Table.RowCount(_), type number}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Grouped Rows",{{"Cerrado - Copy", "Cerrado_1er_día_mes"}}),
+				
+				    //Unir Total Incidencias con SLAs Incumplidos
+				    #"Merged Queries" = Table.NestedJoin(#"Renamed Columns", {"Prioridad", "Cerrado_1er_día_mes"}, #"PRO - Incidencias con SLA - Incumplidas", {"Prioridad", "Cerrado_1er_día_mes"}, "PRO - Incidencias con SLA - Incumplidas", JoinKind.LeftOuter),
+				    #"Expanded PRO - Incidencias con SLA - Incumplidas" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Incidencias con SLA - Incumplidas", {"INCs Incumplidas"}, {"PRO - Incidencias con SLA - Incumplidas.INCs Incumplidas"}),
+				
+				    //Unir Tabla de Parámetros
+				    #"Merged Queries1" = Table.NestedJoin(#"Expanded PRO - Incidencias con SLA - Incumplidas", {"Prioridad"}, #"Parametros KGI21", {"Prioridad "}, "Parametros KGI2-1", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI2-1" = Table.ExpandTableColumn(#"Merged Queries1", "Parametros KGI2-1", {"% Cumplimiento", "Pesos"}, {"Parametros KGI2-1.% Cumplimiento", "Parametros KGI2-1.Pesos"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded Parametros KGI2-1",{{"Cerrado_1er_día_mes", "Mes"}, {"PRO - Incidencias con SLA - Incumplidas.INCs Incumplidas", "INCs Imcumplidas"}, {"Parametros KGI2-1.% Cumplimiento", "Cump. Objetivo %"}, {"Parametros KGI2-1.Pesos", "Peso %"}}),
+				 
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns1",{{"Cump. Objetivo %", Percentage.Type}, {"Peso %", Percentage.Type}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type", "Puntos de KGI21", each 50),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Total INCs", Int64.Type}, {"INCs Imcumplidas", Int64.Type}})
+				in
+				    #"Changed Type1"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

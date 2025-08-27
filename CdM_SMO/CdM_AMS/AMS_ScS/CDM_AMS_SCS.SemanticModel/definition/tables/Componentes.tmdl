@@ -1,0 +1,30 @@
+table Componentes
+	lineageTag: f90932ae-2113-482c-bdcf-7bfd011cf8c5
+
+	column SERVICENOW
+		dataType: string
+		lineageTag: 2e1cefde-d6e3-4819-9eb5-9c0ad35691f7
+		summarizeBy: none
+		sourceColumn: SERVICENOW
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Componentes-52f57b4e-de8c-42d5-8f9a-5e7c1f7acde0 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    URL = globalPathComponentes & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(URL), null, true),
+				    Personalizado1 = Origen{[Name="Componentes Jira por Servicio"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Personalizado1, [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"ENABLON", type text}, {"MAXIMO", type text}, {"IAR", type text}, {"AMS CORE GFI", type text}, {"SERVICENOW", type text}}),
+				    #"Otras columnas quitadas" = Table.SelectColumns(#"Tipo cambiado1",{"SERVICENOW"}),
+				    #"Filas filtradas1" = Table.SelectRows(#"Otras columnas quitadas", each ([SERVICENOW] <> null and [SERVICENOW] <> "ServiceNow AMS" and [SERVICENOW] <> "ServiceNow ITBM" and [SERVICENOW] <> "ServiceNow ITBM Innovación" and [SERVICENOW] <> "ServiceNow ITBM TD" and [SERVICENOW] <> "ServiceNow ITBM TIC" and [SERVICENOW] <> "ServiceNow ITSM cSc" and [SERVICENOW] <> "ServiceNow ITSM TIC" and [SERVICENOW] <> "ServiceNow RRHH" and [SERVICENOW] <> "ServiceNow SecOps" and [SERVICENOW] <> "ServiceNow TIC"))
+				in
+				    #"Filas filtradas1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

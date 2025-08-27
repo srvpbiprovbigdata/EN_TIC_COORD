@@ -1,0 +1,73 @@
+table 'Peticiones (2)'
+	lineageTag: c999eeed-6427-486b-a638-687649ebe264
+
+	column Número
+		dataType: string
+		lineageTag: 5090b814-8b78-4bf9-a3bf-8a9475a24546
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d4b8fc36-5b7d-4835-96d0-a86b333003f7
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		variation Variación
+			isDefault
+			relationship: 527e75a0-671b-41ab-a310-2ccbc3d49dbb
+			defaultHierarchy: LocalDateTable_6f3cc36d-7527-4912-919d-c28eeff9c184.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Abierto por'
+		dataType: string
+		lineageTag: ce078728-6ba0-40f7-a7d2-5a8b0a9cdd04
+		summarizeBy: none
+		sourceColumn: Abierto por
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Definición de SLA'
+		dataType: string
+		lineageTag: 7000e9fe-75af-4d16-8cd0-2309995f84f8
+		summarizeBy: none
+		sourceColumn: Definición de SLA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asignado a'
+		dataType: string
+		lineageTag: f7f939d4-ee0c-4a60-9162-9256514da85f
+		summarizeBy: none
+		sourceColumn: Asignado a
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Peticiones (2)' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = KGI_III_Peticiones,
+				    #"Columnas quitadas" = Table.RemoveColumns(Origen,{"Extracción", "Número", "Nombre", "Prioridad", "Abierto", "Hora de inicio", "Hora de finalización", "Duración real", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado", "Etapa", "Número de reasignación", "Porcentaje de negocio trascurrido", "Duración", "Cerrado mes", "Prioridad grupo", "Abierto mes", "Alegaciones", "ID_KGI_4.1", "ID_KGI_4.2", "ID_KGI_4.3", "Infringido_alegaciones", "Duración excedida", "Incidencia.Número", "Incidencia.Breve descripción", "Incidencia.Subcategoría", "Incidencia.Tipo de Solución", "Incidencia.Alegaciones", "KGI_III_Encuestas.Cerrado", "KGI_III_Encuestas.Valoración", "ID_KGI_3.4"}),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas quitadas",{{"Solicitar elemento", "Número"}}),
+				
+				    // Combinamos con el de encuestas_new(2) para sacar aquellas encuestas contestadas y poder eliminarlas porque ya están en la tabla de encuestas new
+				    #"Consultas combinadas" = Table.NestedJoin(#"Columnas con nombre cambiado1", {"Número"}, #"Encuestas_New(2)", {"Número"}, "Encuestas_New(2)", JoinKind.LeftOuter),
+				    #"Se expandió Encuestas_new(2)" = Table.ExpandTableColumn(#"Consultas combinadas", "Encuestas_New(2)", {"Instancia"}, {"Encuestas_New(2).Instancia"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Se expandió Encuestas_new(2)", each ([#"Encuestas_New(2).Instancia"] = null)),
+				    #"Columnas quitadas1" = Table.RemoveColumns(#"Filas filtradas",{"Encuestas_New(2).Instancia"}),
+				    #"Duplicados quitados" = Table.Distinct(#"Columnas quitadas1", {"Número"})
+				in
+				    #"Duplicados quitados"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

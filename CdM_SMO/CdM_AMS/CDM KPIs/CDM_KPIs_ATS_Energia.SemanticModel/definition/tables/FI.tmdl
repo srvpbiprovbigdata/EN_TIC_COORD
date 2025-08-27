@@ -1,0 +1,33 @@
+table FI
+	lineageTag: 9dccd07c-a0c6-440c-9ecd-1bc897bb649d
+
+	column FI
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5aa0af02-dd24-4183-a452-44dbed8758d8
+		summarizeBy: none
+		sourceColumn: FI
+
+		variation Variación
+			isDefault
+			relationship: 5ad158fc-05e2-45c3-8c32-e5ecfd7c95d6
+			defaultHierarchy: LocalDateTable_b1a71f15-7940-43e6-a347-eb1d85c4823c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition FI-517cfa99-9cb3-49fd-8074-227be3f3ea2d = m
+		mode: import
+		queryGroup: 'Párametros temporales'
+		source =
+				let
+				    Origen = Date.StartOfMonth(Table.Min(#"Incidencias consolidado", each [Inicio])[Inicio]),
+				    #"Extraer fecha" = Date.From(Origen)
+				in
+				    #"Extraer fecha"
+
+	annotation PBI_ResultType = Date
+
+	annotation PBI_NavigationStepName = Navegación
+

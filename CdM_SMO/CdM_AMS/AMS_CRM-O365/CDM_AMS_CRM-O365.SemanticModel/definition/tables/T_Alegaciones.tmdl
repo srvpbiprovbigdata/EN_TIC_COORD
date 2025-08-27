@@ -1,0 +1,180 @@
+table T_Alegaciones
+	lineageTag: cc8f9ee8-29f5-4f14-af41-f2dc87a00150
+
+	column 'ID Alegación'
+		dataType: string
+		lineageTag: df20563a-2415-4896-bad5-f2cc774062b4
+		summarizeBy: none
+		sourceColumn: ID Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: string
+		lineageTag: 128c7a7f-c2b6-486c-b3d0-5965c1158137
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Entrada alegada'
+		dataType: string
+		lineageTag: 6d15982b-0c8a-4f63-b3ff-aff14bddd6bb
+		summarizeBy: none
+		sourceColumn: Entrada alegada
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sistema Afectado'
+		dataType: string
+		lineageTag: 284e83ba-6878-4cc0-b30c-b0b1fedd3914
+		summarizeBy: none
+		sourceColumn: Sistema Afectado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo de Medida del ANS alegado'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 31f3ee79-a13f-40e8-b26e-1d849f0e9678
+		summarizeBy: none
+		sourceColumn: Periodo de Medida del ANS alegado
+
+		variation Variación
+			isDefault
+			relationship: 08846f4f-c686-4380-a1cb-df432c4a9925
+			defaultHierarchy: LocalDateTable_420a2e8f-c37b-42e2-b729-da465d65acd6.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Clasificación
+		dataType: string
+		lineageTag: 12bbe80d-57c5-448b-b692-b9f1310f77b9
+		summarizeBy: none
+		sourceColumn: Clasificación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 77a59ffc-2f11-41f9-928c-f3e3fe7e8ead
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		variation Variación
+			isDefault
+			relationship: 340b0dba-8d7b-403a-9d42-560ec0a4ee10
+			defaultHierarchy: LocalDateTable_99ac6a0f-c2e2-429f-be57-d35bb331d1d4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Estado
+		dataType: string
+		lineageTag: a60901d4-1c68-4f66-9b12-70925fe30e2c
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comentarios
+		dataType: string
+		lineageTag: 3c2ffeef-4363-40d3-81b4-05bea0ce3139
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column Solicitante
+		dataType: string
+		lineageTag: 1f32464f-66c0-4a56-bba1-d989705a3458
+		summarizeBy: none
+		sourceColumn: Solicitante
+
+		annotation SummarizationSetBy = Automatic
+
+	column Alegacion_aceptada
+		dataType: string
+		lineageTag: 64c91fdb-10aa-42e2-926e-e0afe75abdb8
+		summarizeBy: none
+		sourceColumn: Alegacion_aceptada
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo ANS' =
+			
+			IF(
+			T_Alegaciones[ANS] = "KGI 1-1",
+			LOOKUPVALUE(KGI_I_Estimaciones[Finalización mes],KGI_I_Estimaciones[Tarea], T_Alegaciones[ID], KGI_I_Estimaciones[Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 1-2",
+			LOOKUPVALUE('KGI_I_Planificaciones PRJ y MEJ con SLA'[Fecha fin real mes],'KGI_I_Planificaciones PRJ y MEJ con SLA'[Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 1-3",
+			LOOKUPVALUE(KGI_II_Incidencias_Total[Cerrado mes], KGI_II_Incidencias_Total[Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 1-4",
+			LOOKUPVALUE(KGI_I_Entregables_Jira[Resolved mes],KGI_I_Entregables_Jira[Key], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 2-1",
+			LOOKUPVALUE(KGI_II_Incidencias_Total[Cerrado mes], KGI_II_Incidencias_Total[Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 2-2",
+			LOOKUPVALUE(KGI_II_Incidencias_Total[Cerrado mes], KGI_II_Incidencias_Total[Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 2-3",
+			LOOKUPVALUE(KGI_II_Incidencias_Total[Abierto mes], KGI_II_Incidencias_Total[Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 2-4",
+			LOOKUPVALUE(KGI_II_Incidencias_Total[Abierto mes], KGI_II_Incidencias_Total[Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 2-5",
+			LOOKUPVALUE(KGI_II_Incidencias_Total[Extracción], KGI_II_Incidencias_Total[Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 4-1",
+			LOOKUPVALUE(KGI_III_Peticiones[Cerrado mes], KGI_III_Peticiones[Número], T_Alegaciones[ID], KGI_III_Peticiones[Solicitar elemento], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 4-2",
+			LOOKUPVALUE(KGI_III_Peticiones[Cerrado mes], KGI_III_Peticiones[Incidencia.Número], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 4-3",
+			LOOKUPVALUE(KGI_III_Peticiones[Cerrado mes], KGI_III_Peticiones[Solicitar elemento], T_Alegaciones[ID]),
+			IF(
+			T_Alegaciones[ANS] = "KGI 3-4",
+			LOOKUPVALUE(KGI_III_Peticiones[Cerrado mes], KGI_III_Peticiones[Solicitar elemento], T_Alegaciones[ID]),
+			LOOKUPVALUE(KGI_I_Bugs_Jira[Stories.Resolved mes],KGI_I_Bugs_Jira[Key], T_Alegaciones[ID])
+			)))))))))))))
+		formatString: General Date
+		lineageTag: 489d70bc-27e9-4472-8746-09bb3846e5d0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANS
+		dataType: string
+		lineageTag: 50932b15-2646-4d23-b397-f0219436d215
+		summarizeBy: none
+		sourceColumn: ANS
+
+		annotation SummarizationSetBy = Automatic
+
+	partition T_Alegaciones-e6dc5b6c-d82e-4de0-84db-60e7aec7d97b = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = #"T_Alegaciones (stagging)",
+				    #"Filas filtradas" = Table.SelectRows(Origen, each ([ID Alegación] <> "ALS047"))
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

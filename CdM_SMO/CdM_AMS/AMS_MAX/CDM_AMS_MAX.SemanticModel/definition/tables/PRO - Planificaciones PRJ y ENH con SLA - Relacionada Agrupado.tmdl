@@ -1,0 +1,50 @@
+table 'PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado'
+	lineageTag: 745f8ea1-0e5b-4c66-84de-b7a6543a181e
+
+	column Prioridad
+		dataType: string
+		lineageTag: c024e3e9-f63c-473b-9c77-5df6d7baac61
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 95ff4af8-2473-4075-b772-bca2cd390004
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		variation Variación
+			isDefault
+			relationship: 5cccd7b9-8449-41d8-96d2-84dfd177181b
+			defaultHierarchy: LocalDateTable_8e303980-9a35-4b1e-8a6d-714813e97faa.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: 593e8f20-88fc-4fb8-8348-d73895c0e6ba
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Planificaciones PRJ y ENH con SLA - Relacionada Agrupado-4821e922-2bc2-4a61-aaa1-760589a945b7' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Origen = #"PRO - Planificaciones PRJ y ENH con SLA - Relacionada",
+				    #"Filas agrupadas" = Table.Group(Origen, {"Prioridad", "Fecha fin real - Copy"}, {{"Recuento", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Filas agrupadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,110 @@
+table 'Resumen KGI24'
+	lineageTag: 9cc88223-7cbd-46b6-86ec-286a8efb37d7
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d8dac926-830f-4c13-ad21-67a040caed9b
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: bcd82b26-ccf2-4fff-aa7b-7781dbcf3bed
+			defaultHierarchy: LocalDateTable_e08fe090-f70a-4cef-94ba-61eb20e5d2b7.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column KGI
+		dataType: string
+		lineageTag: c7eeb1b9-9790-4eb8-9f34-4b926726b340
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Número Máximo de Incidencias'
+		dataType: int64
+		formatString: 0
+		lineageTag: 50274e55-a9b6-48f1-a043-f8800ef85ac4
+		summarizeBy: sum
+		sourceColumn: Número Máximo de Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: d0d1897b-47f6-4ea1-adb1-0ffd111ac80d
+		summarizeBy: sum
+		sourceColumn: Peso %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI24'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5040da6f-1780-4385-8957-452f2b5487c3
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI24
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF([KGI24 INCs C Sem Anterior A PEN_M]<='Resumen KGI24'[Número Máximo de Incidencias],"Si","No")
+		lineageTag: f459e53b-68c5-4ecf-bd9f-c20fc107c15b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI24'[¿Cumple?]="Si",'Resumen KGI24'[Peso %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 47a8eb91-c47d-40fe-90ac-9b9f99bab49e
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI24'[¿Cumple?]="No",'Resumen KGI24'[Peso %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: e979202b-0d8c-46bc-b713-7e8691027162
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total INCs Críticas'
+		dataType: double
+		lineageTag: 4fd0b8a8-6d26-4195-85f6-3dcb1243c004
+		summarizeBy: sum
+		sourceColumn: Total INCs Críticas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Resumen KGI24-f7a3a49e-f365-4405-8019-48ab5777189b' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA - Críticas",
+				    
+				    //Agrupar Total Incidencias Cerradas
+				    #"Grouped Rows" = Table.Group(Source, {"Cerrado - Copy"}, {{"Total INCs Críticas", each Table.RowCount(_), type number}}),
+				
+				    //Crear Columna para relacionar tabla de parámetros
+				    #"Added Custom" = Table.AddColumn(#"Grouped Rows", "KGI", each "KGI2-4"),
+				
+				    #"Merged Queries" = Table.NestedJoin(#"Added Custom", {"KGI"}, #"Parametros KGI24", {"KGI"}, "Parametros KGI2-4", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI2-4" = Table.ExpandTableColumn(#"Merged Queries", "Parametros KGI2-4", {"Número Máximo de Incidencias", "Peso %", "Puntos de KGI24"}, {"Parametros KGI2-4.Número Máximo de Incidencias", "Parametros KGI2-4.Peso %", "Parametros KGI2-4.Puntos de KGI24"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded Parametros KGI2-4",{{"Parametros KGI2-4.Número Máximo de Incidencias", "Número Máximo de Incidencias"}, {"Parametros KGI2-4.Peso %", "Peso %"}, {"Parametros KGI2-4.Puntos de KGI24", "Puntos de KGI24"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Peso %", Percentage.Type}})
+				
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

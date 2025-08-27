@@ -1,0 +1,73 @@
+table 'Parametros KGI11'
+	excludeFromModelRefresh
+	lineageTag: 8f5f3c9b-f507-490b-bf0a-2d19ae896beb
+
+	column Prioridad
+		dataType: string
+		lineageTag: f08da45e-7a80-407d-ab56-cc0c06398d83
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'T. Resolución Máximo (Jornadas laborales)'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1007f720-4f9a-4765-bcd6-5f53241238e0
+		summarizeBy: sum
+		sourceColumn: T. Resolución Máximo (Jornadas laborales)
+
+		annotation SummarizationSetBy = Automatic
+
+	column '% cumplimiento Objetivo'
+		dataType: double
+		lineageTag: 6ebf0889-092e-4857-b4a7-13a50ebf2065
+		summarizeBy: sum
+		sourceColumn: % cumplimiento Objetivo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Pesos %'
+		dataType: double
+		lineageTag: 1bdac24b-be17-4fca-b0a2-191b6ff555df
+		summarizeBy: sum
+		sourceColumn: Pesos %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Puntos de KGI11'
+		dataType: string
+		lineageTag: ea3b36c8-773f-45ed-b091-4aaa74a23f18
+		summarizeBy: none
+		sourceColumn: Puntos de KGI11
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 3e31cdcb-ec22-4bee-88f1-c7b9e8bee764
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI11-efbac5a5-2860-4c30-9a16-04cd7ccd28f6' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & parametros & xlsx), null, true),
+				    #"P_KGI11_Sheet" = Origen{[Item="P_KGI11",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"P_KGI11_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Prioridad", type text}, {"T. Resolución Máximo (Jornadas laborales)", Int64.Type}, {"% cumplimiento Objetivo", type number}, {"Pesos %", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
