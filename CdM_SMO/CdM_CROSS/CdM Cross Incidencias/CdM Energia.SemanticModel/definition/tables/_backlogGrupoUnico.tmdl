@@ -1,0 +1,96 @@
+table _backlogGrupoUnico
+	lineageTag: 18dec38a-0bc2-4283-a89c-dbc07b256b8f
+
+	measure Acumulado1G =
+			
+			CALCULATE(
+			    Sum(_backlogGrupoUnico[ab1G])+0,
+			    FILTER(ALLSELECTED(_backlogGrupoUnico), _backlogGrupoUnico[fecha]<=MAX(_backlogGrupoUnico[fecha]))
+			)
+		formatString: 0
+		lineageTag: 26b55953-0789-44c0-afa8-3bf00161e2cb
+
+	measure Total1G = SUM(_backlogGrupoUnico[ab1G])+0
+		formatString: 0
+		lineageTag: 599f32f1-8b66-45ac-ac20-465df75fbf7c
+
+	column _myMesAñoInc
+		lineageTag: eba6b29b-bffd-4742-93b1-7d58707dcaf7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: incident[_myMesAñoInc]
+
+		annotation SummarizationSetBy = Automatic
+
+	column NroMes
+		formatString: 0
+		lineageTag: ab490f70-c645-4077-a0c9-e74d8f7e5463
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_aff3165d-b0d1-41f3-8899-50f1e94669e0[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 4ddf4ef5-593d-4120-8e76-d01c5c206c13
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_aff3165d-b0d1-41f3-8899-50f1e94669e0[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abiertas
+		formatString: 0
+		lineageTag: bc138e2a-3401-4c32-a6e0-492118654656
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Abiertas]
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha = DATE(_backlogGrupoUnico[Año],_backlogGrupoUnico[NroMes],1)
+		formatString: d-m-yy
+		lineageTag: 11cc8e6e-ec62-48dc-ab3c-46dfa8b7fa0a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column ab1G = if(_backlogGrupoUnico[Abiertas]=BLANK(), 0, _backlogGrupoUnico[Abiertas])
+		formatString: 0
+		lineageTag: 3a9eae56-bada-4cf0-b872-f5a0b7ae4a7b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column abMesesPasados1G = [Acumulado1G]-_backlogGrupoUnico[ab1G]
+		formatString: 0
+		lineageTag: 2ceb1e2d-a429-4e42-9ef9-debdb09c5f17
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerradas = CALCULATE(COUNTROWS(incident),filter(incident, and(incident[__Util]="Si",and(incident[ParticipacionGrupoAsignacion]="Grupo Único",and(_backlogGrupoUnico[_myMesAñoInc]=incident[_myMesAñoInc],incident[Estado]="Cerrado")))))
+		formatString: 0
+		lineageTag: 27f0e6ff-c843-4d8b-b5f1-018e5eca5aa9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _backlogGrupoUnico-c2f32e65-3946-4b1f-a523-b266c2c9f089 = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'incident',
+				    incident[_myMesAñoInc],
+				    incident[Fecha Apertura].[NroMes], 
+				    incident[Fecha Apertura].[Año],
+				    "Abiertas", CALCULATE(COUNT(incident[_myMesAñoInc]),FILTER(incident,and(and(incident[__Util]="Si",incident[__EstadoGeneral]="Abierta"),incident[ParticipacionGrupoAsignacion]="Grupo Único")))
+				    )
+				```
+
+	annotation PBI_Id = ebef648484e744049e45f72b23c9fd8e
+

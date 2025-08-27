@@ -1,0 +1,84 @@
+table TOrdenProveedor
+	lineageTag: 3ca83a1f-0343-431e-a7c5-f3cabea9db94
+
+	column Unidad
+		lineageTag: ed2a23bd-6fef-4960-b017-bbb905ade002
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PRESUPUESTO[Unidad]
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Suma
+		formatString: 0.00
+		lineageTag: d0014669-de80-4512-8527-558ad1505213
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Suma]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		formatString: 0
+		lineageTag: 981984ed-c1bb-457e-ad59-708096381f5d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TOrdenProveedor = calculated
+		mode: import
+		source = ```
+				
+				VAR TablaFiltrada =
+				    FILTER(
+				        PRESUPUESTO,
+				        PRESUPUESTO[Area] <> "COMUNES" &&
+				        NOT ISBLANK(PRESUPUESTO[Unidad])
+				    )
+				
+				VAR TablaBase =
+				    ADDCOLUMNS(
+				        SUMMARIZE(
+				            TablaFiltrada,
+				            PRESUPUESTO[Unidad]
+				        ),
+				        "Suma",
+				        CALCULATE(
+				            [ZMD_Provisiones_YTD] + [ZMD_Recepcionado_YTD] + [ZMD_Comprometido_YTD],
+				            KEEPFILTERS(
+				                FILTER(
+				                    IMPACTO_BUDGET,
+				                    NOT ISBLANK(IMPACTO_BUDGET[Proveedor]) &&
+				                    IMPACTO_BUDGET[Proveedor] <> "-"
+				                    /*PEDIDOS,
+				                    NOT ISBLANK(PEDIDOS[Proveedor]) &&
+				                    PEDIDOS[Proveedor] <> "-" &&
+				                    NOT ISBLANK(RELATED(IMPACTO_BUDGET[Proveedor])) &&
+				                    RELATED(IMPACTO_BUDGET[Proveedor]) <> "-"*/
+				                )
+				            )
+				        )
+				    )
+				
+				RETURN
+				    ADDCOLUMNS(
+				        TablaBase,
+				        "Orden",
+				        RANKX(
+				            TablaBase,
+				            [Suma],
+				            ,
+				            DESC,
+				            DENSE
+				        )
+				    )
+				
+				
+				
+				```
+
+	annotation PBI_Id = 15c401a787e645118ae76079b3e6e5ed
+

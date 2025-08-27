@@ -1,0 +1,88 @@
+table 'SERV_NOW sc_item_option'
+	lineageTag: ea4c82ab-47f9-41e7-addd-efd959f55af9
+
+	column item_option_new
+		dataType: string
+		lineageTag: c7d83fd2-ab2b-472e-8a84-32c1baebe851
+		summarizeBy: none
+		sourceColumn: item_option_new
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_item_option_new
+		dataType: string
+		lineageTag: 77bc4eeb-7c49-4df6-b45a-89ee6cac1cc3
+		summarizeBy: none
+		sourceColumn: dv_item_option_new
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: dfb57f22-4991-42d7-88aa-5a10da35e2b3
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: d3745fbf-757a-41df-afd2-bf72af3fc756
+			defaultHierarchy: LocalDateTable_5277ec08-7e6e-41ee-a8a5-27a29cd455dc.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: 86e0367c-5810-4b3d-9b2b-6c324af97615
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: a072dc11-f2f5-46a2-a6a2-a6bd6c2b9aa9
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column order
+		dataType: string
+		lineageTag: 3666d4d7-0298-441b-97fa-5056739c5888
+		summarizeBy: none
+		sourceColumn: order
+
+		annotation SummarizationSetBy = Automatic
+
+	column sc_cat_item_option
+		dataType: string
+		lineageTag: cc2f3951-5228-4a86-80e5-31224f501251
+		summarizeBy: none
+		sourceColumn: sc_cat_item_option
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_sc_cat_item_option
+		dataType: string
+		lineageTag: c7b437e9-9f8b-4f3f-a4e8-c3a180adee75
+		summarizeBy: none
+		sourceColumn: dv_sc_cat_item_option
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SERV_NOW sc_item_option-dc504aa0-32a9-4f05-a483-b091221089eb' = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_sc_item_option = Origen{[Schema="SERV_NOW",Item="sc_item_option"]}[Data],
+				    #"Filas filtradas" = Table.SelectRows(SERV_NOW_sc_item_option, each ([dv_item_option_new] = "Affected CI")),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Filas filtradas",{"cart_item", "dv_cart_item", "sys_created_by", "sys_mod_count", "sys_tags", "sys_updated_by", "sys_updated_on"})
+				in
+				    #"Columnas quitadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

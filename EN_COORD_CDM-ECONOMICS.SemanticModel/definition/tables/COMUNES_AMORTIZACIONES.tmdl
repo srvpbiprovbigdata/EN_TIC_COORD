@@ -1,0 +1,64 @@
+table COMUNES_AMORTIZACIONES
+	lineageTag: 8f092d50-7b09-4109-a25f-b82d74a5c553
+
+	column ID
+		dataType: string
+		lineageTag: 5a24ebfa-40b7-45b8-8588-75c0692101d8
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column PROYECTOS
+		dataType: string
+		lineageTag: c4d3069e-2d84-4773-abcb-c4952a450ae1
+		summarizeBy: none
+		sourceColumn: PROYECTOS
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		lineageTag: cf52321a-e78f-4131-8a6c-a01cae4af95c
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2196abc6-fb4d-437d-a8f7-cd8ccf7d969b
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		variation Variation
+			isDefault
+			relationship: 082b374c-6c9f-47a3-9227-dd257acceca3
+			defaultHierarchy: LocalDateTable_2559a18f-9b01-43d0-952d-20418b4fae01.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition COMUNES_AMORTIZACIONES = m
+		mode: import
+		queryGroup: ARCHIVOS_TRATADOS
+		source =
+				let
+				    Source = COMUNES_AMORTIZACIONES_RAW,
+				    #"Unpivoted Columns" = Table.UnpivotOtherColumns(Source, {"ID", "PROYECTOS"}, "Attribute", "Value"),
+				    #"Added Custom" = Table.AddColumn(#"Unpivoted Columns", "Año", each 2025),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom",{{"Año", type text}, {"Value", type number}}),
+				    #"Added Custom1" = Table.AddColumn(#"Changed Type", "Fecha", each [Attribute]&"/"&[Año]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom1",{{"Fecha", type date}}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Changed Type1",{"Attribute", "Año"})
+				in
+				    #"Removed Columns1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+

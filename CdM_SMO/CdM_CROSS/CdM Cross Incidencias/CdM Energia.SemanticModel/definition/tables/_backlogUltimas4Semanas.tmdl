@@ -1,0 +1,69 @@
+table _backlogUltimas4Semanas
+	lineageTag: 0c294930-da6d-4400-99a1-e7e382541dd7
+
+	measure acum =
+			
+			CALCULATE(
+			    Sum(_backlogUltimas4Semanas[Abiertas])+0,
+			    FILTER(ALLSELECTED(_backlogUltimas4Semanas), _backlogUltimas4Semanas[__NumSemanaAbierta]<=MAX(_backlogUltimas4Semanas[__NumSemanaAbierta]))
+			)
+		formatString: 0
+		lineageTag: 3f6a7a91-1083-4151-b365-e8e916f3fdce
+
+	measure _SemanaActualAbiertas = CALCULATE(SUM(_backlogUltimas4Semanas[Abiertas])+0, FILTER(_backlogUltimas4Semanas, and(_backlogUltimas4Semanas[Año] = YEAR(TODAY()), _backlogUltimas4Semanas[__NumSemanaAbierta]= WEEKNUM(TODAY()))))
+		formatString: 0
+		lineageTag: 97dbdf95-c1fa-4c5a-9eb6-983ae443a679
+
+	column Abiertas
+		formatString: 0
+		lineageTag: e09dd7cf-a344-4adc-abf3-c4bda396fe07
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Abiertas]
+
+		annotation SummarizationSetBy = Automatic
+
+	column __NumSemanaAbierta
+		formatString: 0
+		lineageTag: 1b48a0ff-901f-4f2d-9e81-f059ae80524c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: incident[__NumSemanaAbierta]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 80e3ca52-cf95-4d30-8012-72ccf28cf7ce
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_36d9b0ef-9f21-46b2-b214-deaa67102327[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column backLogValido = if(and([__NumSemanaAbierta]+5>WEEKNUM(TODAY()),year(TODAY())=_backlogUltimas4Semanas[Año]), "Si", "No")
+		lineageTag: c29734a9-4660-46b6-b048-cb4d6835e11b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column abiertasSemanasPasadas = [acum]-_backlogUltimas4Semanas[Abiertas]
+		formatString: 0
+		lineageTag: 73644186-fdf7-4448-9138-02360284216a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _backlogUltimas4Semanas-118910db-5c90-4f45-bc73-f7606764d230 = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'incident',
+				    incident[__NumSemanaAbierta],
+				    incident[__DiaAbierta].[Año],
+				    "Abiertas", CALCULATE(COUNT(incident[__NumSemanaAbierta]),FILTER(incident,and(and(incident[__Util]="Si",incident      [__EstadoGeneral]="Abierta"), and(incident[__NumSemanaAbierta]+4>[__SemanaCerrada],year(TODAY())=incident[__DiaAbierta].[Año])))))
+				```
+
+	annotation PBI_Id = cb825631e7dc4910b4743c550182744c
+

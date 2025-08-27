@@ -1,0 +1,61 @@
+expression Parámetro1 = #"Archivo de ejemplo" meta [IsParameterQuery=true, BinaryIdentifier=#"Archivo de ejemplo", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: d025dfe3-8801-4197-a853-9bcccf29b320
+	queryGroup: 'Transformar archivo de Consulta1\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo de ejemplo' =
+		let
+		    Origen = Excel.Workbook(Parámetro1, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+	lineageTag: 60697858-c1bc-4b7f-a0f2-baeec52111ff
+	queryGroup: 'Transformar archivo de Consulta1'
+
+	annotation PBI_ResultType = Table
+
+expression 'Archivo de ejemplo' =
+		let
+		    URL = sharepointSource & Entorno,
+		    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+		    #"Filas ordenadas" = Table.Sort(Origen,{{"Date created", Order.Descending}}),
+		    #"Filas filtradas" = Table.SelectRows(#"Filas ordenadas", each ([Name] = "Indice.xlsx")),
+		    Navegación1 = #"Filas filtradas"{0}[Content]
+		in
+		    Navegación1
+	lineageTag: ae9e702b-6c7f-4b66-98bb-de8fefc35782
+	queryGroup: 'Transformar archivo de Consulta1\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'Transformar archivo' =
+		let
+		    Origen = (Parámetro1 as binary) => let
+		    Origen = Excel.Workbook(Parámetro1, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+		in
+		    Origen
+	lineageTag: 6099c056-4354-4d47-b76a-2f90608f8a0e
+	queryGroup: 'Transformar archivo de Consulta1\Consultas auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression Entorno = "PRE" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 4e144290-421b-40e3-8450-21705ab00603
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 3f47630c-5915-4707-8dc0-d80dabec3109
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+

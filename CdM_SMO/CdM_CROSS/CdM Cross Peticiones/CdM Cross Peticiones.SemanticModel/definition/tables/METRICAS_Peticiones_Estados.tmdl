@@ -1,0 +1,196 @@
+table METRICAS_Peticiones_Estados
+	lineageTag: 9017d105-30c1-4a62-82a2-ff83f1a1825f
+
+	measure NUM_PETICIONES_SinREPETIR = DISTINCTCOUNT(METRICAS_Peticiones_Estados[id_ticket])
+		formatString: 0
+		lineageTag: 0c716e27-b75f-4b53-bed9-25310ad1d0fd
+
+	measure _DuracionDias_Peticiones_SinREPETIR = (SUM('METRICAS_Peticiones_Estados'[_DuracionDias_Peticiones])/[NUM_PETICIONES_SinREPETIR])+0
+		formatString: 0.00
+		lineageTag: 934ec989-bf0b-4eff-b875-a7d96e5411de
+
+	column definition
+		dataType: string
+		lineageTag: ab968144-cd91-49e0-9145-d920e49750ef
+		summarizeBy: none
+		sourceColumn: definition
+
+		annotation SummarizationSetBy = Automatic
+
+	column id
+		dataType: string
+		lineageTag: 71aaaf47-28ad-4cb8-9003-67a0d19d0f7d
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: 48bb7122-29f9-445f-993a-4b8a1567e8db
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3eb28887-568c-441a-8435-2c174c0939d7
+		summarizeBy: none
+		sourceColumn: start
+
+		variation Variación
+			isDefault
+			relationship: 31951f11-0976-40d9-9a09-8c6271de2b4e
+			defaultHierarchy: LocalDateTable_2d1d424b-d907-4a31-91d3-fbbe0dbaa145.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2e92bcb3-c7e5-4c9a-b64d-0650f04c9f0e
+		summarizeBy: none
+		sourceColumn: end
+
+		variation Variación
+			isDefault
+			relationship: b6897f80-c1a1-418c-a61a-e5c93343efcd
+			defaultHierarchy: LocalDateTable_753a80e9-d91c-43d7-b3bc-a4a2353966a2.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration
+		dataType: double
+		lineageTag: d4efa5fe-212f-4092-bacf-8089f613c2f2
+		summarizeBy: sum
+		sourceColumn: duration
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column field
+		dataType: string
+		lineageTag: 126c8b76-e37d-4df2-bd3c-c75569c03a79
+		summarizeBy: none
+		sourceColumn: field
+
+		annotation SummarizationSetBy = Automatic
+
+	column table
+		dataType: string
+		lineageTag: 10a6da3d-9ab0-4723-be73-323fde815097
+		summarizeBy: none
+		sourceColumn: table
+
+		annotation SummarizationSetBy = Automatic
+
+	column id_ticket
+		dataType: string
+		lineageTag: 8e01d688-bc3d-423c-ab91-9285ee387260
+		summarizeBy: none
+		sourceColumn: id_ticket
+
+		annotation SummarizationSetBy = Automatic
+
+	column _DuracionDias_Peticiones = DATEDIFF('METRICAS_Peticiones_Estados'[start],'METRICAS_Peticiones_Estados'[end], DAY)
+		formatString: 0.00
+		lineageTag: a8259ba7-92e4-4041-be24-e68586c5601a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _EstadoGeneral_MetricasPeticiones_Estados = if(METRICAS_Peticiones_Estados[value] = "En espera", "En Espera",  "En Ejecución")
+		lineageTag: 65f4e674-d8ab-4203-99c2-ad49d5a511db
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _DuracionHoras_Peticiones = DATEDIFF('METRICAS_Peticiones_Estados'[start],'METRICAS_Peticiones_Estados'[end], HOUR)
+		formatString: 0.00
+		lineageTag: 3bbd7b4f-4002-4694-822a-6cb2e8ba720e
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaFin = DATE(METRICAS_Peticiones_Estados[end].[Año], METRICAS_Peticiones_Estados[end].[NroMes], 1)
+		formatString: Short Date
+		lineageTag: f516af66-18a2-48f2-99a8-b7b2a49f223f
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: f1530a7d-2ea3-4ee6-a937-696ddf10b1a6
+			defaultHierarchy: LocalDateTable_5dbbf850-e39e-4ae8-b3fa-3382851d53b6.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Peticion_enTablaPeticiones = if(CONTAINS(Peticiones, Peticiones[number],METRICAS_Peticiones_Estados[id_ticket]), TRUE(), FALSE())
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 31ad6cc8-4628-4b62-978b-1182996eadc9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peticiones.number'
+		dataType: string
+		lineageTag: 56955fec-203f-49cb-abc3-1e394cefbf04
+		summarizeBy: none
+		sourceColumn: Peticiones.number
+
+		annotation SummarizationSetBy = Automatic
+
+	column EstadoActual_EnTablaPeticiones = LOOKUPVALUE('Peticiones'[_dv_state - español],'Peticiones'[number], [id_ticket])
+		lineageTag: f5510761-3001-4632-b48d-2fa440d6d877
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column APLICACION_DEFINTIVA_IDENTIF_ENERGIA = LOOKUPVALUE('Peticiones'[APLICACION_DEFINTIVA_IDENTIF_ENERGIA],'Peticiones'[number], [id_ticket])
+		lineageTag: 2fd882ed-e0aa-49f7-933a-1073dce56234
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ELEMENTOSyCIs_ENERGIA = LOOKUPVALUE('Peticiones'[ELEMENTOSyCIs_ENERGIA],'Peticiones'[number], [id_ticket])
+		lineageTag: c1e01d03-29f0-4ffb-a967-6972ec476048
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _DuracionSeg_Peticiones = DATEDIFF('METRICAS_Peticiones_Estados'[start],'METRICAS_Peticiones_Estados'[end], SECOND)
+		formatString: 0
+		lineageTag: 4c7103d9-44d9-4481-b754-87acc49c6fb1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition METRICAS_Peticiones_Estados-2d1a709c-0cd0-40b5-8e7f-d395283cce60 = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_ES_V_metric_instance = Origen{[Schema="SERV_NOW_ES",Item="V_metric_instance"]}[Data],
+				    #"Filas filtradas" = Table.SelectRows(SERV_NOW_ES_V_metric_instance, each ([duration] <> null) and ([table] = "sc_req_item")),
+				    #"Filas filtradas1" = Table.SelectRows(#"Filas filtradas", each ([table] = "sc_req_item")),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas1", {"id_ticket"}, Peticiones, {"number"}, "Peticiones", JoinKind.LeftOuter),
+				    #"Se expandió Peticiones" = Table.ExpandTableColumn(#"Consultas combinadas", "Peticiones", {"number"}, {"Peticiones.number"}),
+				    #"Filas filtradas2" = Table.SelectRows(#"Se expandió Peticiones", each [Peticiones.number] <> null and [Peticiones.number] <> ""),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Filas filtradas2","Open","Abierto",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Work in Progress","En Curso",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","Closed Complete","Cerrado completo",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Closed Incomplete","Cerrado incompleto",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Closed Skipped","Cerrado omitido",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado4","On hold","En espera",Replacer.ReplaceText,{"value"}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Valor reemplazado5",{{"duration", type number}}),
+				    #"Filas filtradas3" = Table.SelectRows(#"Tipo cambiado", each [duration] >= 1),
+				    #"Valor reemplazado6" = Table.ReplaceValue(#"Filas filtradas3","En Curso","En curso",Replacer.ReplaceText,{"value"})
+				in
+				    #"Valor reemplazado6"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,224 @@
+table METRICAS_Tareas_Peticiones
+	lineageTag: 51646654-806c-4102-8e51-1053877d0e8d
+
+	measure NUM_TAREASPETICIONES_SinREPETIR = DISTINCTCOUNT(METRICAS_Tareas_Peticiones[id_ticket])
+		formatString: 0
+		lineageTag: 3406e7d2-9d88-4fce-a780-3caea8da61f9
+
+	measure _DuracionDias_Tareas_SinREPETIR = (SUM('METRICAS_Tareas_Peticiones'[_DuracionDias_Tareas])/[NUM_TAREASPETICIONES_SinREPETIR])+0
+		lineageTag: e431fd0b-1de5-4bc2-ba70-05f3862be04a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure NUM_TAREASPETICIONESGRUPOS_SinREPETIR = DISTINCTCOUNTNOBLANK(METRICAS_Tareas_Peticiones[TAREA_GRUPO])
+		formatString: 0
+		lineageTag: 45b59e38-44b8-45e9-bf40-c2d3ff800f6c
+
+	measure _DuracionDias_TareasGrupos_SinREPETIR = (SUM('METRICAS_Tareas_Peticiones'[_DuracionDias_Tareas])/[NUM_TAREASPETICIONESGRUPOS_SinREPETIR])+0
+		formatString: 0.00
+		lineageTag: b1633d06-2730-49b0-8c50-12ce3c337207
+
+	column definition
+		dataType: string
+		lineageTag: 3c534f91-2dbc-439c-8b68-96934a30b01c
+		summarizeBy: none
+		sourceColumn: definition
+
+		annotation SummarizationSetBy = Automatic
+
+	column id
+		dataType: string
+		lineageTag: 88ac5c2f-de7d-433e-a6cd-d5922edefdb3
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: 284cddb2-a48c-410a-895e-c9127bbc4ee5
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 72e3c6d4-98da-42a4-bf40-8904621b3345
+		summarizeBy: none
+		sourceColumn: start
+
+		variation Variación
+			isDefault
+			relationship: 1e10aea4-8813-49b3-ac8c-d53e2d6d118b
+			defaultHierarchy: LocalDateTable_b2cd8557-3767-44c7-b092-fa8ad822fcc9.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 303c2eb7-a6b0-4eb6-9962-706686536027
+		summarizeBy: none
+		sourceColumn: end
+
+		variation Variación
+			isDefault
+			relationship: 978baa56-1569-439d-87af-5a314211c862
+			defaultHierarchy: LocalDateTable_2f043232-9e2e-44d1-a98b-32e8fcdffb48.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration
+		dataType: double
+		lineageTag: 1feb34ba-3a6c-4cba-afe7-9c81493c7b5b
+		summarizeBy: sum
+		sourceColumn: duration
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column field
+		dataType: string
+		lineageTag: 39869530-2ae5-4493-a593-d76a60055092
+		summarizeBy: none
+		sourceColumn: field
+
+		annotation SummarizationSetBy = Automatic
+
+	column table
+		dataType: string
+		lineageTag: aa0c7865-edb9-439c-ba6b-9519f6322729
+		summarizeBy: none
+		sourceColumn: table
+
+		annotation SummarizationSetBy = Automatic
+
+	column id_ticket
+		dataType: string
+		lineageTag: d909d73a-0152-42b6-bec7-6e4ff189fba4
+		summarizeBy: none
+		sourceColumn: id_ticket
+
+		annotation SummarizationSetBy = Automatic
+
+	column FechaFin = DATE(METRICAS_Tareas_Peticiones[end].[Año], METRICAS_Tareas_Peticiones[end].[NroMes], 1)
+		formatString: Short Date
+		lineageTag: b7d54180-629c-4915-a22d-e4ff57d50a6a
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: d915edc9-e737-4bd0-b9ea-8d3bd72ffd1b
+			defaultHierarchy: LocalDateTable_4b1f6331-2e37-4678-aea7-cdcd065ee78c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID-Petición = LOOKUPVALUE('Tareas de Peticiones'[dv_request_item],'Tareas de Peticiones'[number], [id_ticket])
+		lineageTag: 964ba894-3f41-4f6c-8d70-00921f14e39e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tarea_enTablaTareas = if(CONTAINS('Tareas de Peticiones', 'Tareas de Peticiones'[number],METRICAS_Tareas_Peticiones[id_ticket]), TRUE(), FALSE())
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 76aecc8d-8218-4c7e-871f-8d547ca3bc57
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column EstadoActual_EnTablaTareas = LOOKUPVALUE('Tareas de Peticiones'[_dv_state - español],'Tareas de Peticiones'[number], [id_ticket])
+		lineageTag: 9ea8ac9f-6d95-4f25-b03f-becc150cf3f1
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column APLICACION_DEFINTIVA_IDENTIF_ENERGIA = LOOKUPVALUE('Peticiones'[APLICACION_DEFINTIVA_IDENTIF_ENERGIA],'Peticiones'[number], [ID-Petición])
+		lineageTag: 1ab6e18d-af5b-4730-8014-48c01cbc0b82
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _DuracionDias_Tareas = DATEDIFF('METRICAS_Tareas_Peticiones'[start],'METRICAS_Tareas_Peticiones'[end], DAY)
+		formatString: 0
+		lineageTag: a9bdc695-3398-4cc3-b6a9-e59c361d32b2
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _DuracionHoras_Tareas_Estados = DATEDIFF('METRICAS_Tareas_Peticiones'[start],'METRICAS_Tareas_Peticiones'[end], HOUR)
+		formatString: 0
+		lineageTag: 533294a6-6bd8-4c8a-92f8-fd362f9251c4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _EstadoGeneral_MetricasTareas = if(and(METRICAS_Tareas_Peticiones[field] = "Estado",'METRICAS_Tareas_Peticiones'[value]= "En espera"),"En Espera", if (METRICAS_Tareas_Peticiones[field] = "Grupo de Asignación", "N/A", "En Ejecución"))
+		lineageTag: 687f6930-1aa4-46db-8c7b-5fa8772d8b89
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _value_Solo_Estado
+		dataType: string
+		lineageTag: 0c618197-5dc9-4afe-ac81-dd81b11f4d8c
+		summarizeBy: none
+		sourceColumn: _value_Solo_Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tareas de Peticiones.number'
+		dataType: string
+		lineageTag: f5ab46a5-743b-43fc-9dca-2f4829fa82c4
+		summarizeBy: none
+		sourceColumn: Tareas de Peticiones.number
+
+		annotation SummarizationSetBy = Automatic
+
+	column ELEMENTOSyCIs_ENERGIA = LOOKUPVALUE('Peticiones'[ELEMENTOSyCIs_ENERGIA],'Peticiones'[number], [ID-Petición])
+		lineageTag: 8a2074db-7f5f-4e8d-a233-d3c38bbdbb7a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column TAREA_GRUPO = if ('METRICAS_Tareas_Peticiones'[field] = "Grupo de Asignación", CONCATENATE('METRICAS_Tareas_Peticiones'[id_ticket], 'METRICAS_Tareas_Peticiones'[Value]), "")
+		lineageTag: f9b731b7-c636-4a2c-9b23-950f99aa0a55
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition METRICAS_Tareas_Peticiones-359dfc77-4586-4e52-8ee8-332d64dd50ed = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_ES_V_metric_instance = Origen{[Schema="SERV_NOW_ES",Item="V_metric_instance"]}[Data],
+				    #"Filas filtradas" = Table.SelectRows(SERV_NOW_ES_V_metric_instance, each ([table] = "sc_task") and ([duration] <> null)),
+				    #"Filas filtradas1" = Table.SelectRows(#"Filas filtradas", each [start] >= #datetime(2022, 1, 1, 0, 0, 0)),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas1", {"id_ticket"}, #"Tareas de Peticiones", {"number"}, "Tareas de Peticiones", JoinKind.LeftOuter),
+				    #"Se expandió Tareas de Peticiones" = Table.ExpandTableColumn(#"Consultas combinadas", "Tareas de Peticiones", {"number"}, {"Tareas de Peticiones.number"}),
+				    #"Filas filtradas5" = Table.SelectRows(#"Se expandió Tareas de Peticiones", each [Tareas de Peticiones.number] <> null and [Tareas de Peticiones.number] <> ""),
+				    #"Columnas reordenadas" = Table.ReorderColumns(#"Filas filtradas5",{"definition", "id", "start", "end", "duration", "field", "value", "table", "id_ticket"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas reordenadas","Open","Abierto",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Work in Progress","En curso",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","On hold","En espera",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Closed Complete","Cerrado completo",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Closed Incomplete","Cerrado incompleto",Replacer.ReplaceText,{"value"}),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado4","Closed Skipped","Cerrado omitido",Replacer.ReplaceText,{"value"}),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Valor reemplazado5", "_value_Solo_Estado", each if [field] = "state" then [value] else null),
+				    #"Filas filtradas2" = Table.SelectRows(#"Columna condicional agregada", each [value] <> null and [value] <> ""),
+				    #"Filas filtradas3" = Table.SelectRows(#"Filas filtradas2", each [id_ticket] <> null and [id_ticket] <> ""),
+				    #"Filas filtradas4" = Table.SelectRows(#"Filas filtradas3", each [duration] <> null and [duration] <> ""),
+				    #"Valor reemplazado6" = Table.ReplaceValue(#"Filas filtradas4","assignment_group","Grupo de Asignación",Replacer.ReplaceText,{"field"}),
+				    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","state","Estado",Replacer.ReplaceText,{"field"}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Valor reemplazado7",{{"duration", type number}}),
+				    #"Filas filtradas6" = Table.SelectRows(#"Tipo cambiado", each [duration] > 1)
+				in
+				    #"Filas filtradas6"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

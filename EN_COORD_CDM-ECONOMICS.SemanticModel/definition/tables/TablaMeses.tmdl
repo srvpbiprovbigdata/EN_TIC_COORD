@@ -1,0 +1,35 @@
+table TablaMeses
+	lineageTag: e62b070e-ae5c-462d-b75a-27361e59d9c0
+
+	column Date
+		formatString: General Date
+		lineageTag: c0ea37b1-8157-47d9-a9f4-8606809ed706
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variation
+			isDefault
+			relationship: b8bd68ef-74a1-492f-b8df-40248709ed67
+			defaultHierarchy: LocalDateTable_468c1dfb-74ad-4b52-86ed-ee800042a558.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes
+		lineageTag: 650d18f5-3256-4baa-a8da-ff1e26e8bc1d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TablaMeses = calculated
+		mode: import
+		source =
+				ADDCOLUMNS (
+				    CALENDAR ( DATE ( YEAR ( TODAY() ), 1, 1 ), DATE ( YEAR ( TODAY() ), 12, 31 ) ),
+				    "Mes", FORMAT ( [Date], "mmmm" )
+				)
+
+	annotation PBI_Id = ebd2cb70adfb4e63b34c701ebc55f286
+

@@ -1,0 +1,127 @@
+table _backlog_Peticiones
+	lineageTag: 45f69d33-2618-4bbc-bc02-ec744ce6b11a
+
+	measure 'AcumuladoTotal_ Peticiones_Abiertas' =
+			
+			CALCULATE(
+			    Sum(_backlog_Peticiones[Total_Abiertas])+0,
+			    FILTER(ALLSELECTED(_backlog_Peticiones), _backlog_Peticiones[Fecha_Apertura]<=MAX(_backlog_Peticiones[Fecha_Apertura]))
+			)
+		formatString: 0
+		lineageTag: 321b5cb3-f568-478e-a730-e8cbaf38f74b
+
+	column _MyMesAño_Abierta_Info_BackLog
+		lineageTag: cce912aa-6b50-4711-8417-86d2bffd1ab7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Peticiones[_MyMesAño_Abierta_Info_BackLog]
+
+		annotation SummarizationSetBy = Automatic
+
+	column NroMes-Abierta
+		formatString: 0
+		lineageTag: 092f78ec-1035-4944-b623-951b300e5359
+		summarizeBy: sum
+		sourceColumn: LocalDateTable_7ed399e6-b07b-41bd-804a-bc7e0c47458e[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año-Abierta
+		formatString: 0
+		lineageTag: d8920821-160f-49ee-a07a-2f50d6988798
+		summarizeBy: sum
+		sourceColumn: LocalDateTable_7ed399e6-b07b-41bd-804a-bc7e0c47458e[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abiertas
+		formatString: 0
+		lineageTag: 7e19b021-f341-4cab-bdde-b10059d2d64d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Abiertas]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha_Apertura = DATE(_backlog_Peticiones[Año-Abierta],_backlog_Peticiones[NroMes-Abierta],1)
+		formatString: Short Date
+		lineageTag: 00bc1cb8-7a5c-4314-b0ae-2123b36b8f70
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 9565f647-da7b-4810-bbc7-411d3ff74d7e
+			defaultHierarchy: LocalDateTable_14480b57-9f59-496d-97cf-a938a33dbb95.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Total_Abiertas = if(_backlog_Peticiones[Abiertas]=BLANK(), 0, _backlog_Peticiones[Abiertas])
+		formatString: 0
+		lineageTag: 4dba59d3-0349-4a1b-92a7-caf752bb0312
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerradas
+		formatString: 0
+		lineageTag: 3995863f-9aba-4f84-bbe3-27b98f62f72d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Cerradas]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Total_Cerradas = if(_backlog_Peticiones[Cerradas]=BLANK(), 0, _backlog_Peticiones[Cerradas])
+		formatString: 0
+		lineageTag: e37cfee6-9507-400c-b3b8-f3c37c74c0a3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abiertas - Cerradas' = ('_backlog_Peticiones'[Total_Abiertas] - '_backlog_Peticiones'[Total_Cerradas])*(-1)
+		formatString: 0
+		lineageTag: b33786ef-0982-4ae8-9f0e-60750e8692b2
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Backlog_Acumulado =
+			
+			var RowDate = '_backlog_Peticiones'[Fecha_Apertura]
+			RETURN
+			    CALCULATE(
+			        SUM('_backlog_Peticiones'[Abiertas - Cerradas])+0,
+			        FILTER(
+			            '_backlog_Peticiones',
+			            '_backlog_Peticiones'[Fecha_Apertura] <= RowDate
+			                        )
+			        )
+		formatString: 0
+		lineageTag: 8add1630-3415-4bbf-acbf-d219c8470a0b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abiertas_ MesesPasadosTotal' = [AcumuladoTotal_ Peticiones_Abiertas]- _backlog_Peticiones[Total_Abiertas]
+		formatString: 0
+		lineageTag: de3525e0-e426-46ed-aca7-8ac8a5929ae1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _backlog_Peticiones-92e2cdaf-8252-496e-bb3d-e04622d52c36 = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'Peticiones',
+				    'Peticiones'[_MyMesAño_Abierta_Info_BackLog],
+				    'Peticiones'[Opened_at].[NroMes], 
+				    'Peticiones'[Opened_at].[Año],
+				    "Abiertas", CALCULATE(COUNT('Peticiones'[_MyMesAño_Abierta_Info_BackLog]),FILTER('Peticiones',and('Peticiones'[_Util_para_ENERGIA_Info_BackLog]="Si",'Peticiones'[__EstadoGeneral_Peticiones]="Abierta"))),
+				    "Cerradas", CALCULATE(COUNT('Peticiones'[_MyMesAño_Cerrada_Info_BackLog]),FILTER('Peticiones',and('Peticiones'[_Util_para_ENERGIA_Info_BackLog]="Si",'Peticiones'[__EstadoGeneral_Peticiones]="Cerrada")))
+				    )
+				```
+
+	annotation PBI_Id = 6e337c7bea744c89860c46c8b68c61dc
+

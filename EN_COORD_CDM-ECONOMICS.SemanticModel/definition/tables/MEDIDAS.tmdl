@@ -1,0 +1,1924 @@
+table MEDIDAS
+	lineageTag: 93b678cd-ea41-4a2a-8367-d2eb97147975
+
+	measure ZMD_Presupuesto = SUM(PRESUPUESTO[Presupuesto])
+		formatString: #,0\ "€";-#,0\ "€";#,0\ "€"
+		displayFolder: OVERVIEW
+		lineageTag: cfcd1a6d-1576-48d0-9410-46ac5d02a4fb
+
+	measure ZMD_Disponible = [ZMD_Presupuesto] - [ZMD_Recepcionado_YTD] - [ZMD_Comprometido_YTD] - [ZMD_Provisiones_YTD]
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: OVERVIEW
+		lineageTag: 5aee5e2b-22f2-4883-9621-145096d59208
+
+	measure ZMD_Comprometido_YTD = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Comprometido",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL]
+			        )
+			    ), 
+			    0
+			)
+			```
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: OVERVIEW
+		lineageTag: 13d3f704-a3e7-4c87-8889-6bd1930d3ee4
+
+	measure ZMD_Provisiones_YTD = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Provisiones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL]
+			        )
+			    ), 
+			    0
+			)
+			```
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: OVERVIEW
+		lineageTag: edee2dcd-9fe4-4bdf-830b-cf80b5fa9f8e
+
+	measure ZMD_Recepcionado_YTD = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL]
+			        )
+			    ), 
+			    0
+			)
+			```
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: OVERVIEW
+		lineageTag: d2abb3f0-650d-49ff-b292-5c1d82006e26
+
+	measure ZMD_Asignado = [ZMD_Comprometido_YTD] + [ZMD_Provisiones_YTD] + [ZMD_Recepcionado_YTD]
+		displayFolder: OVERVIEW
+		lineageTag: 5b41f2d3-9058-4a9d-b063-241046727f4c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Comprometido_PrevMonth = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Comprometido",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL] && IMPACTO_BUDGET[FECHA IMPACTO BUDGET] <= [ZMD_PARAMS_LASTDAY_PREVIOUSMONTH]
+			        )
+			    ), 
+			    0
+			)
+			```
+		displayFolder: OVERVIEW
+		lineageTag: 54089749-9b58-4420-a946-3408e24f29e7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Provisiones_PrevMonth = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Provisiones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL] && IMPACTO_BUDGET[FECHA IMPACTO BUDGET] <= [ZMD_PARAMS_LASTDAY_PREVIOUSMONTH]
+			        )
+			    ), 
+			    0
+			)
+			```
+		displayFolder: OVERVIEW
+		lineageTag: b5c793b9-52c3-4929-bcab-9aa386fb491f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Recepcionado_PrevMonth = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL] && IMPACTO_BUDGET[FECHA IMPACTO BUDGET] <= [ZMD_PARAMS_LASTDAY_PREVIOUSMONTH]
+			        )
+			    ), 
+			    0
+			)
+			```
+		displayFolder: OVERVIEW
+		lineageTag: aa41cc3a-8d54-4af9-b0b5-6b0779517294
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Disponible_PrevMonth = [ZMD_Presupuesto] - [ZMD_Recepcionado_PrevMonth] - [ZMD_Comprometido_PrevMonth] - [ZMD_Provisiones_PrevMonth]
+		displayFolder: OVERVIEW
+		lineageTag: fa82e5e1-9b99-436f-b79c-a7db090d8e44
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Provisiones_PrevMonthVar = ```
+			
+			VAR ProvisionesActual = [ZMD_Provisiones_YTD]
+			VAR ProvisionesAnterior = [ZMD_Provisiones_PrevMonth]
+			
+			VAR Variacion = 
+			    IF(ProvisionesAnterior <> 0, 
+			        (ProvisionesActual - ProvisionesAnterior) / ProvisionesAnterior, 
+			        BLANK()
+			    )
+			
+			VAR Simbolo = 
+			    SWITCH(TRUE(),
+			        Variacion > 0, UNICHAR(9650),  -- ▲ Triángulo arriba
+			        Variacion < 0, UNICHAR(9660),  -- ▼ Triángulo abajo
+			        UNICHAR(61)  -- = Signo igual
+			    )
+			
+			RETURN 
+			    FORMAT(Variacion, "0.00%") & " " & Simbolo
+			
+			```
+		displayFolder: OVERVIEW
+		lineageTag: 270b6ba0-4d49-4151-b1bd-eac1d89fee5a
+
+	measure ZMD_Comprometido_PrevMonthVar = ```
+			
+			VAR ComprometidoActual = [ZMD_Comprometido_YTD]
+			VAR ComprometidoAnterior = [ZMD_Comprometido_PrevMonth]
+			
+			VAR Variacion = 
+			    IF(ComprometidoAnterior <> 0, 
+			        (ComprometidoActual - ComprometidoAnterior) / ComprometidoAnterior, 
+			        BLANK()
+			    )
+			
+			VAR Simbolo = 
+			    SWITCH(TRUE(),
+			        Variacion > 0, UNICHAR(9650),  -- ▲ Triángulo arriba
+			        Variacion < 0, UNICHAR(9660),  -- ▼ Triángulo abajo
+			        UNICHAR(61)  -- = Signo igual
+			    )
+			
+			RETURN 
+			    FORMAT(Variacion, "0.00%") & " " & Simbolo
+			
+			```
+		displayFolder: OVERVIEW
+		lineageTag: 9ddb71b1-0dc0-4021-8fc0-ade8e7e3c3a3
+
+	measure ZMD_Recepcionado_PrevMonthVar = ```
+			
+			VAR RecepcionadoActual = [ZMD_Recepcionado_YTD]
+			VAR RecepcionadoAnterior = [ZMD_Recepcionado_PrevMonth]
+			
+			VAR Variacion = 
+			    IF(RecepcionadoAnterior <> 0, 
+			        (RecepcionadoActual - RecepcionadoAnterior) / RecepcionadoAnterior, 
+			        BLANK()
+			    )
+			
+			VAR Simbolo = 
+			    SWITCH(TRUE(),
+			        Variacion > 0, UNICHAR(9650),  -- ▲ Triángulo arriba
+			        Variacion < 0, UNICHAR(9660),  -- ▼ Triángulo abajo
+			        UNICHAR(61)  -- = Signo igual
+			    )
+			
+			RETURN 
+			    FORMAT(Variacion, "0.00%") & " " & Simbolo
+			
+			```
+		displayFolder: OVERVIEW
+		lineageTag: f197a29e-a065-424a-a5d5-b39d93bbe9a5
+
+	measure ZMD_Disponible_PrevMonthVar = ```
+			
+			VAR PresupuestoActual = [ZMD_Disponible]
+			VAR PresupuestoAnterior = [ZMD_Disponible_PrevMonth]
+			
+			VAR Variacion = 
+			    IF(PresupuestoAnterior <> 0, 
+			        (PresupuestoActual - PresupuestoAnterior) / PresupuestoAnterior, 
+			        BLANK()
+			    )
+			
+			VAR Simbolo = 
+			    SWITCH(TRUE(),
+			        Variacion > 0, UNICHAR(9650),  -- ▲ Triángulo arriba
+			        Variacion < 0, UNICHAR(9660),  -- ▼ Triángulo abajo
+			        UNICHAR(61)  -- = Signo igual
+			    )
+			
+			RETURN 
+			    FORMAT(Variacion, "0.00%") & " " & Simbolo
+			
+			```
+		displayFolder: OVERVIEW
+		lineageTag: 08b2833f-9cf1-42f5-9a59-784d3928c960
+
+	measure ZMD_Recepcionado_YTD_vs_Budget = IF([ZMD_Presupuesto] = 0, 1, DIVIDE([ZMD_Recepcionado_YTD], [ZMD_Presupuesto]))
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: OVERVIEW
+		lineageTag: 08017c7c-7193-44e9-959f-53de2155f55b
+
+	measure ZMD_Matrix_ProveedorNombre = ```
+			IF(
+			    ISINSCOPE(PEDIDOS[Contrato Marco]) || ISINSCOPE(PEDIDOS[Documento Compras]) || ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]),  
+			    MAX(PEDIDOS[Proveedor Nombre]),
+			    BLANK()
+			)
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: f0b776e3-687e-47c1-8445-094848f805ee
+
+	measure ZMD_Matrix_Solicitante = ```
+			
+			IF(
+			    ISINSCOPE(PEDIDOS[Contrato Marco]) || ISINSCOPE(PEDIDOS[Documento Compras]) || ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]),  
+			    MAX(PEDIDOS[Solicitante]),  
+			    BLANK()
+			)
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: 6224a9ea-a28e-4233-abc6-73eec041b0ca
+
+	measure ZMD_Matrix_Demanda = ```
+			
+			IF(
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || ISINSCOPE(PEDIDOS[Posición]) || ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]),  
+			    MAX(PEDIDOS[Demanda]),  
+			    BLANK()
+			)
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: 100b2418-15a7-4af0-a109-16f3788a8de1
+
+	measure ZMD_Matrix_Orden = ```
+			
+			IF(
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || ISINSCOPE(PEDIDOS[Posición]) || ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]),  
+			    MAX(PEDIDOS[Orden]),  
+			    BLANK()
+			)
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: f816b596-f5f4-417a-bc03-fff4f7607c1a
+
+	measure ZMD_Matrix_Tagetik = ```
+			
+			IF(
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || ISINSCOPE(PEDIDOS[Posición]) || ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]),  
+			    MAX(PEDIDOS[Tagetik]),  
+			    BLANK()
+			)
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: c6d6f1cf-bb0f-4d4f-80d4-80a37e957965
+
+	measure ZMD_Matrix_Fecha = ```
+			
+			IF(
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || ISINSCOPE(PEDIDOS[Posición]) || ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]),  
+			    MAX(PEDIDOS[Fecha]),  
+			    BLANK()
+			)
+			```
+		formatString: Short Date
+		displayFolder: CAPEX-OPEX
+		lineageTag: 8af383a3-9bb3-4042-b2cc-058ec3a26207
+
+	measure ZMD_Matrix_PedidoRecepcionado = ```
+			
+			VAR EsDetalle =
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || 
+			    ISINSCOPE(PEDIDOS[Posición]) || 
+			    ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia])
+			
+			RETURN
+			IF(
+			    EsDetalle || NOT ISFILTERED(PEDIDOS[Documento Compras]),
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla origen] = "Recepciones"
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: 05584c07-67f9-4b37-ab04-9677d2b5df3c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_PedidoComprometido = ```
+			
+			VAR EsDetalle =
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || 
+			    ISINSCOPE(PEDIDOS[Posición]) || 
+			    ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia])
+			
+			RETURN
+			IF(
+			    EsDetalle || NOT ISFILTERED(PEDIDOS[Documento Compras]),
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla origen] = "Comprometido"
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: 9ff1f2fd-9b90-4e66-97f4-23be325dad47
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_RecepcionadoHist_PrevYear = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_PREVIO]
+			        )
+			    ),
+			    0
+			)
+			 
+			```
+		displayFolder: OVERVIEW
+		lineageTag: f73ffb53-47e8-4d56-ad34-4ef05c7ac233
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_PedidoTotal = [ZMD_Matrix_PedidoComprometido] + [ZMD_Matrix_PedidoRecepcionado]
+		displayFolder: CAPEX-OPEX
+		lineageTag: 52934ce4-61ac-4cf3-a810-976f399c1dd1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_TextosPedidos =
+			
+			SWITCH(
+			    TRUE(),
+			    ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]), CONCATENATE(MAX(IMPACTO_BUDGET[Texto Cabecera Doc]), MAX(IMPACTO_BUDGET[Texto explicativo])),
+			    ISINSCOPE(PEDIDOS[Posición]), MAX(PEDIDOS[Texto de posición]),
+			    ISINSCOPE(PEDIDOS[Documento Compras]), MAX(PEDIDOS[Texto de cabecera]),
+			    BLANK()
+			)
+		displayFolder: CAPEX-OPEX
+		lineageTag: 67d98cb3-df71-45c9-af45-8a7337974e34
+
+	measure ZMD_Matrix_Unidad = ```
+			
+			IF(
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || ISINSCOPE(PEDIDOS[Posición]) || ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]),  
+			    MAX(PEDIDOS[Unidad]),  
+			    BLANK()
+			)
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: fe93f61b-7a2a-4726-9636-5e36dbc80daa
+
+	measure ZMD_Matrix_Solicitud = ```
+			
+			IF(
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || ISINSCOPE(PEDIDOS[Posición]),  
+			    IF(
+			        HASONEVALUE(PEDIDOS[Documento Compras]) || HASONEVALUE(PEDIDOS[Texto de posición]), 
+			        MAX(PEDIDOS[Solicitud de Pedido]), 
+			        BLANK()
+			    ),
+			    BLANK() 
+			)
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: b9181c3f-4283-4278-8f4c-478359d125ce
+
+	measure ZMD_Matrix_NumImputacion = ```
+			
+			IF(
+			    ISINSCOPE(PEDIDOS[Posición]) || ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia]),  
+			    MAX(PEDIDOS[Número de imputación]),  
+			    BLANK()
+			)
+			
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: 3012c0e8-d7c2-4026-bf5e-1c8daf989565
+
+	measure ZMD_Matrix_Cantidad = ```
+			
+			VAR EsDetalle =
+			    ISINSCOPE(PEDIDOS[Documento Compras]) || 
+			    ISINSCOPE(PEDIDOS[Posición]) || 
+			    ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia])
+			
+			RETURN
+			IF(
+			    EsDetalle || NOT ISFILTERED(PEDIDOS[Documento Compras]),
+			    SUM(PEDIDOS[Cantidad]),
+			    BLANK()
+			)
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			```
+		displayFolder: CAPEX-OPEX
+		lineageTag: 39e55f1b-8c6a-4c9d-aa82-6e39391a9706
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PresupuestoHistorico = SUM(PRESUPUESTO_HISTORICO[Presupuesto])
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: OVERVIEW
+		lineageTag: 77609248-c5c1-4f38-86bb-cf70c2e6c28a
+
+	measure ZMD_PARAMS_AÑO_ACTUAL = 2025
+		formatString: 0
+		displayFolder: OVERVIEW
+		lineageTag: bc67cb9e-c73a-4869-bb6d-bcdaec6d679b
+
+	measure ZMD_PARAMS_AÑO_PREVIO = 2024
+		formatString: 0
+		displayFolder: OVERVIEW
+		lineageTag: c4db0369-a12b-4a04-a993-67412fa23307
+
+	measure ZMD_PARAMS_LASTDAY_PREVIOUSMONTH = EOMONTH(TODAY(), -1)
+		formatString: General Date
+		displayFolder: OVERVIEW
+		lineageTag: 1b836ae8-3b90-4fa2-a794-fdabcdc4b664
+
+	measure ZMD_RecepcionadoHist_PrevYear_CurrMonth = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_PREVIO] && IMPACTO_BUDGET[FECHA IMPACTO BUDGET] <= [ZMD_PARAMS_LASTDAY_PREVIOUSYEAR_CURRENT_MONTH]
+			        )
+			    ), 
+			    0
+			)
+			```
+		displayFolder: OVERVIEW
+		lineageTag: 777a835c-70b8-4983-8b27-1581832a4b0e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PARAMS_LASTDAY_PREVIOUSYEAR_CURRENT_MONTH = EOMONTH(TODAY(), -12)
+		formatString: General Date
+		displayFolder: OVERVIEW
+		lineageTag: 2d0994d3-91a0-4f99-a4b3-e3ea3a6cf8aa
+
+	measure ZMD_RecepcionadoHist_PrevYear_RestYear = [ZMD_RecepcionadoHist_PrevYear] - [ZMD_RecepcionadoHist_PrevYear_CurrMonth]
+		displayFolder: OVERVIEW
+		lineageTag: 22c0af84-6cf1-467d-b3df-b214304e1c68
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Provisiones_YTD_Resto = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Provisiones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL] && ISBLANK(IMPACTO_BUDGET[DEMANDA IMPACTO BUDGET])
+			        )
+			    ), 
+			    0
+			)
+			```
+		displayFolder: OVERVIEW
+		lineageTag: 9235aa18-8cd3-4171-a228-19ea2a324aad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Provisiones_YTD_Demanda = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Provisiones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL] && NOT ISBLANK(IMPACTO_BUDGET[DEMANDA IMPACTO BUDGET])
+			        )
+			    ), 
+			    0
+			)
+			```
+		displayFolder: OVERVIEW
+		lineageTag: f665bd73-4694-4a42-af02-d8ebf43c3bb7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Recepcionado_YTD_Demanda = ```
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL] && NOT ISBLANK(IMPACTO_BUDGET[DEMANDA IMPACTO BUDGET])
+			        )
+			    ), 
+			    0
+			)
+			```
+		displayFolder: OVERVIEW
+		lineageTag: 6d6eb792-298d-4f5d-bbd4-5c5e7b032a6d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Comprometido_Proveedores = ```
+			
+			VAR EsDetalle =
+			    ISINSCOPE(PROVEEDORES[Nombre]) || 
+			    ISINSCOPE(PROVEEDORES[Proveedor])
+			
+			RETURN
+			IF(
+			    EsDetalle || NOT ISFILTERED(PROVEEDORES[Nombre]),
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Comprometido"
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: PROVEEDORES
+		lineageTag: aab24ec7-2729-438a-bb43-ab1223fe6425
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Recepciones_Proveedores = ```
+			
+			VAR EsDetalle =
+			    ISINSCOPE(PROVEEDORES[Nombre]) || 
+			    ISINSCOPE(PROVEEDORES[Proveedor])
+			
+			RETURN
+			IF(
+			    EsDetalle || NOT ISFILTERED(PROVEEDORES[Nombre]),
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones"
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: PROVEEDORES
+		lineageTag: f5dd7843-3e7f-42e7-a84b-5232b21f47b1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Ficha_Demanda = MAX(DEMANDA[Demanda])
+		displayFolder: DEMANDA
+		lineageTag: 794cc564-382e-469f-9d9a-bba3470c7440
+
+	measure ZMD_Ficha_Asunto = MAX(DEMANDA[Asunto])
+		displayFolder: DEMANDA
+		lineageTag: fc2de5b8-766f-4b8f-8cc0-b9906498fbcf
+
+	measure ZMD_Ficha_Porfolio = MAX(DEMANDA[Porfolio])
+		displayFolder: DEMANDA
+		lineageTag: ff285bb2-03a3-46b7-9827-270af56d7a38
+
+	measure ZMD_Ficha_Gestor_Demanda = MAX(DEMANDA[Gestor de Demanda])
+		displayFolder: DEMANDA
+		lineageTag: 7dedf967-4a51-4763-a624-cc933f226ebc
+
+	measure ZMD_Ficha_Jefe_Proyecto = MAX(DEMANDA[Jefe de proyecto])
+		displayFolder: DEMANDA
+		lineageTag: 2050a01e-fb77-4b5f-aea1-b73b3055f5d2
+
+	measure ZMD_Ficha_Fecha_Aprobación = MAX(DEMANDA[Fecha de Aprobacion])
+		formatString: Short Date
+		displayFolder: DEMANDA
+		lineageTag: 3dcebfea-be91-4deb-8326-c77e4c81ccfe
+
+	measure ZMD_Ficha_Estado_Demanda = MAX(DEMANDA[Estado de la Demanda])
+		displayFolder: DEMANDA
+		lineageTag: 24ea259a-12b2-47db-87b2-335b3eb26ded
+
+	measure ZMD_Ficha_Presupuesto_CAPEX = MAX(DEMANDA[Presupuesto  Capex])
+		displayFolder: DEMANDA
+		lineageTag: 1fbfd5ef-4b1c-4029-9136-dd5f4402327f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Ficha_Presupuesto_OPEX = MAX(DEMANDA[Presupuesto  Opex])
+		displayFolder: DEMANDA
+		lineageTag: 025256df-7c0a-4a47-be82-67148526e42e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Demandas_Q_Sin_Economics =
+			
+			CALCULATE(
+			    SUM(DEMANDA[Presupuesto Total]),
+			    FILTER(
+			        DEMANDA,
+			        ISBLANK(
+			            CALCULATE(
+			                COUNTROWS(IMPACTO_BUDGET),
+			                FILTER(
+			                    IMPACTO_BUDGET,
+			                    IMPACTO_BUDGET[DEMANDA IMPACTO BUDGET] = DEMANDA[Demanda] &&
+			                    IMPACTO_BUDGET[Tabla Origen] IN { "Recepciones", "Comprometido" }
+			                )
+			            )
+			        )
+			    )
+			)
+		displayFolder: DEMANDA
+		lineageTag: 3b15cecb-3cbd-4243-aeab-8c866ae362ad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Demandas_P_Sin_Economics = ```
+			
+			CALCULATE(
+			    COUNT(DEMANDA[Demanda]),
+			    FILTER(
+			        DEMANDA,
+			        ISBLANK(
+			            CALCULATE(
+			                COUNTROWS(IMPACTO_BUDGET),
+			                FILTER(
+			                    IMPACTO_BUDGET,
+			                    IMPACTO_BUDGET[DEMANDA IMPACTO BUDGET] = DEMANDA[Demanda] &&
+			                    IMPACTO_BUDGET[Tabla Origen] IN { "Recepciones", "Comprometido" }
+			                )
+			            )
+			        )
+			    )
+			)
+			
+			```
+		displayFolder: DEMANDA
+		lineageTag: 098cef3a-8509-46ed-b711-5e87629465c8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Errores_Key_Budget =
+			COALESCE(
+			    CALCULATE(
+			        COUNTROWS('ERROR_KEY_BUDGET'),
+			        REMOVEFILTERS('ERROR_KEY_BUDGET')
+			    ),
+			    0
+			)
+		formatString: 0
+		displayFolder: CHECKS
+		lineageTag: f5472df4-003b-4368-8330-fb1f2f694795
+
+	measure ZMD_Errores_Key_Pedido =
+			COALESCE(
+			    CALCULATE(
+			        COUNTROWS('ERROR_KEY_PEDIDO'),
+			        REMOVEFILTERS('ERROR_KEY_PEDIDO')
+			    ),
+			    0
+			)
+		formatString: 0
+		displayFolder: CHECKS
+		lineageTag: 35909bab-418d-4db9-bccd-28a024829f57
+
+	measure ZMD_Total_Pedidos = [ZMD_Comprometido_YTD] + [ZMD_Provisiones_YTD] + [ZMD_Recepcionado_YTD]
+		displayFolder: DEMANDA
+		lineageTag: 64648a9b-0502-4ce1-9241-3ce52cd35f1f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Disponible_Historico_PrevYear = [ZMD_PresupuestoHistorico] - [ZMD_RecepcionadoHist_PrevYear]
+		formatString: 0.00
+		displayFolder: OVERVIEW
+		lineageTag: 503532e5-b3f6-45ac-a139-a31ecd4da47a
+
+	measure ZMD_Ficha_Fecha_Planificada = ```
+			
+			IF(
+			    ISBLANK(MAX(DEMANDA[Fecha Inicio Estimada])),
+			    "-",
+			    FORMAT(MAX(DEMANDA[Fecha Inicio Estimada]), "dd/mm/yyyy")
+			)
+			
+			```
+		displayFolder: DEMANDA
+		lineageTag: 2203e924-c170-434f-aa55-7b09bc7f9fc0
+
+	measure ZMD_Ficha_Fecha_Inicio_Plan = ```
+			
+			IF(
+			    ISBLANK(MAX(DEMANDA[Fecha de fin real])),
+			    "-",
+			    FORMAT(MAX(DEMANDA[Fecha de fin real]), "dd/mm/yyyy")
+			)
+			
+			```
+		displayFolder: DEMANDA
+		lineageTag: 8dfd3372-9e1c-47b8-849a-38c52db399a3
+
+	measure ZMD_Ficha_Fecha_Final_Real = ```
+			
+			IF(
+			    ISBLANK(MAX(DEMANDA[Fecha de fin real])),
+			    "-",
+			    FORMAT(MAX(DEMANDA[Fecha de fin real]), "dd/mm/yyyy")
+			)
+			
+			```
+		displayFolder: DEMANDA
+		lineageTag: c90b9f24-4d2e-4500-8769-3a676ad7b5b0
+
+	measure ZMD_Ficha_Importe = MAX(DEMANDA[Presupuesto Total])
+		displayFolder: DEMANDA
+		lineageTag: f55e6fa1-6dd3-42dd-b363-25548fcfd194
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PARAM_Comunes_Presupuesto = SUM(COMUNES_PRESUPUESTO[03 - Energy])
+		displayFolder: COMUNES
+		lineageTag: 1523fd22-e475-4123-9b1e-a673f6931fa2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PARAM_Comunes_Disponible = [ZMD_PARAM_Comunes_Presupuesto] - [ZMD_PARAM_Comunes_Recepciones]
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: COMUNES
+		lineageTag: bd3a0476-2124-4619-aa65-473ce24b775d
+
+	measure ZMD_PARAM_Comunes_Recepciones = SUM(COMUNES_RECEPCIONES[Value])
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: COMUNES
+		lineageTag: 3c7bbdbd-3c14-449e-a468-0c22122e940d
+
+	measure ZMD_Matrix_Comunes_Enero = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 1
+			    ),
+			    BLANK()
+			)
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: cdf2a2e9-71a7-4ea0-896e-ef411c3da43c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Febrero = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 2
+			    ),
+			    BLANK()
+			)
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: efa4924c-f20d-4c06-a39d-1c4bfb23d57b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Marzo = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			       SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 3
+			    ),
+			    BLANK()
+			)
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 2099c951-a6fd-43f6-9946-9f515dee086e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Abril = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 4
+			    ),
+			    BLANK()
+			)
+			
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 541bb7a9-a9a6-40cf-8f39-656a08fdf524
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Mayo = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 5
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: af9391b4-398c-48d3-bbb7-227423fa67be
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Junio = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 6
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 2cdfe6af-7cf0-4346-96ac-72707a835431
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Julio = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 7
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: c9a236b1-fd00-43d5-bc2f-b7770aba8cf1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Agosto = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 8
+			    ),
+			    BLANK()
+			)
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 4e1fcabe-62eb-4aca-bd5d-9f4fd64c5b9d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Septiembre = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 9
+			    ),
+			    BLANK()
+			)
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: a32c9a99-2f84-4b36-8835-dbd47a58ac68
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Octubre = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 10
+			    ),
+			    BLANK()
+			)
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 5901311f-9685-4b61-b0bb-0d86f3c3b1c3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Noviembre = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 11
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 27a0f58f-c307-40ab-a316-fb05c73e18e4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Diciembre = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    CALCULATE(
+			        SUM(COMUNES_RECEPCIONES[Value]),
+			        MONTH(COMUNES_RECEPCIONES[Fecha]) = 12
+			    ),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 07719ca5-11f2-4af9-af54-8541247b019a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Presupuesto = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    SUM(COMUNES_PRESUPUESTO[03 - Energy]),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 602906e7-d16c-4294-8006-822e5f50fea3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Recepcionado = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			   SUM(COMUNES_RECEPCIONES[Value]),
+			    BLANK()
+			)
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 17c9e309-880d-420e-85ab-dbc7e3c59864
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PARAM_Comunes_Disponible_Anterior = [ZMD_PARAM_Comunes_Presupuesto] - [ZMD_PARAM_Comunes_Recepciones_Anterior]
+		displayFolder: COMUNES
+		lineageTag: e7b58d86-b71d-4bfc-a8f2-bce397663dd1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PARAM_Comunes_Recepciones_Anterior = ```
+			
+			VAR MaxFecha = MAX(COMUNES_RECEPCIONES[Fecha])
+			VAR MaxMes = MONTH(MaxFecha)
+			VAR MaxAnio = YEAR(MaxFecha)
+			VAR UltimoMesCompleto = EOMONTH(DATE(MaxAnio, MaxMes, 1), -1)
+			
+			RETURN
+			CALCULATE(
+			    SUM(COMUNES_RECEPCIONES[Value]),
+			    FILTER(
+			        COMUNES_RECEPCIONES,
+			        COMUNES_RECEPCIONES[Fecha] <= UltimoMesCompleto
+			    )
+			)
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 2f4747fb-dd68-4412-beca-1e6df3374f9f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Forecast_Planificado_Todo =
+			CALCULATE(
+			    SUM(FORECAST[Coste]),
+			    FILTER(
+			        FORECAST,
+			        YEAR(FORECAST[Date]) = [ZMD_PARAMS_AÑO_ACTUAL] &&
+			        MONTH(FORECAST[Date]) >= [ZMD_PARAM_Forecast_Mes]
+			    )
+			)
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: FORECAST
+		lineageTag: f15380a1-71e2-43ef-82e2-efaa2830705e
+
+	measure ZMD_Forecast_Disponible_PrevMonth = [ZMD_Presupuesto] - [ZMD_Forecast_Recepcionado_PrevMonth] - [ZMD_Forecast_Planificado_PendientePrevMonth]
+		displayFolder: FORECAST
+		lineageTag: 9a71133d-104f-4382-ac49-e60d81e5e825
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Forecast_Planificado_Pendiente =
+			CALCULATE(
+			    SUM(FORECAST[Coste]),
+			    FILTER(
+			        FORECAST,
+			        YEAR(FORECAST[Date]) = [ZMD_PARAMS_AÑO_ACTUAL] &&
+			        MONTH(FORECAST[Date]) >= MONTH(TODAY())
+			    )
+			)
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: FORECAST
+		lineageTag: 3657991f-b8d0-4b58-a48f-cc938ed5547a
+
+	measure ZMD_Matrix_Comunes_Disponible = [ZMD_Matrix_Comunes_Presupuesto] - [ZMD_Matrix_Comunes_Recepcionado]
+		displayFolder: COMUNES
+		lineageTag: 96193ff0-ed57-4b83-9b98-b8e7f143be9b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Demanda_Presupuesto_Total = SUM(DEMANDA[Presupuesto Total])
+		displayFolder: DEMANDA
+		lineageTag: 08ec0486-5a39-49cd-b4ab-767276019066
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Coste_Total_Impacto_Budget = SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET])
+		formatString: #,0.00
+		displayFolder: OVERVIEW
+		lineageTag: 8363dca8-f70f-4c7c-98c2-f2509e2cb436
+
+	measure ZMD_Comunes_Presupuesto_Energy = SUM(COMUNES_PRESUPUESTO[03 - Energy])
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: COMUNES
+		lineageTag: 7ad251ae-f9a0-4929-b220-8c2e7c09571f
+
+	measure ZMD_Comunes_Recepciones = SUM(COMUNES_RECEPCIONES[Value])
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: COMUNES
+		lineageTag: 603e6e20-d2c9-44b8-9428-08e43388e5c2
+
+	measure ZMD_Color_Fila_Demanda = ```
+			
+			VAR PedidoFila = ISINSCOPE(PEDIDOS[Documento Compras])
+			VAR PosicionFila = ISINSCOPE(PEDIDOS[Posición])
+			VAR DocumentoFila = ISINSCOPE(IMPACTO_BUDGET[Doc. Referencia])
+			
+			RETURN
+			    SWITCH(TRUE(),
+			        DocumentoFila, "#FFFFFF",    // blanco
+			        PosicionFila, "#DDDDDD",     // gris oscuro
+			        PedidoFila, "#BBBBBB",       // gris medio
+			        "#000000"                    // gris claro por defecto
+			    )
+			
+			
+			```
+		displayFolder: DEMANDA
+		lineageTag: 52d7b5c6-89eb-427a-a29c-8ced69af2db8
+
+	measure ZMD_Color_Fila_Proveedor = ```
+			
+			VAR ContratoMarcoFila = ISINSCOPE(PEDIDOS[Contrato Marco])
+			VAR ProveedorFila = ISINSCOPE(PROVEEDORES[Nombre])
+			
+			RETURN
+			    SWITCH(TRUE(),
+			        ContratoMarcoFila, "#FFFFFF",     // blanco
+			        ProveedorFila, "#DDDDDD",         // gris oscuro
+			        "#000000"                         // gris medio por defecto
+			    )
+			
+			
+			
+			```
+		displayFolder: PROVEEDORES
+		lineageTag: def8261c-1df5-407b-8d9a-7b39deb363ae
+
+	measure ZMD_Color_Fila_Comunes = ```
+			
+			VAR EsOrden = ISINSCOPE(COMUNES_PRESUPUESTO[DESCRIPCION ORDEN])
+			VAR EsArea = ISINSCOPE(COMUNES_PRESUPUESTO[AREA])
+			VAR EsSubarea = ISINSCOPE(COMUNES_PRESUPUESTO[SUBAREA])
+			VAR EsPartida = ISINSCOPE(COMUNES_RECEPCIONES[Partida])
+			
+			RETURN
+			    SWITCH(TRUE(),
+			        EsPartida, "#FFFFFF",   // blanco
+			        EsSubarea, "#DDDDDD",   // gris claro (contrastado)
+			        EsOrden, "#BBBBBB",     // gris medio
+			        EsArea, "#999999",      // gris oscuro
+			        "#000000"               // negro por defecto
+			    )
+			
+			
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 16b6f378-276b-4b3b-bb35-e209c6e288b3
+
+	measure ZMD_Color_Fila_Comunes_AZUL = ```
+			
+			VAR EsOrden = ISINSCOPE(COMUNES_PRESUPUESTO[DESCRIPCION ORDEN])
+			VAR EsArea = ISINSCOPE(COMUNES_PRESUPUESTO[AREA])
+			VAR EsSubarea = ISINSCOPE(COMUNES_PRESUPUESTO[SUBAREA])
+			VAR EsPartida = ISINSCOPE(COMUNES_RECEPCIONES[Partida])
+			
+			RETURN
+			    SWITCH(TRUE(),
+			        EsPartida, "#D0E4FF",    // azul muy claro
+			        EsSubarea, "#7FBFFF",    // azul claro (contrastado)
+			        EsOrden, "#5CA6E0",      // azul medio
+			        EsArea, "#337AB7",       // azul oscuro
+			        "#000000"                // negro por defecto
+			    )
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 0e56aa7b-ca31-452b-8701-ad03c9fc2dc1
+
+	measure ZMD_Color_Fila_Comunes_VERDE = ```
+			
+			VAR EsOrden = ISINSCOPE(COMUNES_PRESUPUESTO[DESCRIPCION ORDEN])
+			VAR EsArea = ISINSCOPE(COMUNES_PRESUPUESTO[AREA])
+			VAR EsSubarea = ISINSCOPE(COMUNES_PRESUPUESTO[SUBAREA])
+			VAR EsPartida = ISINSCOPE(COMUNES_RECEPCIONES[Partida])
+			
+			RETURN
+			    SWITCH(TRUE(),
+			        EsPartida, "#D9F2D9",    // verde muy claro
+			        EsSubarea, "#8FD88F",    // verde claro
+			        EsOrden, "#5DBA5D",      // verde medio
+			        EsArea, "#3C8D3C",       // verde oscuro
+			        "#000000"                // negro por defecto
+			    )
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 9254128c-9529-4618-a1df-ab1335bd5312
+
+	measure ZMD_Forecast_Planificado_PendientePrevMonth =
+			
+			VAR MesHoy = MONTH(TODAY())
+			VAR MesForecast = [ZMD_PARAM_Forecast_Mes]
+			
+			RETURN
+			IF (
+			    MesHoy = MesForecast,
+			    [ZMD_FORECAST_Planificado_todo],
+			    CALCULATE(
+			        SUM(FORECAST[Coste]),
+			        FILTER(
+			            FORECAST,
+			            YEAR(FORECAST[Date]) = [ZMD_PARAMS_AÑO_ACTUAL] &&
+			            MONTH(FORECAST[Date]) >= (MesHoy - 1)
+			        )
+			    )
+			)
+		displayFolder: FORECAST
+		lineageTag: 96a6d4d8-0683-4730-8c63-4270edcb5777
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Forecast_Cierre_Previsto = [ZMD_Presupuesto] - [ZMD_Recepcionado_YTD] - [ZMD_Forecast_Planificado_Pendiente]
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: FORECAST
+		lineageTag: de2ced80-4d54-4a13-9dff-8744ab265093
+
+	measure ZMD_Recepcionado_AñoPrevio =
+			
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_PREVIO]
+			        )
+			    ),
+			    0
+			)
+		displayFolder: OVERVIEW
+		lineageTag: 1fb301b9-d3a2-477f-b5d5-50cb9d09ad63
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Forecast_Cierre_Forecast = [ZMD_Presupuesto] - [ZMD_Forecast_Recepcionado_PrevioForecast] - [ZMD_Forecast_Planificado_Todo]
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: FORECAST
+		lineageTag: 93be2c36-9b60-4a6f-a62b-b2108895f476
+
+	measure ZMD_Forecast_Cierre_Desvio = ABS([ZMD_Forecast_Cierre_Previsto]-[ZMD_Forecast_Cierre_Forecast])
+		displayFolder: FORECAST
+		lineageTag: dfb3a0fb-60b2-4663-a03d-39782c6fb39b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Forecast_Fichero_Mensual =
+			
+			VAR AnioActual = [ZMD_PARAMS_AÑO_ACTUAL]
+			VAR MesActualIteracion = MONTH(MAX(FORECAST[Date]))
+			
+			VAR CosteForecastMesActual =
+			    CALCULATE(
+			        SUM(FORECAST[Coste]),
+			        FILTER(
+			            ALL(FORECAST[Date]),  -- solo elimina filtro de fecha, no de relaciones
+			            YEAR(FORECAST[Date]) = AnioActual &&
+			            MONTH(FORECAST[Date]) = MesActualIteracion
+			        )
+			    )
+			
+			RETURN
+			    CosteForecastMesActual
+		displayFolder: FORECAST
+		lineageTag: 177df697-e63c-4447-808b-39a384efa35c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PARAM_Forecast_Mes = 5
+		formatString: 0
+		displayFolder: FORECAST
+		lineageTag: 51978a62-ce61-4846-9a4b-169098ed0e82
+
+	measure ZMD_Forecast_Recepcionado_PrevioForecast = SUM(FORECAST[Recepcionado])
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: FORECAST
+		lineageTag: 5f1cd8df-cfe0-4cd5-9702-e70869274ec2
+
+	measure ZMD_Forecast_Cierre_PrevistoPrevMonth = [ZMD_Presupuesto] - [ZMD_Forecast_Recepcionado_PrevMonth] - [ZMD_Forecast_Planificado_PendientePrevMonth]
+		displayFolder: FORECAST
+		lineageTag: 92ccfd98-f6a7-4583-bcd1-d6b01c33bb13
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Forecast_Recepcionado_PrevMonth =
+			
+			VAR MesHoy = MONTH(TODAY())
+			VAR MesForecast = [ZMD_PARAM_Forecast_Mes]
+			
+			RETURN
+			IF (
+			    MesHoy = MesForecast,
+			    [ZMD_FORECAST_RECEPCIONADO_PREVIOFORECAST],
+			    COALESCE(
+			        CALCULATE(
+			            SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			            IMPACTO_BUDGET[Tabla Origen] = "Recepciones",
+			            FILTER(
+			                IMPACTO_BUDGET,
+			                YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = [ZMD_PARAMS_AÑO_ACTUAL] &&
+			                MONTH(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) <= MesHoy
+			            )
+			        ),
+			        0
+			    )
+			)
+		displayFolder: FORECAST
+		lineageTag: f4eae55e-00ff-46ea-bd87-bb8613002b30
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Forecast_Cierre_Desvio_PrevMonth = ABS([ZMD_Forecast_Cierre_Forecast_PrevMonth] - [ZMD_Forecast_Cierre_PrevistoPrevMonth])
+		displayFolder: FORECAST
+		lineageTag: fdf2eef5-3cb4-43ee-982b-c3b395ed8216
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_MAX_Comprometido_Mensual = ```
+			
+			CALCULATE(
+			    MAXX(
+			        ADDCOLUMNS(
+			            VALUES('Calendario'[Date].[Month]),  -- or the date field you're grouping by
+			            "TotalComprometido",
+			                [ZMD_Comprometido_YTD] +
+			                [ZMD_Provisiones_YTD]
+			        ),
+			        [TotalComprometido]
+			    ) 
+			) * 1.25
+			```
+		displayFolder: OVERVIEW
+		lineageTag: ae72df32-8eb0-420a-9d3a-d5129378ac35
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Forecast_Cierre_Forecast_PrevMonth = [ZMD_Presupuesto] - [ZMD_Forecast_Recepcionado_PrevMonth] - [ZMD_Forecast_Planificado_PendientePrevMonth]
+		displayFolder: FORECAST
+		lineageTag: 70c06ad9-e1a0-4608-a35b-b798df8c4390
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Presupuesto_Porcentaje_Asignado = ```
+			
+			DIVIDE(
+			    [ZMD_Recepcionado_YTD] + 
+			    [ZMD_Provisiones_YTD_Demanda] + 
+			    [ZMD_Provisiones_YTD_Resto] + 
+			    [ZMD_Comprometido_YTD], 
+			    [ZMD_Presupuesto], 
+			    0
+			)
+			```
+		formatString: 0\ %;-0\ %;0\ %
+		displayFolder: OVERVIEW
+		lineageTag: 96b662fc-71e7-477e-9687-047764912725
+
+	measure ZMD_Presupuesto_Porcentaje_Recepcionado = DIVIDE([ZMD_Recepcionado_YTD], [ZMD_Presupuesto],0)
+		formatString: 0\ %;-0\ %;0\ %
+		displayFolder: OVERVIEW
+		lineageTag: c84cce41-17bf-4b3d-8ee0-ef75c428073b
+
+	measure ZMD_Demanda_Total = MAX(DEMANDA[Demanda])
+		displayFolder: DEMANDA
+		lineageTag: db03b2a1-c2ee-4e36-a94e-e82b2b576bcb
+
+	measure ZMD_Forecast_Total = [ZMD_Forecast_Planificado_Todo]+[ZMD_Forecast_Recepcionado_PrevioForecast]
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: FORECAST
+		lineageTag: 96136a65-2709-4c2a-ba42-7ed72eac2258
+
+	measure ZMD_Matrix_Comunes_Presupuesto_Global =
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca,
+			    SUM(COMUNES_PRESUPUESTO[PRESUPUESTO GLOBAL]),
+			    BLANK()
+			)
+		displayFolder: COMUNES
+		lineageTag: 44ad6571-53fa-4288-9eb2-09297622d30b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Porcentaje = [ZMD_Matrix_Comunes_Presupuesto] / [ZMD_Matrix_Comunes_Presupuesto_Global]
+		displayFolder: COMUNES
+		lineageTag: b4749add-06c4-4ec8-a3f7-ef760c8ffb58
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Driver =
+			
+			IF(
+			    ISINSCOPE(COMUNES_RECEPCIONES[Partida]),
+			    MAX(COMUNES_PRESUPUESTO[DRIVER]),
+			    BLANK()
+			)
+		displayFolder: COMUNES
+		lineageTag: cf59b434-e1b7-4209-8e2a-d2348a2c304e
+
+	measure ZMD_Coste_Recepcionado_Impacto_Budget =
+			CALCULATE(
+			    SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			    FILTER(
+			        IMPACTO_BUDGET,
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones"
+			    )
+			)
+		formatString: #,0.00
+		displayFolder: OVERVIEW
+		lineageTag: effd9e8e-800c-4c96-96b7-6e7603975a0a
+
+	measure ZMD_Coste_Comprometido_Impacto_Budget =
+			CALCULATE(
+			    SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			    FILTER(
+			        IMPACTO_BUDGET,
+			        IMPACTO_BUDGET[Tabla Origen] = "Comprometido"
+			    )
+			)
+		formatString: #,0.00
+		displayFolder: OVERVIEW
+		lineageTag: c309942c-b7d8-444a-813b-c8fa10df1580
+
+	measure ZMD_Comunes_Diferencia = [ZMD_Recepcionado_YTD] - [ZMD_PARAM_Comunes_Recepciones]
+		displayFolder: COMUNES
+		lineageTag: a9a860e4-6f4a-4d03-a70c-08cad9f73c7d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PARAM_Comunes_Amortizaciones = SUM(COMUNES_AMORTIZACIONES[Value])
+		displayFolder: COMUNES
+		lineageTag: 477b50fc-f3f4-4df8-8d10-977ffc27911c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_PARAM_Comunes_Check = [ZMD_PARAM_Comunes_Amortizaciones] + [ZMD_Comunes_Recepciones] - [ZMD_Recepcionado_YTD_Filtrado]
+		displayFolder: COMUNES
+		lineageTag: 26c224b4-095f-4d57-b2b5-8320007ce49c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Recepcionado_YTD_Filtrado = ```
+			
+			VAR FechaMax = MAX(COMUNES_RECEPCIONES[Fecha])
+			VAR FechaInicioAnio = DATE(YEAR(FechaMax), 1, 1)
+			VAR FechaFinMes = EOMONTH(FechaMax, 0)
+			RETURN
+			COALESCE(
+			    CALCULATE(
+			        SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			        IMPACTO_BUDGET[Tabla Origen] = "Recepciones",
+			        IMPACTO_BUDGET[Orden] = "100000000193",
+			        FILTER(
+			            IMPACTO_BUDGET,
+			            IMPACTO_BUDGET[FECHA IMPACTO BUDGET] >= FechaInicioAnio &&
+			            IMPACTO_BUDGET[FECHA IMPACTO BUDGET] <= FechaFinMes
+			        )
+			    ),
+			    0
+			)
+			
+			
+			
+			
+			```
+		displayFolder: COMUNES
+		lineageTag: 9adaf813-3f04-4126-9fb5-8e6a436c97a9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Matrix_Comunes_Presupuesto_Porcentaje = ```
+			
+			VAR TieneAreaNoBlanca =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES(COMUNES_PRESUPUESTO[AREA]),
+			            NOT ISBLANK(COMUNES_PRESUPUESTO[AREA])
+			        )
+			    ) > 0
+			
+			VAR PorcentajeExistente = SELECTEDVALUE(COMUNES_PRESUPUESTO[% Energy])
+			
+			RETURN
+			IF(
+			    TieneAreaNoBlanca && NOT ISBLANK(PorcentajeExistente), 
+			    PorcentajeExistente,
+			    DIVIDE(
+			        [ZMD_Matrix_Comunes_Presupuesto],
+			        [ZMD_Matrix_Comunes_Presupuesto_Global],
+			        BLANK() 
+			    )
+			)
+			```
+		displayFolder: COMUNES
+		lineageTag: 7a9a4528-fddf-444d-a6fd-209b788c3a3c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Enero = ```
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]), 
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 1 -- Filtra específicamente para Enero (mes 1)
+			)
+			```
+		displayFolder: COMUNES
+		lineageTag: ffff99dd-6577-491a-94f3-b625f7bff410
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Febrero =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]), -- Suma la columna [Value] de AMORTIZACIONES
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 2 -- Filtra específicamente para Febrero (mes 2)
+			)
+		displayFolder: COMUNES
+		lineageTag: 4056f8cf-15a5-49bd-8570-c7cf59601231
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Marzo =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 3 // Filtra para Marzo (mes 3)
+			)
+		displayFolder: COMUNES
+		lineageTag: 430ec167-a6f6-4936-bff9-50e22e6e8ee7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Abril =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 4 // Filtra para Abril (mes 4)
+			)
+		displayFolder: COMUNES
+		lineageTag: c829c5f7-cc79-4d09-b9d8-1f935183e237
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Mayo =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 5 // Filtra para Mayo (mes 5)
+			)
+		displayFolder: COMUNES
+		lineageTag: 1dfaadb7-a804-4793-ba09-d98829d16aa1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Junio =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 6 // Filtra para Junio (mes 6)
+			)
+		displayFolder: COMUNES
+		lineageTag: 7925ec6d-c3bc-4bcc-b95c-b04abd8f9182
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Julio =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 7 // Filtra para Julio (mes 7)
+			)
+		displayFolder: COMUNES
+		lineageTag: c5286719-0d60-4905-8950-67a6e53af4fd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Agosto =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 8 // Filtra para Agosto (mes 8)
+			)
+		displayFolder: COMUNES
+		lineageTag: f5b4777e-508c-47cd-b438-16b0bde27de1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Septiembre =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 9 // Filtra para Septiembre (mes 9)
+			)
+		displayFolder: COMUNES
+		lineageTag: eb50c6bf-f4f0-4c71-9dbd-f6fb03fa3339
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Octubre =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 10 // Filtra para Octubre (mes 10)
+			)
+		displayFolder: COMUNES
+		lineageTag: f57b400d-a0db-4802-a4b5-4741b629931d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Noviembre =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 11 // Filtra para Noviembre (mes 11)
+			)
+		displayFolder: COMUNES
+		lineageTag: ee296ac6-a39e-43e2-b603-af7f3f7d22fc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_Diciembre =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    MONTH(COMUNES_AMORTIZACIONES[Fecha]) = 12 // Filtra para Diciembre (mes 12)
+			)
+		displayFolder: COMUNES
+		lineageTag: 854fc022-026e-4f9a-8cc4-92d986ab41b3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Amortizaciones_TotalAnual =
+			
+			CALCULATE(
+			    SUM(COMUNES_AMORTIZACIONES[Value]),
+			    REMOVEFILTERS(Calendario[Date]) // Opcional: Elimina el filtro de mes si existe una tabla de fechas
+			)
+		displayFolder: COMUNES
+		lineageTag: 9de13a45-89e8-4766-b50c-58771fe01229
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Presupuesto_Filtro = CALCULATE(SUM(PRESUPUESTO[Presupuesto]), ALL(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]))
+		displayFolder: OVERVIEW
+		lineageTag: afc092b2-9c90-42b6-97df-23591305e660
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_Disponible_Filtro = [ZMD_Presupuesto_Filtro] - [ZMD_Recepcionado_YTD] - [ZMD_Comprometido_YTD] - [ZMD_Provisiones_YTD]
+		displayFolder: OVERVIEW
+		lineageTag: c1db2514-7403-4ba9-85d2-be222541ec8f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ZMD_EJE_MAXIMO_GLOBAL = ```
+			
+			VAR AnioActual = [ZMD_PARAMS_AÑO_ACTUAL]
+			VAR AnioPrevio = [ZMD_PARAMS_AÑO_PREVIO]
+			
+			-- Tabla virtual de los 12 meses
+			VAR TablaMeses = GENERATESERIES(1, 12)
+			
+			-- 1. Máximos mensuales para FORECAST
+			VAR MaxForecast =
+			    MAXX(
+			        TablaMeses,
+			        VAR MesActual = [Value]
+			        RETURN
+			            CALCULATE(
+			                SUM(FORECAST[Coste]),
+			                FILTER(
+			                    FORECAST,
+			                    YEAR(FORECAST[Date]) = AnioActual &&
+			                    MONTH(FORECAST[Date]) = MesActual
+			                )
+			            )
+			    )
+			
+			-- 2. Máximos mensuales para COMPROMETIDO + RECEPCIONADO (año actual)
+			VAR MaxCompRec =
+			    MAXX(
+			        TablaMeses,
+			        VAR MesActual = [Value]
+			        RETURN
+			            CALCULATE(
+			                SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			                FILTER(
+			                    IMPACTO_BUDGET,
+			                    IMPACTO_BUDGET[Tabla Origen] IN { "Comprometido", "Recepciones" } &&
+			                    YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = AnioActual &&
+			                    MONTH(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = MesActual
+			                )
+			            )
+			    )
+			
+			-- 3. Máximos mensuales para RECEPCIONADO (año previo)
+			VAR MaxRecepPrev =
+			    MAXX(
+			        TablaMeses,
+			        VAR MesActual = [Value]
+			        RETURN
+			            CALCULATE(
+			                SUM(IMPACTO_BUDGET[COSTE IMPACTO BUDGET]),
+			                FILTER(
+			                    IMPACTO_BUDGET,
+			                    IMPACTO_BUDGET[Tabla Origen] = "Recepciones" &&
+			                    YEAR(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = AnioPrevio &&
+			                    MONTH(IMPACTO_BUDGET[FECHA IMPACTO BUDGET]) = MesActual
+			                )
+			            )
+			    )
+			
+			RETURN
+			    MAX( MAX(MaxForecast, MaxCompRec), MaxRecepPrev )
+			
+			
+			
+			
+			```
+		displayFolder: FORECAST
+		lineageTag: 40aa77c9-2883-492b-aac6-a9caa406476f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition MEDIDAS = m
+		mode: import
+		queryGroup: TABLAS_AUXILIARES
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Removed Columns" = Table.RemoveColumns(Source,{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

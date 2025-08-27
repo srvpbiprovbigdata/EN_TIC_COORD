@@ -1,0 +1,630 @@
+/// Sharepoint con dato para Test en DESARROLLO
+expression P_SHAREPOINT_DEV = "https://acciona365.sharepoint.com/sites/CuadrodemandoConsultoriaDeloitte/" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: aea297d4-b644-4433-8681-44251fdae66c
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+/// Sharepoint con dato real PRODUCTIVO
+expression P_SHAREPOINT_PRO = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRO" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 6130f3c8-159c-4072-9fd3-1c899b46eded
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression COMPROMETIDO_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"COMPROMETIDO xlsx" = Source{[Name="COMPROMETIDO.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"COMPROMETIDO xlsx"),
+		    COMPROMETIDO_Sheet = #"Libro de Excel importado"{[Item="COMPROMETIDO",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(COMPROMETIDO_Sheet, [PromoteAllScalars=true]),
+		    #"Filas superiores quitadas" = Table.Skip(#"Encabezados promovidos",3)
+		in
+		    #"Filas superiores quitadas"
+	lineageTag: 6bb33057-5df6-4555-ac3a-053f108f020a
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression RECEPCIONES_HISTORICO_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"RECEPCIONES_HISTORICO xlsx" = Source{[Name="RECEPCIONES_HISTORICO.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"RECEPCIONES_HISTORICO xlsx"),
+		    RECEPCIONADO_Sheet = #"Libro de Excel importado"{[Item="RECEPCIONADO",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(RECEPCIONADO_Sheet, [PromoteAllScalars=true]),
+		    #"Filas superiores quitadas" = Table.Skip(#"Encabezados promovidos",3)
+		in
+		    #"Filas superiores quitadas"
+	lineageTag: 3210a46c-e174-4ee9-be4b-d71b4233e960
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression PROVEEDORES_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"PROVEEDORES xlsx" = Source{[Name="PROVEEDORES.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"PROVEEDORES xlsx"),
+		    Sheet1_Sheet = #"Libro de Excel importado"{[Item="Sheet1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true])
+		in
+		    #"Encabezados promovidos"
+	lineageTag: cc2fbf71-b184-4882-aef0-77dbd7a97050
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression PROVISIONES_DEMANDA_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"PROVISIONES_DEMANDA xlsx" = Source{[Name="PROVISIONES_DEMANDA.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"PROVISIONES_DEMANDA xlsx"),
+		    #"DEMANDAS PROVISIONES_Sheet" = #"Libro de Excel importado"{[Item="DEMANDAS PROVISIONES",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"DEMANDAS PROVISIONES_Sheet", [PromoteAllScalars=true]),
+		    #"Filas superiores quitadas" = Table.Skip(#"Encabezados promovidos",1)
+		in
+		    #"Filas superiores quitadas"
+	lineageTag: a487f0e6-e3e3-4d58-9d22-502e282d941e
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression PRESUPUESTO_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"PRESUPUESTO xlsx" = Source{[Name="PRESUPUESTO.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"PRESUPUESTO xlsx"),
+		    RESUMEN_Sheet = #"Libro de Excel importado"{[Item="RESUMEN",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(RESUMEN_Sheet, [PromoteAllScalars=true])
+		in
+		    #"Encabezados promovidos"
+	lineageTag: 6d27f964-a7be-478d-b039-e2811eded5db
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression PEDIDOS_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"PEDIDOS xlsx" = Source{[Name="PEDIDOS.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"PEDIDOS xlsx"),
+		    COMPROMETIDO_Sheet = #"Libro de Excel importado"{[Item="COMPROMETIDO",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(COMPROMETIDO_Sheet, [PromoteAllScalars=true]),
+		    #"Filas superiores quitadas" = Table.Skip(#"Encabezados promovidos",3)
+		in
+		    #"Filas superiores quitadas"
+	lineageTag: 9c7ef37c-4695-4b2d-8034-b3d7076e41ba
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression RECEPCIONES_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"RECEPCIONES xlsx" = Source{[Name="RECEPCIONES.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"RECEPCIONES xlsx"),
+		    RECEPCIONADO_Sheet = #"Libro de Excel importado"{[Item="RECEPCIONADO",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(RECEPCIONADO_Sheet, [PromoteAllScalars=true]),
+		    #"Filas superiores quitadas" = Table.Skip(#"Encabezados promovidos",3)
+		in
+		    #"Filas superiores quitadas"
+	lineageTag: 545166bc-5780-4572-8e26-76c9bbe00e08
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression FORECAST_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"FORECAST_PLAN xlsx" = Source{[Name="FORECAST.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"FORECAST_PLAN xlsx"),
+		    FORECAST_Sheet = #"Libro de Excel importado"{[Item="FORECAST",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(FORECAST_Sheet, [PromoteAllScalars=true]),
+		    #"Filas superiores quitadas" = Table.Skip(#"Encabezados promovidos",1),
+		    #"Filas filtradas" = Table.SelectRows(#"Filas superiores quitadas", each ([Importe] <> null))
+		in
+		    #"Filas filtradas"
+	lineageTag: 3199f3cd-1302-48b1-87d7-c824558df507
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Exception
+
+expression PROVISIONES_RESTO_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"PROVISIONES_RESTO xlsx" = Source{[Name="PROVISIONES_RESTO.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"PROVISIONES_RESTO xlsx"),
+		    FORECAST_Sheet = #"Libro de Excel importado"{[Item="FORECAST",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(FORECAST_Sheet, [PromoteAllScalars=true]),
+		    #"Filas superiores quitadas" = Table.Skip(#"Encabezados promovidos",1)
+		in
+		    #"Filas superiores quitadas"
+	lineageTag: 0b602c17-ef90-46a1-8bd2-5b7642814900
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression COMPROMETIDO = ```
+		let
+		    Source = COMPROMETIDO_RAW,
+		    Filtrado = Table.SelectRows(Source, each ([Ignorar] = null)),
+		    Tipado = Table.TransformColumnTypes(Filtrado,{
+		        {"Sociedad", type text}, {"Documento Compras", type text}, {"Proveedor", type text}, {"Posición", type text}, 
+		        {"Fecha Registro", type date}, {"Texto explicativo", type text}, {"Descripción Cuenta", type text}, {"Cantidad", type number}, 
+		        {"Unidad", type text}, {"Coste", type number}, {"Fecha Esperada Cargo", type date}, {"Orden", type text}, 
+		        {"Tagetik", type text}, {"Ignorar", type text}, {"Observaciones", type text}, {"Demanda", type text}
+		    }),
+		    #"Add KEY_PEDIDO" = Table.AddColumn(Tipado, "KEY_PEDIDO", each [Documento Compras]&"_"&[Posición]&"_"&[Orden]),
+		    #"Tipado 2" = Table.TransformColumnTypes(#"Add KEY_PEDIDO",{{"KEY_PEDIDO", type text}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Tipado 2",{"Ignorar", "Observaciones", "Sociedad", "Fecha Registro"}),
+		    #"Sanitizar proveedor 1" = Table.ReplaceValue(#"Columnas quitadas", null, "-", Replacer.ReplaceValue, {"Proveedor"}),
+		    #"Sanitizar proveedor 2" = Table.ReplaceValue(#"Sanitizar proveedor 1","","-",Replacer.ReplaceValue,{"Proveedor"}),
+		    #"Add FECHA IMPACTO BUDGET" = Table.AddColumn(#"Sanitizar proveedor 2", "FECHA IMPACTO BUDGET", each 
+		        let
+		            currentYearStart = AÑO_ACTUAL,
+		            fechaEsperada = [Fecha Esperada Cargo]
+		        in
+		            if fechaEsperada < currentYearStart then currentYearStart else fechaEsperada
+		    ),
+		    #"Renombrar IMPACTO BUDGET" = Table.RenameColumns(#"Add FECHA IMPACTO BUDGET",{{"Coste", "COSTE IMPACTO BUDGET"}}),
+		    #"Add DEMANDA IMPACTO BUDGET" = Table.AddColumn(#"Renombrar IMPACTO BUDGET", "DEMANDA IMPACTO BUDGET", each
+		        let
+		            match = Table.SelectRows(PEDIDOS, (p) => p[KEY_PEDIDO] = [KEY_PEDIDO]),
+		            firstMatch = if Table.RowCount(match) > 0 then match{0}[Demanda] else [Demanda]
+		        in
+		            firstMatch
+		    ),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Add DEMANDA IMPACTO BUDGET",{"Demanda", "Fecha Esperada Cargo"}),
+		    #"Add ERROR_KP (Vlookup)" = Table.AddColumn(#"Columnas quitadas1", "ERROR_KP", each
+		        let
+		            match = Table.SelectRows(PEDIDOS, (r) => r[KEY_PEDIDO] = [KEY_PEDIDO]),
+		            isDocEmpty = [Documento Compras] = null or Text.Trim([Documento Compras]) = "",
+		            firstMatch = if Table.RowCount(match) > 0 or isDocEmpty then null else true
+		        in
+		            firstMatch
+		    ),
+		    #"Add New Tagetik (lookup)" = Table.AddColumn(#"Add ERROR_KP (Vlookup)", "New Tagetik", each 
+		        let
+		            currentKeyPedido = [KEY_PEDIDO],
+		            match = Table.First(Table.SelectRows(PEDIDOS, (r) => r[KEY_PEDIDO] = currentKeyPedido), null)
+		        in
+		            if match <> null then match[Tagetik] else [Tagetik]
+		    ),
+		    #"Remove Tagetik" = Table.RemoveColumns(#"Add New Tagetik (lookup)",{"Tagetik"}),
+		    #"Renombrar New Tagetik" = Table.RenameColumns(#"Remove Tagetik",{{"New Tagetik", "Tagetik"}}),
+		    #"Add KEY_BUDGET" = Table.AddColumn(#"Renombrar New Tagetik", "KEY_BUDGET", each [Orden]&"_"&[Tagetik]),
+		    #"Add ERROR_KB (Vlookup)" = Table.AddColumn(#"Add KEY_BUDGET", "ERROR_KB", each
+		        let
+		            match = Table.SelectRows(PRESUPUESTO, (r) => r[KEY_BUDGET] = [KEY_BUDGET] and r[Año] = Date.Year(AÑO_ACTUAL)),
+		            firstMatch = if Table.RowCount(match) > 0 then null else true
+		        in
+		            firstMatch
+		    ),
+		    #"Add IGNORAR (Vlookup)" = Table.AddColumn(#"Add ERROR_KB (Vlookup)", "Ignorar", each 
+		        let
+		            match = Table.SelectRows(PEDIDOS_IGNORAR, (r) => 
+		                r[#"Documento Compras"] = [#"Documento Compras"] and
+		                r[Posición] = [Posición]
+		            ),
+		            hayIgnorar = if Table.RowCount(match) > 0 then true else null
+		        in
+		            hayIgnorar
+		    ),
+		    #"Filas filtradas" = Table.SelectRows(#"Add IGNORAR (Vlookup)", each [Ignorar] = null),
+		    #"Add TABLA_ORIGEN" = Table.AddColumn(#"Filas filtradas", "Tabla Origen", each "Comprometido", type text),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Add TABLA_ORIGEN",{
+		        "Documento Compras", "Proveedor", "Posición", "Texto explicativo", "Descripción Cuenta", "Cantidad", "Unidad", 
+		        "COSTE IMPACTO BUDGET", "Orden", "Tagetik", "KEY_PEDIDO", "FECHA IMPACTO BUDGET", "DEMANDA IMPACTO BUDGET", 
+		        "ERROR_KP", "KEY_BUDGET", "ERROR_KB", "Ignorar", "Tabla Origen"
+		    })
+		in
+		    #"Columnas reordenadas"
+		```
+	lineageTag: f0031d0c-d00f-487c-bda9-7c7b89cebc8b
+	queryGroup: ARCHIVOS_TRATADOS
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+
+expression RECEPCIONES = ```
+		let
+		    Source = RECEPCIONES_RAW,
+		    Filtrado = Table.SelectRows(Source, each ([Ignorar] = null)),
+		    Tipado = Table.TransformColumnTypes(Filtrado,{{"Fecha Registro", type date}, {"Fecha Contable", type date}, {"Documento Compras", type text}, {"Proveedor", type text}, {"Coste", type number}, {"Orden", type text}, {"Tagetik", type text}, {"Posición", type text}, {"Sociedad", type text}, {"Texto explicativo", type text}, {"Descripción Cuenta", type text}, {"Cantidad", type number}, {"Unidad", type text}, {"Documento CO", type text}, {"Ignorar", type text}, {"Observaciones", type text}}),
+		    Renombrado = Table.RenameColumns(Tipado,{{"Fecha Contable", "Fecha"}}),
+		    #"Add KEY_PEDIDO" = Table.AddColumn(Renombrado, "KEY_PEDIDO", each if [Documento Compras] <> null and [Documento Compras] <> "" then [Documento Compras]&"_"&[Posición]&"_"&[Orden] else null),
+		    #"Tipado 2" = Table.TransformColumnTypes(#"Add KEY_PEDIDO",{{"KEY_PEDIDO", type text}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Tipado 2",{"Fecha Registro", "Ignorar", "Observaciones", "Sociedad"}),
+		    #"Renombrado IMPACTO BUDGET" = Table.RenameColumns(#"Columnas quitadas",{{"Fecha", "FECHA IMPACTO BUDGET"}, {"Coste", "COSTE IMPACTO BUDGET"}}),
+		    #"Sanitizar proveedor" = Table.ReplaceValue(#"Renombrado IMPACTO BUDGET", null, "-", Replacer.ReplaceValue, {"Proveedor"}),
+		    #"Sanitizar proveedor 2" = Table.ReplaceValue(#"Sanitizar proveedor","","-",Replacer.ReplaceValue,{"Proveedor"}),
+		    #"Add DEMANDA IMPACTO BUDGET" = Table.AddColumn(#"Sanitizar proveedor 2", "DEMANDA IMPACTO BUDGET", each
+		     let
+		             match = Table.SelectRows(PEDIDOS, (p) => p[KEY_PEDIDO] = [KEY_PEDIDO]),
+		             firstMatch = if Table.RowCount(match) > 0 then match{0}[Demanda] else [Demanda]
+		    in
+		        firstMatch
+		),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Add DEMANDA IMPACTO BUDGET",{"Demanda"}),
+		    #"Add ERROR_KP (lookup)" = Table.AddColumn(#"Columnas quitadas1", "ERROR_KP", each let
+		    currentYear = Date.Year(AÑO_ACTUAL),
+		    isMatch = Table.RowCount(Table.SelectRows(PEDIDOS, (r) => r[KEY_PEDIDO] = [KEY_PEDIDO])),
+		    isDocEmpty = [Documento Compras] = null or Text.Trim([Documento Compras]) = "",
+		    isDocPrevYear = Date.Year([FECHA IMPACTO BUDGET]) < currentYear,
+		    firstMatch = if isDocEmpty or isDocPrevYear then null else if isMatch > 0 then null else true
+		in
+		    firstMatch
+		),
+		    #"Add New Tagetik (lookup)" = Table.AddColumn(
+		    #"Add ERROR_KP (lookup)", 
+		    "New Tagetik", 
+		    each 
+		        let
+		            currentKeyPedido = [KEY_PEDIDO],
+		            fechaImpacto = [FECHA IMPACTO BUDGET],
+		            isPreviousYear = Date.Year(fechaImpacto) < Date.Year(AÑO_ACTUAL),
+		            match = Table.First(Table.SelectRows(PEDIDOS, (r) => r[KEY_PEDIDO] = currentKeyPedido), null)
+		        in
+		            if isPreviousYear then
+		                [Tagetik]
+		            else
+		                if match <> null then match[Tagetik] else [Tagetik]
+		),
+		    #"Remove Tagetik" = Table.RemoveColumns(#"Add New Tagetik (lookup)",{"Tagetik"}),
+		    #"Renombar New Tagetik" = Table.RenameColumns(#"Remove Tagetik",{{"New Tagetik", "Tagetik"}}),
+		    #"Add KEY_BUDGET" = Table.AddColumn(#"Renombar New Tagetik", "KEY_BUDGET", each [Orden]&"_"&[Tagetik]),
+		    #"Add ERROR_KB (Vlookup)" = Table.AddColumn(#"Add KEY_BUDGET", "ERROR_KB", each
+		     let
+		        sourceTable = if Date.Year([FECHA IMPACTO BUDGET]) = Date.Year(AÑO_ACTUAL) then PRESUPUESTO else PRESUPUESTO_HISTORICO,
+		        match = Table.SelectRows(sourceTable, (r) => r[KEY_BUDGET] = [KEY_BUDGET]),
+		        firstMatch = if Table.RowCount(match) > 0 then null else true
+		    in
+		        firstMatch
+		),
+		    #"Add IGNORAR (Vlookup)" = Table.AddColumn(#"Add ERROR_KB (Vlookup)", "Ignorar", each 
+		        let
+		        match = Table.SelectRows(PEDIDOS, (r) => r[KEY_PEDIDO] = [KEY_PEDIDO] and r[Ignorar] <> null),
+		        hayIgnorar = if Table.RowCount(match) > 0 then true else null
+		    in
+		        hayIgnorar
+		    ),
+		    #"Filas filtradas" = Table.SelectRows(#"Add IGNORAR (Vlookup)", each [Ignorar] = null),
+		    #"Add TABLA_ORIGEN" = Table.AddColumn(#"Filas filtradas", "Tabla Origen", each "Recepciones", type text),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Add TABLA_ORIGEN",{"Documento Compras", "Proveedor", "FECHA IMPACTO BUDGET", "Posición", "Texto explicativo", "Descripción Cuenta", "Doc. Referencia", "Clase Doc. Referencia", "Texto Cabecera Doc", "Cantidad", "Unidad", "COSTE IMPACTO BUDGET", "Orden", "Tagetik", "Documento CO", "KEY_PEDIDO", "DEMANDA IMPACTO BUDGET", "ERROR_KP", "KEY_BUDGET", "ERROR_KB", "Ignorar", "Tabla Origen"})
+		in
+		    #"Columnas reordenadas"
+		```
+	lineageTag: acee4100-b260-4e72-b265-9f44d8a441ac
+	queryGroup: ARCHIVOS_TRATADOS
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression PROVISIONES = ```
+		let
+		    Source = PROVISIONES_RESTO_RAW,
+		    Filtrado = Table.SelectRows(Source, each ([Desactivar provisión] = null)),
+		    Unpivoted = Table.UnpivotOtherColumns(Filtrado, {"Tagetik", "Id Partida Forecast", "Descripción partida Forecast", "Solicitante", "Proveedor", "Importe", "Tipo Provisión", "Documento Compras"}, "Mes", "Coste"),
+		    #"Tipado 1" = Table.TransformColumnTypes(Unpivoted,{{"Mes", type text}}),
+		    #"Add Fecha Provison Otras" = Table.AddColumn(#"Tipado 1", "Fecha Provisión Otras", each Number.ToText(Date.Year(DateTime.LocalNow())) &"/"&[Mes]),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Add Fecha Provison Otras",{{"Fecha Provisión Otras", type date}}),
+		    #"Columnas quitadas3" = Table.RemoveColumns(#"Tipo cambiado1",{"Mes"}),
+		    #"Add Provisiones Demanda" = Table.Combine({#"Columnas quitadas3", PROVISIONES_DEMANDA_RAW}),
+		    #"Filas filtradas" = Table.SelectRows(#"Add Provisiones Demanda", each ([Desactivar provisión] = null)),
+		    #"Add Fecha Provision Demanda" = Table.AddColumn(#"Filas filtradas", "Fecha Provisión Demanda", each if [Inicio Real] <> null then [Inicio Real] else if [Inicio Plan] <> null then [Inicio Plan] else [Inicio Estimado]),
+		    #"Consolidar FECHA IMPACTO BUDGET" = Table.AddColumn(#"Add Fecha Provision Demanda", "Fecha Impacto Budget", each if [Fecha Provisión Otras] <> null then [Fecha Provisión Otras] else [Fecha Provisión Demanda]),
+		    #"Consolidar COSTE IMPACTO BUDGET" = Table.AddColumn(#"Consolidar FECHA IMPACTO BUDGET", "Coste Impacto Budget", each 
+		if [Tipo Provisión] = "HISTORICA" then
+		   if [Fecha Impacto Budget] < DateTime.Date(DateTime.LocalNow()) then 0 else [Coste]
+		else if [Tipo Provisión] = "FUTURO" then [Coste]
+		else [Importe]
+		),
+		    #"Add ORDEN (vlookup)" = Table.AddColumn(#"Consolidar COSTE IMPACTO BUDGET", "Orden", each
+		     let
+		        currentYear = AÑO_ACTUAL,
+		        match = Table.SelectRows(PRESUPUESTO, (r) => r[Tagetik] = [Tagetik] and r[Año] = currentYear),
+		        firstMatch = if Table.RowCount(match) > 0 then match{0}[Orden] else null
+		    in
+		        firstMatch
+		),
+		    #"Add KEY_BUDGET" = Table.AddColumn(#"Add ORDEN (vlookup)", "KEY_BUDGET", each [Orden]&"_"&[Tagetik]),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Add KEY_BUDGET",{"Coste", "Fecha Provisión Otras", "Inicio Estimado", "Inicio Plan", "Inicio Real", "Desactivar provisión", "Fecha Provisión Demanda", "Importe"}),
+		    #"Tipado 2" = Table.TransformColumnTypes(#"Columnas quitadas",{{"Fecha Impacto Budget", type date}, {"Coste Impacto Budget", type number}, {"KEY_BUDGET", type text}, {"Orden", type text}}),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Tipado 2",{"Orden", "Tagetik", "Id Partida Forecast", "Descripción partida Forecast", "Solicitante", "Proveedor", "Tipo Provisión", "Documento Compras", "Horas", "Fecha Impacto Budget", "Coste Impacto Budget", "KEY_BUDGET"}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas reordenadas",{{"Coste Impacto Budget", "COSTE IMPACTO BUDGET"}, {"Fecha Impacto Budget", "FECHA IMPACTO BUDGET"}}),
+		    #"Sanitizar proveedor" = Table.ReplaceValue(#"Columnas con nombre cambiado", null, "-", Replacer.ReplaceValue, {"Proveedor"}),
+		    #"Add DEMANDA IMPACTO BUDGET" = Table.AddColumn(#"Sanitizar proveedor", "DEMANDA IMPACTO BUDGET", each if [Tipo Provisión] = "DEMANDA" then [Id Partida Forecast] else null),
+		    #"Check PROVISION DEMANDA PEDIDO" = Table.AddColumn(#"Add DEMANDA IMPACTO BUDGET", "Check demanda en pedido", each
+		    let
+		        match = if [Tipo Provisión] = "DEMANDA" then
+		                    Table.SelectRows(PEDIDOS, (p) => p[Demanda] = [DEMANDA IMPACTO BUDGET])
+		                 else
+		                    null,
+		        firstMatch = if match <> null and Table.RowCount(match) > 0 then "True" else null
+		    in
+		        firstMatch
+		),
+		    #"Filas filtradas1" = Table.SelectRows(#"Check PROVISION DEMANDA PEDIDO", each ([Check demanda en pedido] = null) and ([COSTE IMPACTO BUDGET] <> 0)),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Filas filtradas1",{"Check demanda en pedido"}),
+		    #"Add ERROR_KB (Vlookup)" = Table.AddColumn(#"Columnas quitadas1", "ERROR_KB", each
+		     let
+		        year = Date.Year([FECHA IMPACTO BUDGET]),
+		        match = Table.SelectRows(PRESUPUESTO, (r) => r[KEY_BUDGET] = [KEY_BUDGET] and r[Año] = year),
+		        firstMatch = if Table.RowCount(match) > 0 then null else true
+		    in
+		        firstMatch
+		),
+		    #"Add TABLA_ORIGEN" = Table.AddColumn(#"Add ERROR_KB (Vlookup)", "Tabla Origen", each "Provisiones", type text)
+		in
+		    #"Add TABLA_ORIGEN"
+		```
+	lineageTag: f0d432da-7767-4faf-bf68-2c663c40e8ac
+	queryGroup: ARCHIVOS_TRATADOS
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression RUTAS_FICHEROS =
+		let
+		    ID_DATOS = P_SHAREPOINT_PRO,
+		    ID_FICHEROS = RUTAS_FICHEROS_PRO,
+		    ID_RUTA = RUTAS_CARPETA_PRO,
+		    Origen = SharePoint.Contents(ID_DATOS, [ApiVersion = 15]),
+		    #"Documentos compartidos" = Origen{[Name=ID_FICHEROS]}[Content],
+		    Economics = #"Documentos compartidos"{[Name=ID_RUTA]}[Content],
+		    Presupuesto_Nuevo = Economics{[Name="2025"]}[Content],
+		    #"Filas filtradas" = Table.SelectRows(Presupuesto_Nuevo, each Text.EndsWith([Name], "xlsx"))
+		in
+		    #"Filas filtradas"
+	lineageTag: 068e7dc6-fff8-4622-993d-377cd610ea23
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression DEMANDA_RAW =
+		let
+		    Source = RUTAS_FICHEROS_DEMANDA,
+		    #"EN_COORD_CDM-DEMANDA_DMND xlsx" = Source{[Name="EN_COORD_CDM-DEMANDA_DMND.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"EN_COORD_CDM-DEMANDA_DMND xlsx"),
+		    #"Page 1_Sheet" = #"Libro de Excel importado"{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Filas filtradas" = Table.SelectRows(#"Encabezados promovidos", each [Demanda] <> null and [Demanda] <> "")
+		in
+		    #"Filas filtradas"
+	lineageTag: 0e3dd6a0-5243-4000-a3c5-3500800922a8
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression RUTAS_FICHEROS_DEMANDA =
+		let
+		    ID_DATOS = P_SHAREPOINT_PRO,
+		    ID_FICHEROS = RUTAS_FICHEROS_PRO,
+		    ID_RUTA = RUTAS_CARPETA_DEM,
+		    Origen = SharePoint.Contents(ID_DATOS, [ApiVersion = 15]),
+		    #"Documentos compartidos" = Origen{[Name=ID_FICHEROS]}[Content],
+		    Demanda = #"Documentos compartidos"{[Name=ID_RUTA]}[Content],
+		    //Presupuesto_Nuevo = Demanda{[Name="Presupuesto_Nuevo"]}[Content], //Este paso lo hemos introducido porque con datos de DEV tenemos que entrar a otra carpeta más
+		    #"Filas filtradas" = Table.SelectRows(Demanda, each ([Name] = "EN_COORD_CDM-CONFIGURACION.xlsx" or [Name] = "EN_COORD_CDM-DEMANDA_DMND.xlsx"))
+		in
+		    #"Filas filtradas"
+	lineageTag: a481c41b-9958-42c5-a8fc-a6a45d580b5e
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression DEMANDA_EQUIPOS_GESTORES_RAW =
+		let
+		    Source = RUTAS_FICHEROS_DEMANDA,
+		    #"EN_COORD_CDM-DEMANDA_DMND xlsx" = Source{[Name="EN_COORD_CDM-CONFIGURACION.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"EN_COORD_CDM-DEMANDA_DMND xlsx"),
+		    #"Equipos Gestores _Sheet" = #"Libro de Excel importado"{[Item="Equipos Gestores ",Kind="Sheet"]}[Data],
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Equipos Gestores _Sheet",{"Column1", "Column2"}),
+		    #"Filas superiores quitadas" = Table.Skip(#"Columnas quitadas",5),
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Filas superiores quitadas", [PromoteAllScalars=true]),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Encabezados promovidos",{"Column5", "Column6", "Column7", "Column8", "Column9", "Column10", "Column11", "Column12", "Column13", "Column14"})
+		in
+		    #"Columnas quitadas1"
+	lineageTag: 209ef21b-c3f1-41ac-ab92-af1d2b1f0350
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression RUTAS_FICHEROS_DESEADO = "PRO" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: a5aa5225-fc0c-4339-ba32-0cfc7ea6d2cc
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression RUTAS_FICHEROS_DEV = "Shared Documents" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 3250d203-144b-4f07-bf7f-35145b53f4cd
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression RUTAS_FICHEROS_PRO = "Documentos compartidos" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 00372093-550d-4ba6-a53a-039a5c73fa70
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression RUTAS_CARPETA_DEV = "General" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: afda51fc-7b77-43ab-8f7a-55cf75afdbb7
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression RUTAS_CARPETA_PRO = "Economics" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: e7d355f5-23aa-4970-8f64-40bb4669e9ec
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression RUTAS_CARPETA_DEM = "Demanda" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 645ea909-d448-4dcf-9f56-e6b90e957991
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Exception
+
+expression COMUNES_PRESUPUESTO_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"COMUNES_PRESUPUESTO.xlsx" = Source{[Name="COMUNES_PRESUPUESTO.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"COMUNES_PRESUPUESTO.xlsx"),
+		    #"COMUNES PRESUPUESTO_Sheet" = #"Libro de Excel importado"{[Item="PRESUPUESTO COMUNES",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"COMUNES PRESUPUESTO_Sheet", [PromoteAllScalars=true])
+		in
+		    #"Encabezados promovidos"
+	lineageTag: b97ea389-b50f-4bc1-9167-68dee2ef201a
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression COMUNES_RECEPCIONES_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"COMUNES_RECEPCIONES.xlsx" = Source{[Name="COMUNES_RECEPCIONES.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"COMUNES_RECEPCIONES.xlsx"),
+		    #"COMUNES RECEPCIONES_Sheet" = #"Libro de Excel importado"{[Item="Comun_Recepcion",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"COMUNES RECEPCIONES_Sheet", [PromoteAllScalars=true])
+		in
+		    #"Encabezados promovidos"
+	lineageTag: 921c1608-8ed4-4c0d-b25d-0bd99122abc0
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+/// Año actual
+expression AÑO_ACTUAL = #date(2025, 1, 1) meta [IsParameterQuery=true, Type="Date", IsParameterQueryRequired=true]
+	lineageTag: 8a37a3fb-7dbc-4f7e-b6b4-3cb1e80f6aa2
+	queryGroup: PARAMETERS
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Date
+
+expression RECEPCIONES_HISTORICO =
+		let
+		    Source = RECEPCIONES_HISTORICO_RAW,
+		    Filtrado = Table.SelectRows(Source, each ([Ignorar] = null)),
+		    Tipado = Table.TransformColumnTypes(Filtrado,{{"Fecha Registro", type date}, {"Fecha Contable", type date}, {"Documento Compras", type text}, {"Proveedor", type text}, {"Coste", type number}, {"Orden", type text}, {"Tagetik", type text}, {"Posición", type text}, {"Sociedad", type text}, {"Texto explicativo", type text}, {"Descripción Cuenta", type text}, {"Cantidad", type number}, {"Unidad", type text}, {"Documento CO", type text}, {"Ignorar", type text}, {"Observaciones", type text}}),
+		    Renombrado = Table.RenameColumns(Tipado,{{"Fecha Contable", "Fecha"}, {"Demanda", "DEMANDA IMPACTO BUDGET"}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(Renombrado,{"Fecha Registro", "Ignorar", "Observaciones", "Sociedad"}),
+		    #"Renombrado IMPACTO BUDGET" = Table.RenameColumns(#"Columnas quitadas",{{"Fecha", "FECHA IMPACTO BUDGET"}, {"Coste", "COSTE IMPACTO BUDGET"}}),
+		    #"Sanitizar proveedor" = Table.ReplaceValue(#"Renombrado IMPACTO BUDGET", null, "-", Replacer.ReplaceValue, {"Proveedor"}),
+		    #"Sanitizar proveedor 2" = Table.ReplaceValue(#"Sanitizar proveedor","","-",Replacer.ReplaceValue,{"Proveedor"}),
+		    #"Add KEY_BUDGET" = Table.AddColumn(#"Sanitizar proveedor 2", "KEY_BUDGET", each [Orden]&"_"&[Tagetik]),
+		    #"Add TABLA_ORIGEN" = Table.AddColumn(#"Add KEY_BUDGET", "Tabla Origen", each "Recepciones", type text),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Add TABLA_ORIGEN",{"Documento Compras", "Proveedor", "FECHA IMPACTO BUDGET", "Posición", "Texto explicativo", "Descripción Cuenta", "Doc. Referencia", "Clase Doc. Referencia", "Texto Cabecera Doc", "Cantidad", "Unidad", "COSTE IMPACTO BUDGET", "Orden", "Tagetik", "Documento CO", "DEMANDA IMPACTO BUDGET", "KEY_BUDGET",
+		"Tabla Origen"})
+		in
+		    #"Columnas reordenadas"
+	lineageTag: b2bacb3f-102c-4824-8c0d-37ec5632ab1b
+	queryGroup: ARCHIVOS_TRATADOS
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression COMUNES_AMORTIZACIONES_RAW =
+		let
+		    Source = RUTAS_FICHEROS,
+		    #"COMUNES_PRESUPUESTO.xlsx" = Source{[Name="COMUNES_AMORTIZACIONES.xlsx"]}[Content],
+		    #"Libro de Excel importado" = Excel.Workbook(#"COMUNES_PRESUPUESTO.xlsx"),
+		    #"COMUNES PRESUPUESTO_Sheet" = #"Libro de Excel importado"{[Item="Comun_Recepcion",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"COMUNES PRESUPUESTO_Sheet", [PromoteAllScalars=true])
+		in
+		    #"Encabezados promovidos"
+	lineageTag: 218a8329-2f58-4b21-9aba-3967349d9380
+	queryGroup: ARCHIVOS_RAW
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression PEDIDOS_IGNORAR =
+		let
+		    Source = PEDIDOS_RAW,
+		    Tipado = Table.TransformColumnTypes(Source,{{"Orden", type text}, {"Tagetik", type text}, {"Cantidad", type number}, {"Importe", type number}, {"Fecha Pedido", type date}, {"Documento Compras", type text}, {"Texto de cabecera", type text}, {"Solicitud de Pedido", type text}, {"Sociedad", type text}, {"Contrato Marco", type text}, {"Proveedor", type text}, {"Solicitante", type text}, {"Número de imputación", type text}, {"Texto de posición", type text}, {"Fecha de Entrega", type date}, {"Indicador Liberación", type text}, {"Indicador de borrado", type text}, {"Tipo pedido", type text}, {"Demanda", type text}, {"Ignorar", type text}, {"Observaciones", type text}, {"Posición", type text}}),
+		    Renombrado = Table.RenameColumns(Tipado,{{"Importe", "Coste"}, {"Fecha Pedido", "Fecha"}}),
+		    #"Sanitizar Proveedor" = Table.ReplaceValue(Renombrado,null,"-",Replacer.ReplaceValue,{"Proveedor"}),
+		    #"Sanitizar proveedor 2" = Table.ReplaceValue(#"Sanitizar Proveedor","","-",Replacer.ReplaceValue,{"Proveedor"}),
+		    #"Add KEY_PEDIDO" = Table.AddColumn(#"Sanitizar proveedor 2", "KEY_PEDIDO", each [Documento Compras]&"_"&[Posición]&"_"&[Orden]),
+		    #"Add KEY_BUDGET" = Table.AddColumn(#"Add KEY_PEDIDO", "KEY_BUDGET", each [Orden]&"_"&[Tagetik]),
+		    #"Tipado 2" = Table.TransformColumnTypes(#"Add KEY_BUDGET",{{"KEY_BUDGET", type text}, {"KEY_PEDIDO", type text}}),
+		    Personalizado1 = Table.AddColumn(#"Tipado 2", "Proveedor Nombre", each
+		     let
+		             match = Table.SelectRows(PROVEEDORES, (p) => p[Proveedor] = [Proveedor]),
+		             firstMatch = if Table.RowCount(match) > 0 then match{0}[Nombre] else [Proveedor]
+		    in
+		        firstMatch
+		),
+		    #"Add ERROR_KB (vlookup)" = Table.AddColumn(#"Personalizado1", "ERROR_KB", each
+		     let
+		        match = Table.SelectRows(PRESUPUESTO, (r) => r[KEY_BUDGET] = [KEY_BUDGET] and r[Año] = Date.Year(AÑO_ACTUAL)),
+		        firstMatch = if Table.RowCount(match) > 0 then null else true
+		    in
+		        firstMatch
+		),
+		    Filtrado = Table.SelectRows(#"Add ERROR_KB (vlookup)", each ([Ignorar] = "true")),
+		    #"Add TABLA_ORIGEN" = Table.AddColumn(Filtrado, "Tabla Origen", each "Pedidos", type text)
+		in
+		    #"Add TABLA_ORIGEN"
+	lineageTag: 56bdfae4-667b-4c82-9662-5b85c5b01132
+	queryGroup: ARCHIVOS_TRATADOS
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+

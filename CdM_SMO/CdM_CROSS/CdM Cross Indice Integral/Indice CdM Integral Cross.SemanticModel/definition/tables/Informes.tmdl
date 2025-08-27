@@ -1,0 +1,59 @@
+table Informes
+	lineageTag: 20cf932f-4c26-4606-a416-ddd34dd060ef
+
+	column Nombre
+		dataType: string
+		lineageTag: 52103d26-226a-465b-aee1-b5787ca3892c
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Enlace
+		dataType: string
+		lineageTag: c0dd9b47-4689-40e9-b2a3-bf7b16fb2477
+		summarizeBy: none
+		sourceColumn: Enlace
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ubicación
+		dataType: string
+		lineageTag: 57d5cbbe-bf18-4e11-8047-3050d6374d36
+		summarizeBy: none
+		sourceColumn: Ubicación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripcion
+		dataType: string
+		lineageTag: be9b0cde-3cf0-4e4e-9c63-b3fcc32f598b
+		summarizeBy: none
+		sourceColumn: Descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Informes-d8b921e4-2ef1-4bb4-bfef-1bb66045b1b2 = m
+		mode: import
+		source =
+				let
+				    URL = sharepointSource & Entorno,
+				    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+				    #"Filas ordenadas" = Table.Sort(Origen,{{"Date created", Order.Descending}}),
+				    #"Filas filtradas" = Table.SelectRows(#"Filas ordenadas", each ([Name] = "Indice.xlsx")),
+				    #"Archivos ocultos filtrados1" = Table.SelectRows(#"Filas filtradas", each [Attributes]?[Hidden]? <> true),
+				    #"Invocar función personalizada1" = Table.AddColumn(#"Archivos ocultos filtrados1", "Transformar archivo", each #"Transformar archivo"([Content])),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Invocar función personalizada1", {"Name", "Source.Name"}),
+				    #"Otras columnas quitadas1" = Table.SelectColumns(#"Columnas con nombre cambiado1", {"Source.Name", "Transformar archivo"}),
+				    #"Columna de tabla expandida1" = Table.ExpandTableColumn(#"Otras columnas quitadas1", "Transformar archivo", Table.ColumnNames(#"Transformar archivo"(#"Archivo de ejemplo"))),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columna de tabla expandida1",{{"Source.Name", type text}, {"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado",{"Source.Name"}),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Columnas quitadas", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Nombre", type text}, {"Enlace", type text}, {"Ubicación", type text}, {"Descripcion", type text}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

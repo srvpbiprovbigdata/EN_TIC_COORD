@@ -1,0 +1,143 @@
+table PRESUPUESTO
+	lineageTag: 2a13f949-ebc4-4c97-a1c5-d4809b359ea7
+
+	column Area
+		dataType: string
+		lineageTag: cdcb53df-ca6e-43b1-931e-c02a91025551
+		summarizeBy: none
+		sourceColumn: Area
+
+		annotation SummarizationSetBy = Automatic
+
+	column Responsable
+		dataType: string
+		lineageTag: 761462cd-e2df-4217-b49c-06d83589f879
+		summarizeBy: none
+		sourceColumn: Responsable
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo
+		dataType: string
+		lineageTag: a4b132e0-c8f2-4b51-b977-2d527f46e48f
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo SAP'
+		dataType: string
+		lineageTag: 3c1efcd5-d760-4d38-8963-5a36116e374d
+		summarizeBy: none
+		sourceColumn: Tipo SAP
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tagetik
+		dataType: string
+		lineageTag: 107cbd13-5690-4753-9c6e-c55b5036f1dc
+		summarizeBy: none
+		sourceColumn: Tagetik
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: string
+		lineageTag: 9d7a7f92-8021-4fd4-a552-501e2f249d97
+		summarizeBy: none
+		sourceColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción Partida'
+		dataType: string
+		lineageTag: 910224a9-0ac1-497c-b776-23c200f7432e
+		summarizeBy: none
+		sourceColumn: Descripción Partida
+
+		annotation SummarizationSetBy = Automatic
+
+	column Presupuesto
+		dataType: double
+		lineageTag: 953fbf62-8a7f-4e07-8a5a-6aa4ba2b6e91
+		summarizeBy: sum
+		sourceColumn: Presupuesto
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Cartera
+		dataType: string
+		lineageTag: 2d8e2dad-bea9-49f6-9207-67c71f284df9
+		summarizeBy: none
+		sourceColumn: Cartera
+
+		annotation SummarizationSetBy = Automatic
+
+	column Grupo
+		dataType: string
+		lineageTag: 3d229355-baa6-4242-b0d4-c7454281234e
+		summarizeBy: none
+		sourceColumn: Grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubGrupo
+		dataType: string
+		lineageTag: f0f3a667-147f-450c-8f5d-f3feea52242f
+		summarizeBy: none
+		sourceColumn: SubGrupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column KEY_BUDGET
+		dataType: string
+		lineageTag: 8ac9c223-5682-4beb-9163-888f57123e27
+		summarizeBy: none
+		sourceColumn: KEY_BUDGET
+
+		annotation SummarizationSetBy = Automatic
+
+	column Unidad
+		dataType: string
+		lineageTag: 072c3450-f2bd-47f6-b5bd-6785d4e26e65
+		summarizeBy: none
+		sourceColumn: Unidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tabla Origen'
+		dataType: string
+		lineageTag: fa18c0f0-a9d5-4381-973b-8e537ac3f6f7
+		summarizeBy: none
+		sourceColumn: Tabla Origen
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		dataType: string
+		lineageTag: 2d1d9568-f65f-4614-8573-7b6c4cf568b3
+		summarizeBy: none
+		sourceColumn: Año
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PRESUPUESTO = m
+		mode: import
+		queryGroup: ARCHIVOS_TRATADOS
+		source =
+				let
+				    Source = PRESUPUESTO_RAW,
+				    Tipado = Table.TransformColumnTypes(Source,{{"Tagetik", type text}, {"Orden", type text}, {"Tipo", type text}, {"Presupuesto", type number}, {"Area", type text}, {"Responsable", type text}, {"Tipo SAP", type text}, {"Descripción Partida", type text}, {"Cartera", type text}, {"Unidad", type text}, {"Grupo", type text}, {"SubGrupo", type text}}),
+				    #"Add KEY_BUDGET" = Table.AddColumn(Tipado, "KEY_BUDGET", each [Orden]&"_"&[Tagetik]),
+				    #"Tipado 2" = Table.TransformColumnTypes(#"Add KEY_BUDGET",{{"KEY_BUDGET", type text}}),
+				    #"Add TABLA_ORIGEN" = Table.AddColumn(#"Tipado 2", "Tabla Origen", each "Presupuesto", type text),
+				    #"Filas filtradas" = Table.SelectRows(#"Add TABLA_ORIGEN", each ([Año] = Date.Year(AÑO_ACTUAL)))
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,60 @@
+table _Elementos_Pedidos_Energia
+	lineageTag: 8ffaa166-c5db-4546-b3c7-f41d457e6f75
+
+	column 'Elementos identificados por Energía'
+		dataType: string
+		lineageTag: e4c55215-fb86-4d4f-82b4-f42c6dfef004
+		summarizeBy: none
+		sourceColumn: Elementos identificados por Energía
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Aplicación identificada por Energía'
+		dataType: string
+		lineageTag: e8580799-2338-494a-8490-f9007c7da90f
+		summarizeBy: none
+		sourceColumn: Aplicación identificada por Energía
+
+		annotation SummarizationSetBy = Automatic
+
+	column Elemento_CI
+		dataType: string
+		lineageTag: a68953e2-3baa-433d-97b8-2fe710a5c065
+		summarizeBy: none
+		sourceColumn: Elemento_CI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'cmdb_ci_appl.sys_id'
+		dataType: string
+		lineageTag: e4f3cf51-8838-47fe-b128-20590cda4a31
+		summarizeBy: none
+		sourceColumn: cmdb_ci_appl.sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Elementos_Pedidos_Energia = m
+		mode: import
+		source =
+				let
+				    URL = sharepointSource & Entorno,
+				    URLcompleta = URL & sharepointSource2,
+				    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+				    #"Filas filtradas" = Table.SelectRows(Origen, each ([Extension] = ".xlsx") and ([Name] = "ElementosCIs_Identificados_ParaEnergia.xlsx")),
+				    #"Archivos ocultos filtrados1" = Table.SelectRows(#"Filas filtradas", each [Attributes]?[Hidden]? <> true),
+				    #"Archivos ocultos filtrados2" = Table.SelectRows(#"Archivos ocultos filtrados1", each [Attributes]?[Hidden]? <> true),
+				    #"Invocar función personalizada1" = Table.AddColumn(#"Archivos ocultos filtrados2", "Transformar archivo (4)", each #"Transformar archivo (4)"([Content])),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Invocar función personalizada1", {"Name", "Source.Name"}),
+				    #"Filas filtradas1" = Table.SelectRows(#"Columnas con nombre cambiado1", each ([Folder Path] = URLcompleta)),
+				    #"Otras columnas quitadas1" = Table.SelectColumns(#"Filas filtradas1", {"Source.Name", "Transformar archivo (4)"}),
+				    #"Transformar archivo (4)1" = #"Otras columnas quitadas1"{0}[#"Transformar archivo (4)"],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Transformar archivo (4)1", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Elementos identificados por Energía", type text}, {"Aplicación identificada por Energía", type text}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado1",null,"Ninguno",Replacer.ReplaceValue,{"cmdb_ci_appl.sys_id"})
+				in
+				    #"Valor reemplazado"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

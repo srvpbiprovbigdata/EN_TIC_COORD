@@ -1,0 +1,143 @@
+table COMUNES_PRESUPUESTO
+	lineageTag: 99489f9b-693f-419e-93a6-7810fb2667be
+
+	column País
+		dataType: string
+		lineageTag: b6e259b6-1aeb-4db3-a142-527324ae97d9
+		summarizeBy: none
+		sourceColumn: País
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Servicio TIC responsable de ejecutar'
+		dataType: string
+		lineageTag: aeafae21-d631-4779-b658-bc87e684ab15
+		summarizeBy: none
+		sourceColumn: Servicio TIC responsable de ejecutar
+
+		annotation SummarizationSetBy = Automatic
+
+	column AREA
+		dataType: string
+		lineageTag: fa89d476-3a81-4e92-9d98-61566b1d77c6
+		summarizeBy: none
+		sourceColumn: AREA
+
+		annotation SummarizationSetBy = Automatic
+
+	column SUBAREA
+		dataType: string
+		lineageTag: 4eb78324-4092-4ba2-9f7b-e1fc9beb79d2
+		summarizeBy: none
+		sourceColumn: SUBAREA
+
+		annotation SummarizationSetBy = Automatic
+
+	column '% Energy'
+		dataType: double
+		lineageTag: 6848e9b7-9a97-4521-b3d4-cd3edcc57b40
+		summarizeBy: sum
+		sourceColumn: % Energy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column '03 - Energy'
+		dataType: double
+		lineageTag: 1d4886ad-50af-413b-98f1-dce81cd9737a
+		summarizeBy: sum
+		sourceColumn: 03 - Energy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Tipo
+		dataType: string
+		lineageTag: 31702d6d-7d48-4864-bc66-34b460f2af42
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c0ca2e3c-2b67-49e6-814b-00fc3ea8bc1e
+		summarizeBy: none
+		sourceColumn: Año
+
+		variation Variation
+			isDefault
+			relationship: 06470e86-2ccf-498a-9687-5e3a112ac969
+			defaultHierarchy: LocalDateTable_a9c76551-0c52-4193-8381-cac9068c9a32.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ORDEN
+		dataType: string
+		lineageTag: ea722532-ae08-4c0e-a155-15ffa501ab46
+		summarizeBy: none
+		sourceColumn: ORDEN
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DESCRIPCION ORDEN'
+		dataType: string
+		lineageTag: a82fa2d1-07ad-4f37-bb58-04059cf4469c
+		summarizeBy: none
+		sourceColumn: DESCRIPCION ORDEN
+
+		annotation SummarizationSetBy = Automatic
+
+	column TAGETIK
+		dataType: string
+		lineageTag: 461c9410-cc12-4313-82db-c90f3a4745b6
+		summarizeBy: none
+		sourceColumn: TAGETIK
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DESCRIPCION TAGETIK'
+		dataType: string
+		lineageTag: fef19ab4-b9c7-4086-a613-3967846629be
+		summarizeBy: none
+		sourceColumn: DESCRIPCION TAGETIK
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PRESUPUESTO GLOBAL'
+		dataType: double
+		lineageTag: 288193f6-2336-453e-91a3-4e231b3944df
+		summarizeBy: sum
+		sourceColumn: PRESUPUESTO GLOBAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DRIVER
+		dataType: string
+		lineageTag: 311dccbb-adc7-4b5b-b360-8d08ff6cfd66
+		summarizeBy: none
+		sourceColumn: DRIVER
+
+		annotation SummarizationSetBy = Automatic
+
+	partition COMUNES_PRESUPUESTO = m
+		mode: import
+		queryGroup: ARCHIVOS_TRATADOS
+		source =
+				let
+				    Source = COMUNES_PRESUPUESTO_RAW,
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"03 - Energy", type number}, {"% Energy", Percentage.Type}, {"Año", type date}, {"PRESUPUESTO GLOBAL", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

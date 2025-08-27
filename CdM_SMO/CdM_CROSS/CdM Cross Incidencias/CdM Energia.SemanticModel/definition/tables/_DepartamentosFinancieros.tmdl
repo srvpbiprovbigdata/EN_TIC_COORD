@@ -1,0 +1,46 @@
+table _DepartamentosFinancieros
+	lineageTag: 15ce4eff-ee55-4f62-b7e9-b8312b992148
+
+	column 'Nombre Departamento'
+		dataType: string
+		lineageTag: 48a928bd-68c1-4983-97a8-f6648b44c283
+		summarizeBy: none
+		sourceColumn: Nombre Departamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: string
+		lineageTag: 82783239-f795-45a6-8390-8968b84dffeb
+		summarizeBy: none
+		sourceColumn: ID
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _DepartamentosFinancieros-ac92ce19-5d4e-4e2e-8fb8-3be5ff06f41a = m
+		mode: import
+		source =
+				let
+				    URL = sharepointSource & Entorno,
+				    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+				    #"Filas filtradas" = Table.SelectRows(Origen, each ([Extension] = ".xlsx")),
+				    #"Filas ordenadas" = Table.Sort(#"Filas filtradas",{{"Date created", Order.Descending}}),
+				    #"Filas filtradas1" = Table.SelectRows(#"Filas ordenadas", each ([Name] = "_DepartamentosFinancieros.xlsx")),
+				    #"Archivos ocultos filtrados1" = Table.SelectRows(#"Filas filtradas1", each [Attributes]?[Hidden]? <> true),
+				    #"Invocar función personalizada1" = Table.AddColumn(#"Archivos ocultos filtrados1", "Transformar archivo (2)", each #"Transformar archivo (2)"([Content])),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Invocar función personalizada1", {"Name", "Source.Name"}),
+				    #"Filas filtradas3" = Table.SelectRows(#"Columnas con nombre cambiado1", each ([Folder Path] = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRE/Documentos compartidos/CdM_SMO/CdM_CROSS/CdM Cross Incidencias/01. Incidencias/")),
+				    #"Otras columnas quitadas1" = Table.SelectColumns(#"Filas filtradas3", {"Source.Name", "Transformar archivo (2)"}),
+				    #"Columna de tabla expandida1" = Table.ExpandTableColumn(#"Otras columnas quitadas1", "Transformar archivo (2)", Table.ColumnNames(#"Transformar archivo (2)"(#"Archivo de ejemplo (2)"))),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columna de tabla expandida1",{{"Source.Name", type text}, {"Nombre Departamento", type text}, {"ID", Int64.Type}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado",{"Source.Name"}),
+				    #"Filas filtradas2" = Table.SelectRows(#"Columnas quitadas", each ([Nombre Departamento] <> null))
+				in
+				    #"Filas filtradas2"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

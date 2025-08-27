@@ -1,0 +1,103 @@
+table 'SERV_NOW sc_item_option_mtom'
+	lineageTag: 09199c53-e3b3-420e-9aa6-1b0345ebc47c
+
+	column request_item
+		dataType: string
+		lineageTag: 3831e4e4-11b7-4b5e-8b61-9a6398a6664c
+		summarizeBy: none
+		sourceColumn: request_item
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_request_item
+		dataType: string
+		lineageTag: 887348f8-05f8-4844-b07d-2c1cad35079e
+		summarizeBy: none
+		sourceColumn: dv_request_item
+
+		annotation SummarizationSetBy = Automatic
+
+	column sc_item_option
+		dataType: string
+		lineageTag: cd1e957e-2828-487d-aef2-43dde87ab090
+		summarizeBy: none
+		sourceColumn: sc_item_option
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1be25aa5-cf34-4be7-98d7-699935c77487
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: 87280b72-6d62-409c-9626-3bdc8639c44e
+			defaultHierarchy: LocalDateTable_e0009aba-1827-4422-b1f9-34a14066fb2f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: 7c533e80-ea69-47d4-b576-3017fec8f932
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Variable_AffectedCI
+		dataType: string
+		lineageTag: a3e53f65-3329-4edb-baad-abc21ec0b233
+		summarizeBy: none
+		sourceColumn: Variable_AffectedCI
+
+		annotation SummarizationSetBy = Automatic
+
+	column ValorEnSysID_Variable_AffectedCI
+		dataType: string
+		lineageTag: e2681e74-0953-4d0e-bc92-f0cd420fbb29
+		summarizeBy: none
+		sourceColumn: ValorEnSysID_Variable_AffectedCI
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_Elementos_Pedidos_Energia.Elemento_CI'
+		dataType: string
+		lineageTag: 29272ecf-c1fd-4ecd-9040-c75ee939d6c2
+		summarizeBy: none
+		sourceColumn: _Elementos_Pedidos_Energia.Elemento_CI
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_Elementos_Pedidos_Energia.cmdb_ci_appl.sys_id'
+		dataType: string
+		lineageTag: 383d4eff-a7c0-48b2-8616-ea86bd4445a7
+		summarizeBy: none
+		sourceColumn: _Elementos_Pedidos_Energia.cmdb_ci_appl.sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SERV_NOW sc_item_option_mtom-ae3e19e5-1542-4660-97c6-c25bcc577cd9' = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_sc_item_option_mtom = Origen{[Schema="SERV_NOW",Item="sc_item_option_mtom"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_sc_item_option_mtom,{"dv_sc_item_option", "sys_created_by", "sys_mod_count", "sys_tags", "sys_updated_by", "sys_updated_on"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each [sys_created_on] >= #datetime(2022, 1, 1, 0, 0, 0)),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas", {"sc_item_option"}, #"SERV_NOW sc_item_option", {"sys_id"}, "SERV_NOW sc_item_option", JoinKind.LeftOuter),
+				    #"Se expandió SERV_NOW sc_item_option" = Table.ExpandTableColumn(#"Consultas combinadas", "SERV_NOW sc_item_option", {"dv_item_option_new", "value"}, {"SERV_NOW sc_item_option.dv_item_option_new", "SERV_NOW sc_item_option.value"}),
+				    #"Filas filtradas2" = Table.SelectRows(#"Se expandió SERV_NOW sc_item_option", each ([SERV_NOW sc_item_option.dv_item_option_new] = "Affected CI")),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Filas filtradas2",{{"SERV_NOW sc_item_option.dv_item_option_new", "Variable_AffectedCI"}, {"SERV_NOW sc_item_option.value", "ValorEnSysID_Variable_AffectedCI"}}),
+				    #"Consultas combinadas1" = Table.NestedJoin(#"Columnas con nombre cambiado", {"ValorEnSysID_Variable_AffectedCI"}, #"_Elementos_Pedidos_Energia", {"cmdb_ci_appl.sys_id"}, "_Elementos_Pedidos_Energia", JoinKind.LeftOuter),
+				    #"Se expandió _Elementos_Pedidos_Energia" = Table.ExpandTableColumn(#"Consultas combinadas1", "_Elementos_Pedidos_Energia", {"Elemento_CI", "cmdb_ci_appl.sys_id"}, {"_Elementos_Pedidos_Energia.Elemento_CI", "_Elementos_Pedidos_Energia.cmdb_ci_appl.sys_id"}),
+				    #"Filas filtradas1" = Table.SelectRows(#"Se expandió _Elementos_Pedidos_Energia", each ([_Elementos_Pedidos_Energia.Elemento_CI] = "CI"))
+				in
+				    #"Filas filtradas1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

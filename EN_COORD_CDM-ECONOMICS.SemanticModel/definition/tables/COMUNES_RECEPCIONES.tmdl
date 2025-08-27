@@ -1,0 +1,72 @@
+table COMUNES_RECEPCIONES
+	lineageTag: 590a5ecc-9f93-4049-8aa8-d591b2101c71
+
+	column 'PROYECTOS COMUNES'
+		dataType: string
+		lineageTag: c86622d7-90be-4700-95b9-6205e7e92c93
+		summarizeBy: none
+		sourceColumn: PROYECTOS COMUNES
+
+		annotation SummarizationSetBy = Automatic
+
+	column Partida
+		dataType: string
+		lineageTag: f94a327f-1f24-477c-b4cb-aa9841c20d77
+		summarizeBy: none
+		sourceColumn: Partida
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 54bae53a-ee8c-40c1-87ef-b7ea1b935c7d
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Value
+		dataType: double
+		lineageTag: 05503f8b-73a8-4edc-8ef8-4c4f8258335b
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TAGETIK
+		dataType: string
+		lineageTag: 6f494d74-88d8-4baf-b717-5f3b2463250d
+		summarizeBy: none
+		sourceColumn: TAGETIK
+
+		annotation SummarizationSetBy = Automatic
+
+	partition COMUNES_RECEPCIONES = m
+		mode: import
+		queryGroup: ARCHIVOS_TRATADOS
+		source =
+				let
+				    Source = COMUNES_RECEPCIONES_RAW,
+				    #"Replaced Value" = Table.ReplaceValue(Source,"4O3U3",0,Replacer.ReplaceValue,{"Enero"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Replaced Value",{{"Diciembre", type number}, {"Enero", type number}, {"Febrero", type number}, {"Marzo", type number}, {"Abril", type number}, {"Mayo", type number}, {"Junio", type number}, {"Julio", type number}, {"Agosto", type number}, {"Septiembre", type number}, {"Octubre", type number}, {"Noviembre", type number}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type", "Partida", each [TAGETIK]&" - "&[PROYECTOS COMUNES]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Partida", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type1",{{"Enero", "Enero/25"}, {"Febrero", "Febrero/25"}, {"Marzo", "Marzo/25"}, {"Abril", "Abril/25"}, {"Mayo", "Mayo/25"}, {"Junio", "Junio/25"}, {"Julio", "Julio/25"}, {"Agosto", "Agosto/25"}, {"Septiembre", "Septiembre/25"}, {"Octubre", "Octubre/25"}, {"Noviembre", "Noviembre/25"}, {"Diciembre", "Diciembre/25"}}),
+				    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Renamed Columns", {"TAGETIK", "PROYECTOS COMUNES", "Partida"}, "Attribute", "Value"),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Unpivoted Columns",{{"Attribute", type date}}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Changed Type2",{{"Attribute", "Fecha"}}),
+				    #"Changed Type3" = Table.TransformColumnTypes(#"Renamed Columns1",{{"Value", type number}})
+				in
+				    #"Changed Type3"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

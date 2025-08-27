@@ -1,0 +1,33 @@
+table PROVEEDORES
+	lineageTag: e9df2c9c-1e36-467a-9126-e8398845d705
+
+	column Proveedor
+		dataType: string
+		lineageTag: 76b52af0-e97a-4f66-92ef-b8b710e2f50c
+		summarizeBy: none
+		sourceColumn: Proveedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nombre
+		dataType: string
+		lineageTag: c50bf8e7-aa35-4e4b-b1d2-c1d1b6619c95
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PROVEEDORES = m
+		mode: import
+		queryGroup: ARCHIVOS_TRATADOS
+		source =
+				let
+				    Source = PROVEEDORES_RAW,
+				    Tipado = Table.TransformColumnTypes(Source,{{"Proveedor", type text}, {"Nombre", type text}})
+				in
+				    Tipado
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

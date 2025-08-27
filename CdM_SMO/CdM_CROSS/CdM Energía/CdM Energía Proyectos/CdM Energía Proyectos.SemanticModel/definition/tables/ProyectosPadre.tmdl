@@ -1,0 +1,1499 @@
+table ProyectosPadre
+	lineageTag: 9c0d021c-cc49-4bec-9248-05ff4e6d6a2c
+
+	measure '_% Percent_complete_SIN_ERROR_ProyectosPadre' = (AVERAGE('ProyectosPadre'[percent_complete_ProyectosEnergia])/100)+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 954fd49c-b100-4d16-bd98-11c8a51bcc17
+
+	measure 1_Ponderacion_Suma_Presuspuestos = SUM(ProyectosPadre[budget_cost])
+		lineageTag: 194c3b1d-4376-460d-ac55-0e69b9ee653c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Avance_Ponderado_SinERROR = (SUM(ProyectosPadre[Avance_Ponderado]))+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: bf5d2d3d-48d6-41c1-be0a-71f468c36c7b
+
+	measure Porcentaje_Desviacion_SinERROR = (AVERAGE(ProyectosPadre[Porcentaje_Desviacion_Decimal])/100)+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: d089b4d2-a399-4bcb-a1f3-c113e8636cdd
+
+	measure Medida_SUMA_Desviacion_Ponderada_Por_Presupuesto = SUM(ProyectosPadre[Desviacion_Ponderada_Por_Presupuesto_SoloProyectosEnergia])+0
+		formatString: 0.00
+		lineageTag: 0c1a3290-c5c0-4079-b071-cefcd3db2cdd
+
+	measure 'Medida_ Desviacion_Ponderada_Por_PresupuestoEnergia' = (('ProyectosPadre'[Medida_SUMA_Desviacion_Ponderada_Por_Presupuesto] / 'ProyectosPadre'[Medida_SUMA_Presupuestos_BudgetCost_GradoAvance_SoloProyectosEnergia])/100)+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 6964297e-04ee-41c3-9905-c9456617ad32
+
+	measure Medida_SUMA_Presupuestos_BudgetCost_GradoAvance_SoloProyectosEnergia = SUM(ProyectosPadre[BudgetCost_GradoAvance_SoloProyectosEnergia])+0
+		lineageTag: 7ab7b9a2-1e98-4af8-b4b6-d8b284c7b9fc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Avance_Ponderado_Filtros =
+			
+			VAR SelectedFPlanificadaInicio = SELECTEDVALUE( ProyectosPadre[_start_date - SoloFecha] )
+			VAR SelectedAplicacion = SELECTEDVALUE( ProyectosPadre[dv_cmdb_ci_business_app] )
+			VAR SelectedTallaje = SELECTEDVALUE( ProyectosPadre[Tallaje-Demanda] )
+			VAR SelectedRelevante = SELECTEDVALUE( ProyectosPadre[u_relevant_español] )
+			VAR SelectedPrioridad = SELECTEDVALUE( ProyectosPadre[_dv_priority - español] )
+			VAR myFilteredTable  =
+			    CALCULATETABLE(
+			        ProyectosPadre,
+			        ProyectosPadre[_start_date - SoloFecha] = SelectedFPlanificadaInicio,
+			        ProyectosPadre[dv_cmdb_ci_business_app] = SelectedAplicacion,
+			        ProyectosPadre[Tallaje-Demanda] = SelectedTallaje,
+			        ProyectosPadre[u_relevant_español] = SelectedRelevante,
+			        ProyectosPadre[_dv_priority - español] = SelectedPrioridad
+			    )
+			RETURN
+			    DIVIDE(SUMX(ProyectosPadre, ProyectosPadre[_% Percent_complete]*ProyectosPadre[BudgetCost_GradoAvance_SoloProyectosEnergia]),
+			     SUMX(ProyectosPadre, ProyectosPadre[BudgetCost_GradoAvance_SoloProyectosEnergia]))
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: d38352b6-e68d-457a-bfd8-8e63c5b80f83
+
+	measure Avance_Ponderado_Filtros_SinERROR = if(ProyectosPadre[Avance_Ponderado_Filtros] > 0, ProyectosPadre[Avance_Ponderado_Filtros], 0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 0e5fc2d1-ec72-4e06-b54c-4175ef40c0f7
+
+	measure 'Medida_ Desviacion_Ponderada_Por_PresupuestoEnergia_SinError' = if (ProyectosPadre[Medida_ Desviacion_Ponderada_Por_PresupuestoEnergia]>0, ProyectosPadre[Medida_ Desviacion_Ponderada_Por_PresupuestoEnergia],0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: a36c9df6-cf7d-4153-92cf-eb1a75b8e1da
+
+	measure '_% Percent_complete_SIN_ERROR_total' = (AVERAGE('ProyectosPadre'[percent_complete])/100)+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: dce23c0e-160a-483d-97bb-5e4e24169cc4
+
+	measure Avance_Ponderado_total =
+			
+			VAR SelectedFPlanificadaInicio = SELECTEDVALUE( ProyectosPadre[_start_date - SoloFecha] )
+			VAR SelectedAplicacion = SELECTEDVALUE( ProyectosPadre[dv_cmdb_ci_business_app] )
+			VAR SelectedTallaje = SELECTEDVALUE( ProyectosPadre[Tallaje-Demanda] )
+			VAR SelectedRelevante = SELECTEDVALUE( ProyectosPadre[u_relevant_español] )
+			VAR SelectedPrioridad = SELECTEDVALUE( ProyectosPadre[_dv_priority - español] )
+			VAR myFilteredTable  =
+			    CALCULATETABLE(
+			        ProyectosPadre,
+			        ProyectosPadre[_start_date - SoloFecha] = SelectedFPlanificadaInicio,
+			        ProyectosPadre[dv_cmdb_ci_business_app] = SelectedAplicacion,
+			        ProyectosPadre[Tallaje-Demanda] = SelectedTallaje,
+			        ProyectosPadre[u_relevant_español] = SelectedRelevante,
+			        ProyectosPadre[_dv_priority - español] = SelectedPrioridad
+			    )
+			RETURN
+			    DIVIDE(SUMX(ProyectosPadre, ProyectosPadre[_% Percent_complete]*ProyectosPadre[Cost]),
+			     SUMX(ProyectosPadre, ProyectosPadre[Cost]))
+		lineageTag: faf982a0-46dc-4842-9a31-525c32b88bb4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Avance_Ponderado_total_SinERROR = if(ProyectosPadre[Avance_Ponderado_total] > 0, ProyectosPadre[Avance_Ponderado_total], 0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 97235beb-0724-4a0a-ba59-f0394ea914fa
+
+	measure Medida_SUMA_Presupuestos_BudgetCost_GradoAvance_Total = SUM(ProyectosPadre[Cost])+0
+		lineageTag: c5af4688-73de-4659-8ab2-020e15947fa4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Medida_SUMA_Desviacion_Ponderada_Por_Presupuesto_total = SUM(ProyectosPadre[Desviacion_Ponderada_Por_Presupuesto_Decimal])+0
+		lineageTag: 37678a91-0199-475c-928b-4019d248a201
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Medida_ Desviacion_Ponderada_Por_PresupuestoTotal' = (('ProyectosPadre'[Medida_SUMA_Desviacion_Ponderada_Por_Presupuesto_total] / 'ProyectosPadre'[Medida_SUMA_Presupuestos_BudgetCost_GradoAvance_Total])/100)+0
+		lineageTag: 37ff3e3d-cec4-45fa-a8b5-7d49330c2a5d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Medida_ Desviacion_Ponderada_Por_PresupuestoTotal_SinError' = if (ProyectosPadre[Medida_ Desviacion_Ponderada_Por_PresupuestoTotal]>0, ProyectosPadre[Medida_ Desviacion_Ponderada_Por_PresupuestoTotal],0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 8e7908e1-d76e-4074-90f8-75a0b5f5dde4
+
+	column active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6731be44-a139-40e3-834e-549866701d01
+		summarizeBy: none
+		sourceColumn: active
+
+		annotation SummarizationSetBy = Automatic
+
+	column activity_due
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 264bc8ce-c178-40d1-be3b-75d68a68c8cf
+		summarizeBy: none
+		sourceColumn: activity_due
+
+		variation Variación
+			isDefault
+			relationship: 07cfbb06-9c96-4fc0-96b1-4d482a2d38a9
+			defaultHierarchy: LocalDateTable_c65fc183-b408-4686-aae4-6d3305c1ee8e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column actual_benefits
+		dataType: double
+		lineageTag: 3a51be2d-e1d7-4e38-a7de-0d11873e2543
+		summarizeBy: sum
+		sourceColumn: actual_benefits
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column additional_assignee_list
+		dataType: string
+		lineageTag: a1dad7e9-e954-42f5-a6bf-d00f6fbcf446
+		summarizeBy: none
+		sourceColumn: additional_assignee_list
+
+		annotation SummarizationSetBy = Automatic
+
+	column approved_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f387bd45-0201-4031-a6fd-0ec989da0b1e
+		summarizeBy: none
+		sourceColumn: approved_end_date
+
+		variation Variación
+			isDefault
+			relationship: 6f44de0d-8296-4640-b27b-24e2d00389da
+			defaultHierarchy: LocalDateTable_50004762-6ec2-4880-9141-a3d6572af44b.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column approved_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: cf0888f5-2b47-4782-a27d-57c0f23c6140
+		summarizeBy: none
+		sourceColumn: approved_start_date
+
+		variation Variación
+			isDefault
+			relationship: 3ffe98d3-8ed0-4ba1-9187-48fac1d28386
+			defaultHierarchy: LocalDateTable_d2390379-46ea-406e-9335-0648cafc548e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column budget_cost
+		dataType: double
+		lineageTag: d96cf710-d2ff-456a-a698-629b95c80b1b
+		summarizeBy: sum
+		sourceColumn: budget_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column business_applications
+		dataType: string
+		lineageTag: 57eaaa97-f604-4d0f-ad36-b00b3cbf4ef9
+		summarizeBy: none
+		sourceColumn: business_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column capex_cost
+		dataType: double
+		lineageTag: 1069e9bc-2df4-4764-b005-71ea0f76c8ab
+		summarizeBy: sum
+		sourceColumn: capex_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column capex_estimate_to_completion
+		dataType: double
+		lineageTag: e33afcd0-a26f-45f9-b17f-66d86f8b7192
+		summarizeBy: sum
+		sourceColumn: capex_estimate_to_completion
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column capex_forecast_cost
+		dataType: double
+		lineageTag: 1323d341-8174-46fa-829d-4d6b8d806b77
+		summarizeBy: sum
+		sourceColumn: capex_forecast_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column closed_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f0a9ddd8-e1e4-448f-807d-31c516127bff
+		summarizeBy: none
+		sourceColumn: closed_at
+
+		variation Variación
+			isDefault
+			relationship: f32756cd-61c4-4b8e-8590-7bb7d7ef6116
+			defaultHierarchy: LocalDateTable_fad88cd8-3156-4c7c-b0ff-c759d8e07a99.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmdb_ci_business_app
+		dataType: string
+		lineageTag: 90202f6e-086e-4538-bb3b-5f1c3840e3e2
+		summarizeBy: none
+		sourceColumn: cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_cmdb_ci_business_app
+		dataType: string
+		lineageTag: 387e81e7-4528-4115-a547-db6cb6144f73
+		summarizeBy: none
+		sourceColumn: dv_cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column cost
+		dataType: double
+		lineageTag: de791075-15b9-4374-9b74-34a7194019bb
+		summarizeBy: sum
+		sourceColumn: cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column demand
+		dataType: string
+		lineageTag: 9b71e394-eb8d-4221-a0f8-d01c6590d299
+		summarizeBy: none
+		sourceColumn: demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_demand
+		dataType: string
+		lineageTag: 100962cc-3aab-4421-966b-caea751c8194
+		summarizeBy: none
+		sourceColumn: dv_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 44849696-4cb6-4740-9db6-094e5bd8a2a8
+		summarizeBy: none
+		sourceColumn: end
+
+		variation Variación
+			isDefault
+			relationship: 16859138-e80d-4e8f-9ecc-2cab35122344
+			defaultHierarchy: LocalDateTable_3053fde8-24b7-43f8-aeb4-3ffe34a49ee4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 753886f7-d284-4a2c-a01d-2f7c2e3c1aec
+		summarizeBy: none
+		sourceColumn: end_date
+
+		variation Variación
+			isDefault
+			relationship: 7852d843-914b-4bae-b875-18e760dde2b5
+			defaultHierarchy: LocalDateTable_b38bc1b8-e34f-40c7-bc03-8a4b82e4e839.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column impact
+		dataType: int64
+		formatString: 0
+		lineageTag: 0f609032-0645-4d4b-ab4b-c55afe9069a5
+		summarizeBy: sum
+		sourceColumn: impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_impact
+		dataType: string
+		lineageTag: 3cccfee8-96f6-4a43-8cd2-ec5bf642d2b2
+		summarizeBy: none
+		sourceColumn: dv_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column key_milestone
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 360d7963-5477-4563-8095-4527e7a64176
+		summarizeBy: none
+		sourceColumn: key_milestone
+
+		annotation SummarizationSetBy = Automatic
+
+	column marked_for_delete
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9b46b708-56b9-4e01-a541-257cfb3a0e00
+		summarizeBy: none
+		sourceColumn: marked_for_delete
+
+		annotation SummarizationSetBy = Automatic
+
+	column milestone
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 96288b4d-5d04-44c4-a834-573ddedb115f
+		summarizeBy: none
+		sourceColumn: milestone
+
+		annotation SummarizationSetBy = Automatic
+
+	column number
+		dataType: string
+		lineageTag: 6376d3f9-c1ee-4a87-94f2-791e7042d71a
+		summarizeBy: none
+		sourceColumn: number
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 464189fc-7401-4e92-b5d6-babc1059b351
+		summarizeBy: none
+		sourceColumn: opened_at
+
+		variation Variación
+			isDefault
+			relationship: 76a1b6fb-e9e0-4163-b854-ee5413e6d07b
+			defaultHierarchy: LocalDateTable_b7a3d156-14dd-44e5-9927-72aeb980a097.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column opex_cost
+		dataType: double
+		lineageTag: 2f17fa68-a1e3-4f92-9773-1722c25eb4e6
+		summarizeBy: sum
+		sourceColumn: opex_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column opex_forecast_cost
+		dataType: double
+		lineageTag: 9adf2054-a1ba-4f0f-87b2-7a0149d12b45
+		summarizeBy: sum
+		sourceColumn: opex_forecast_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column parent
+		dataType: string
+		lineageTag: ed0dc1fe-2297-48c6-b63d-041962f1f98c
+		summarizeBy: none
+		sourceColumn: parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_parent
+		dataType: string
+		lineageTag: 48cd2f2b-0fcf-4dac-94e0-9b6985312189
+		summarizeBy: none
+		sourceColumn: dv_parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column percent_complete
+		dataType: double
+		lineageTag: 07912268-4332-4cbe-8bd5-63efc29bc922
+		summarizeBy: sum
+		sourceColumn: percent_complete
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column phase
+		dataType: string
+		lineageTag: 9d922c8f-0d66-4979-bdbc-c0d023ffbfc5
+		summarizeBy: none
+		sourceColumn: phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_phase
+		dataType: string
+		lineageTag: d7506ca3-c89f-4d49-9440-3fa841c3074c
+		summarizeBy: none
+		sourceColumn: dv_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column phase_type
+		dataType: string
+		lineageTag: e8b760a0-433c-4abb-b2eb-18e72141395b
+		summarizeBy: none
+		sourceColumn: phase_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_phase_type
+		dataType: string
+		lineageTag: a275a16c-4375-43da-bec3-2cbf6c9b85f3
+		summarizeBy: none
+		sourceColumn: dv_phase_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column primary_portfolio
+		dataType: string
+		lineageTag: 97fba85a-1ef4-43cf-81e4-383f8b24baa8
+		summarizeBy: none
+		sourceColumn: primary_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_primary_portfolio
+		dataType: string
+		lineageTag: 0cb20eb8-7275-4e47-ab32-af71826d7ea0
+		summarizeBy: none
+		sourceColumn: dv_primary_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column priority
+		dataType: int64
+		formatString: 0
+		lineageTag: 147e91a3-12f0-4c74-97d3-48e92369cdea
+		summarizeBy: sum
+		sourceColumn: priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_priority
+		dataType: string
+		lineageTag: 4f0990e6-85d9-4dee-9705-5b53cd072266
+		summarizeBy: none
+		sourceColumn: dv_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_manager
+		dataType: string
+		lineageTag: cafa3332-f33e-4396-b0c8-c413c0f5d35d
+		summarizeBy: none
+		sourceColumn: project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_project_manager
+		dataType: string
+		lineageTag: 55d3749c-a26e-4177-b189-e7a1ea488ebb
+		summarizeBy: none
+		sourceColumn: dv_project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column risk
+		dataType: string
+		lineageTag: 0a6ae398-7e06-4afc-add5-23d64a2aeac0
+		summarizeBy: none
+		sourceColumn: risk
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_risk
+		dataType: string
+		lineageTag: 4d1cc5f5-9b5b-4454-b554-137c888af95a
+		summarizeBy: none
+		sourceColumn: dv_risk
+
+		annotation SummarizationSetBy = Automatic
+
+	column risk_cost
+		dataType: double
+		lineageTag: 0cc951ca-4c73-4f9f-8361-f03d49d660ed
+		summarizeBy: sum
+		sourceColumn: risk_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column roi
+		dataType: double
+		lineageTag: 89f2cdc3-8db3-4386-9c6b-42fa922ad697
+		summarizeBy: sum
+		sourceColumn: roi
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column rollup
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 0d0cc5f4-ea7a-4798-9997-5cbd9b77adff
+		summarizeBy: none
+		sourceColumn: rollup
+
+		annotation SummarizationSetBy = Automatic
+
+	column schedule_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 62d5fe2d-1717-4ace-b6a6-c82f9f9557c2
+		summarizeBy: none
+		sourceColumn: schedule_end_date
+
+		variation Variación
+			isDefault
+			relationship: e1102d15-403d-41c2-aac2-60ee7d9c419e
+			defaultHierarchy: LocalDateTable_a7ed197c-0949-4fef-9c21-0eff80ac6b5e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column schedule_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 81d963b7-5228-4fb4-8ed0-7d9d9623097c
+		summarizeBy: none
+		sourceColumn: schedule_start_date
+
+		variation Variación
+			isDefault
+			relationship: 0cbd2266-b083-4743-a6b2-a19cf1e988c5
+			defaultHierarchy: LocalDateTable_d47097bc-cde3-4d14-9641-24fa4f1a6df5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column short_description
+		dataType: string
+		lineageTag: 76f8c04c-d6c0-4abb-aa3a-98eb24a684c2
+		summarizeBy: none
+		sourceColumn: short_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c5391eed-28f4-4282-bd7c-ed75ba3a5b30
+		summarizeBy: none
+		sourceColumn: start
+
+		variation Variación
+			isDefault
+			relationship: 0842f3f5-4473-4ca5-b01a-e432196bfd5e
+			defaultHierarchy: LocalDateTable_e166543d-b7d2-4100-aeb8-4f11dea91eda.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3ea00359-8e21-47ae-908b-bed5773b4179
+		summarizeBy: none
+		sourceColumn: start_date
+
+		variation Variación
+			isDefault
+			relationship: b53458d5-e4c0-4985-b2aa-0f039d69234c
+			defaultHierarchy: LocalDateTable_38e6e150-5e4a-4893-acb1-e1cf0c064d78.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: int64
+		formatString: 0
+		lineageTag: d3197a8f-3538-4804-8c70-12b9bdab8732
+		summarizeBy: sum
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_state
+		dataType: string
+		lineageTag: 0c61a1fc-c6a6-4659-9029-61ee52b26dfa
+		summarizeBy: none
+		sourceColumn: dv_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: 92247eff-9471-41cb-b424-43157eecc402
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_status
+		dataType: string
+		lineageTag: f115c510-68a3-4985-a125-5a2640fcff0a
+		summarizeBy: none
+		sourceColumn: dv_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column sub_tree_root
+		dataType: string
+		lineageTag: 4125743d-6689-4538-b4e8-a0b6e7118964
+		summarizeBy: none
+		sourceColumn: sub_tree_root
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_sub_tree_root
+		dataType: string
+		lineageTag: d7a8aa8a-4ea5-46e0-b95f-87365447111e
+		summarizeBy: none
+		sourceColumn: dv_sub_tree_root
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3990cb70-98e4-4276-9e1c-452cad4e6935
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: 498df02a-ca5b-4513-865d-87dceddf6200
+			defaultHierarchy: LocalDateTable_6415e191-08ea-425e-8f52-5ab8f3a8d360.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: d086c586-4083-4a67-bd86-353b006f4d58
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column task
+		dataType: string
+		lineageTag: 88abb87e-73ce-47a0-b382-43fe0b454926
+		summarizeBy: none
+		sourceColumn: task
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_effective_number
+		dataType: string
+		lineageTag: 321cd7e5-079f-42f3-863d-d6f01f40acc1
+		summarizeBy: none
+		sourceColumn: task_effective_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column top_portfolio
+		dataType: string
+		lineageTag: 761ef1f6-fd5d-4c6c-9e1c-3e6341204371
+		summarizeBy: none
+		sourceColumn: top_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_top_portfolio
+		dataType: string
+		lineageTag: d9309fa4-9e2c-4f65-b3c0-15898feb9e0a
+		summarizeBy: none
+		sourceColumn: dv_top_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column top_task
+		dataType: string
+		lineageTag: 0cfa6ca0-020b-4a1a-b0cd-6f31f0937d55
+		summarizeBy: none
+		sourceColumn: top_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_top_task
+		dataType: string
+		lineageTag: d868909d-873e-412c-966b-88956f731da9
+		summarizeBy: none
+		sourceColumn: dv_top_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_affected_portfolios
+		dataType: string
+		lineageTag: dc616eed-c9b4-4558-a979-4ac16f8da846
+		summarizeBy: none
+		sourceColumn: u_affected_portfolios
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_costs
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a4b6305c-1ac5-4702-a7ea-69c437755852
+		summarizeBy: none
+		sourceColumn: u_costs
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_id_plan
+		dataType: string
+		lineageTag: 513b8052-6d63-4abb-939e-9f967bc0f83f
+		summarizeBy: none
+		sourceColumn: u_id_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_project_phase
+		dataType: string
+		lineageTag: 851e8d48-da92-4e86-89cb-b42c35568a8c
+		summarizeBy: none
+		sourceColumn: u_project_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_project_phase
+		dataType: string
+		lineageTag: 4979674e-df3e-4d3d-8bd7-868254002636
+		summarizeBy: none
+		sourceColumn: dv_u_project_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_project_type
+		dataType: string
+		lineageTag: d9918b61-48a5-4296-ab77-06c18e62c6fb
+		summarizeBy: none
+		sourceColumn: u_project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_project_type
+		dataType: string
+		lineageTag: dd2a4e5b-ff2a-4610-afad-030901481428
+		summarizeBy: none
+		sourceColumn: dv_u_project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_relevant
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1ce12a11-0aa5-410e-a502-fcbfe139075a
+		summarizeBy: none
+		sourceColumn: u_relevant
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_size
+		dataType: string
+		lineageTag: 6b6136f3-4e17-429c-bac8-1610ce180069
+		summarizeBy: none
+		sourceColumn: u_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_size
+		dataType: string
+		lineageTag: f7960e47-fae1-46f1-ae6e-b096d3d7b01f
+		summarizeBy: none
+		sourceColumn: dv_u_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_state_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7073144a-dbe5-40de-86d8-a305eca65e02
+		summarizeBy: none
+		sourceColumn: u_state_date
+
+		variation Variación
+			isDefault
+			relationship: 94a89ede-88ba-43ad-8eb9-ccb7bc47bcf5
+			defaultHierarchy: LocalDateTable_48669bf8-09f0-4106-a6e9-95fab2ab05b5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column urgency
+		dataType: int64
+		formatString: 0
+		lineageTag: 197c6457-922b-4656-9aee-29a85de1c267
+		summarizeBy: sum
+		sourceColumn: urgency
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_urgency
+		dataType: string
+		lineageTag: 1a3d5939-4160-4026-bb18-bba0fe4ab3ad
+		summarizeBy: none
+		sourceColumn: dv_urgency
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9ed9d172-00ed-427b-b0ad-2a2299f76737
+		summarizeBy: none
+		sourceColumn: work_end
+
+		variation Variación
+			isDefault
+			relationship: aee8b18e-137b-4dab-b161-ae8c975086d2
+			defaultHierarchy: LocalDateTable_723439f0-b7d4-4d17-9965-1326ff323257.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b8b06e36-19a8-4293-b9e4-128636a429d3
+		summarizeBy: none
+		sourceColumn: work_start
+
+		variation Variación
+			isDefault
+			relationship: b739f73a-aa19-42c5-a9c8-a05510ad116f
+			defaultHierarchy: LocalDateTable_5e425da4-7a5d-4eab-9d2d-89781a44fbbd.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_project_typology
+		dataType: string
+		lineageTag: 7ccbf009-bad2-4317-80f3-b3f3a72e7c24
+		summarizeBy: none
+		sourceColumn: dv_u_project_typology
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProyectoDemandaEnergia = if(CONTAINS(Demandas,Demandas[sys_id], ProyectosPadre[demand]), TRUE(), FALSE())
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6af02956-e0b6-4cd6-ad93-1cdea5e9118c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_dv_priority - español'
+		dataType: string
+		lineageTag: 7bf62765-ac97-4759-b602-49cbea6032c4
+		summarizeBy: none
+		sourceColumn: _dv_priority - español
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tallaje-Demanda = LOOKUPVALUE('Demandas'[dv_size],'Demandas'[sys_id], [demand])
+		lineageTag: a8d56060-a3bf-4db7-b126-014d99f86ae4
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'URL ProyectoPadre' = CONCATENATE("https://acciona.service-now.com/pm_project.do?sysparm_query=number%3d",ProyectosPadre[number])
+		lineageTag: c84b8343-e27e-4d1a-a66c-6de8a66da355
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_% Percent_complete' = (('ProyectosPadre'[percent_complete])/100)+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: e0ef213c-d42c-41a5-9b92-1ebaaa1bb893
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Suma_Presupuestos_BudgetCost_GradoAvance_SoloProyectosEnergia = SUM(ProyectosPadre[BudgetCost_GradoAvance_SoloProyectosEnergia])+0
+		lineageTag: a1e2b664-e362-401f-a595-ed9242ba290b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column '% Presupuesto_TOTAL' = (DIVIDE([BudgetCost_GradoAvance_SoloProyectosEnergia],[Suma_Presupuestos_BudgetCost_GradoAvance_SoloProyectosEnergia],BLANK()))*100
+		formatString: 0.00000
+		lineageTag: e8761e52-f14f-4236-9309-0018e486b192
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Avance_Ponderado = ([_% Percent_complete]*[% Presupuesto_TOTAL])/100
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 541cf24b-cf3e-4f1d-98d4-bacd56c916fd
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column CandidatosENERGIAParaCalcular_GradoAvance = if(and(related(Demandas[Es_Portfolio_Energia])=TRUE(), ProyectosPadre[ProyectoDemandaEnergia]=TRUE()), "Candidato")
+		lineageTag: 402d16a3-aacc-4ed5-bcb5-b2a5119993c5
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column BudgetCost_GradoAvance_SoloProyectosEnergia = if(and(or(ProyectosPadre[dv_phase]="Executing", ProyectosPadre[dv_phase]="In Pause"), ProyectosPadre[CandidatosENERGIAParaCalcular_GradoAvance] = "Candidato"), ProyectosPadre[cost], 0)
+		lineageTag: f15de1c5-f35d-4e8d-81b7-a011a474fb38
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DuracionProyecto = ((DATEDIFF('ProyectosPadre'[end_date],'ProyectosPadre'[start_date],HOUR)/24*(-1)))
+		formatString: 0.00
+		lineageTag: 774753cd-6bd9-472d-b41d-ce6c098e7b65
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column DuracionProyecto_ConPorcentajeCompletado = ('ProyectosPadre'[DuracionProyecto]*'ProyectosPadre'[percent_complete])/100
+		formatString: 0.00
+		lineageTag: 297999b2-26c8-4098-bc97-c50ace75df66
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha_Objetivo = 'ProyectosPadre'[start_date] + 'ProyectosPadre'[DuracionProyecto_ConPorcentajeCompletado]
+		formatString: General Date
+		lineageTag: b87f713a-39df-4890-88fa-9d65b1e63a7a
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 87011054-7ad3-4253-a59e-843a291d91bf
+			defaultHierarchy: LocalDateTable_71a9d493-2e92-4703-abcb-69fb97a4f85c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Desviacion = TODAY() - 'ProyectosPadre'[Fecha_Objetivo]
+		dataType: double
+		formatString: 0.00
+		lineageTag: 7847ce22-90fd-43fa-8cc5-5660627691d9
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Porcentaje_Desviacion_Decimal = DIVIDE('ProyectosPadre'[Desviacion],'ProyectosPadre'[DuracionProyecto], 0)*100
+		formatString: 0.00
+		lineageTag: 71faab62-8070-4130-b5ea-8a08a86b3b6a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Porcentaje_Desviacion = DIVIDE('ProyectosPadre'[Desviacion],'ProyectosPadre'[DuracionProyecto], 0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 08500531-7316-4fcb-b31f-73cad451e288
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Desviacion_Ponderada_Por_Presupuesto_Decimal = ('ProyectosPadre'[Porcentaje_Desviacion_Decimal]*'ProyectosPadre'[cost])
+		formatString: 0.00
+		lineageTag: 9aa430a9-53ff-4d14-a945-021fecf6603d
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Porcentaje_Desviacion_Decimal_SoloProyectosEnergia = if(and(or(ProyectosPadre[dv_phase]="Executing", ProyectosPadre[dv_phase]="In Pause"), ProyectosPadre[CandidatosENERGIAParaCalcular_GradoAvance] = "Candidato"), ProyectosPadre[Porcentaje_Desviacion_Decimal], 0)
+		formatString: 0.00
+		lineageTag: ae8ecbf1-e4b5-4bb2-93de-a3f3587d5ec1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Suma_Porcentaje_Desviacion_Decimal_SoloProyectosEnergia = SUM(ProyectosPadre[Porcentaje_Desviacion_Decimal_SoloProyectosEnergia])+0
+		formatString: 0.00
+		lineageTag: cfb7a581-d223-4cda-a297-4ac4290ae770
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Desviacion_Ponderada_Por_Presupuesto_SoloProyectosEnergia = if(and(or(ProyectosPadre[dv_phase]="Executing", ProyectosPadre[dv_phase]="In Pause"), ProyectosPadre[CandidatosENERGIAParaCalcular_GradoAvance] = "Candidato"), ProyectosPadre[Desviacion_Ponderada_Por_Presupuesto_Decimal], 0)
+		formatString: 0.00
+		lineageTag: 52abbbcc-c4b8-494b-9aa0-71849cda0ee6
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Suma_Desviacion_Ponderada_Por_Presupuesto = SUM(ProyectosPadre[Desviacion_Ponderada_Por_Presupuesto_SoloProyectosEnergia])+0
+		formatString: 0.00
+		lineageTag: 3b7d2d64-fe74-45e6-a34f-1db90f4f0155
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Desviacion_Ponderada_Por_PresupuestoEnergia = DIVIDE ('ProyectosPadre'[Suma_Desviacion_Ponderada_Por_Presupuesto], 'ProyectosPadre'[Suma_Presupuestos_BudgetCost_GradoAvance_SoloProyectosEnergia], 0)
+		formatString: 0.00
+		lineageTag: ec9b2e63-a363-4ec6-880d-bf7a2bbafd8c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column percent_complete_ProyectosEnergia = if(and(or(ProyectosPadre[dv_phase]="Executing", ProyectosPadre[dv_phase]="In Pause"), ProyectosPadre[CandidatosENERGIAParaCalcular_GradoAvance] = "Candidato"), ProyectosPadre[percent_complete], 0)
+		lineageTag: f982f188-d9bb-447b-bfac-21f17c220609
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_relevant_español = if(proyectosPadre[u_relevant] = TRUE(), "SI", "NO")
+		lineageTag: 55879804-c37a-4258-8adf-fec3112144d9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Cierre'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 3b7f5d29-4462-4420-959e-fd063a4d45ce
+		summarizeBy: none
+		sourceColumn: Fecha Cierre
+
+		variation Variación
+			isDefault
+			relationship: 7154c2f9-284f-4be4-9ea8-c36d6dfec6f3
+			defaultHierarchy: LocalDateTable_67aa294c-ff2f-4d07-8b25-ed40039fa2ac.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Fecha Apertura'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: ad7a0028-2f21-4fb0-9ca2-c21329004580
+		summarizeBy: none
+		sourceColumn: Fecha Apertura
+
+		variation Variación
+			isDefault
+			relationship: 1c91808b-8db5-4b37-a047-d8d58263c67a
+			defaultHierarchy: LocalDateTable_d8fa61a9-9f81-4f52-b00a-768bd770832c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column '_dv_status - español'
+		dataType: string
+		lineageTag: db20fc91-6283-4da5-a565-750a8b801c46
+		summarizeBy: none
+		sourceColumn: _dv_status - español
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_end_date - SoloFecha'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 32f1fe36-f54f-4ea0-8cc5-f73a1c81360a
+		summarizeBy: none
+		sourceColumn: _end_date - SoloFecha
+
+		variation Variación
+			isDefault
+			relationship: 487a9447-3aa7-4335-ad6e-6706a19e1127
+			defaultHierarchy: LocalDateTable_fb8a6993-612e-4c7d-9b1c-33cdb29ff4e2.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column '_start_date - SoloFecha'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 82f511df-10fd-46a8-8018-6b4ad2cc124c
+		summarizeBy: none
+		sourceColumn: _start_date - SoloFecha
+
+		variation Variación
+			isDefault
+			relationship: 73dc9dbc-29e0-4369-bbbc-9ef83a22b242
+			defaultHierarchy: LocalDateTable_2e109498-aa50-4942-b4a6-193572dbbcfe.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column status_u_executive_summary = LOOKUPVALUE('SERV_NOW u_project_last_status_sin_duplicados'[status_u_executive_summary], 'SERV_NOW u_project_last_status_sin_duplicados'[prj_number], [number])
+		lineageTag: 09120df1-3f1f-4c16-b48f-ee8ba930cd23
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: d5234628-6dbd-43b0-a801-eab60e9929dc
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_start_SoloFecha
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 57b0e249-9f70-43e5-a4a5-99b3215be3ac
+		summarizeBy: none
+		sourceColumn: work_start_SoloFecha
+
+		variation Variación
+			isDefault
+			relationship: 3983c1ba-f08c-4a90-88c3-016774e34a46
+			defaultHierarchy: LocalDateTable_62a071f8-ca29-472d-8cb7-f62c79d272e4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column work_end_SoloFecha
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: aaf15deb-b5a8-40bb-8566-977b9f851de5
+		summarizeBy: none
+		sourceColumn: work_end_SoloFecha
+
+		variation Variación
+			isDefault
+			relationship: 6aa0855a-3f95-41f8-b21d-52d48ea8666f
+			defaultHierarchy: LocalDateTable_4f80c952-3610-407d-b8d5-c390678d1410.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column business_service
+		dataType: string
+		lineageTag: 4f1d914a-08eb-47df-85c8-2acc783c4bc1
+		summarizeBy: none
+		sourceColumn: business_service
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_business_service
+		dataType: string
+		lineageTag: b4777154-7b65-4452-a7a9-44a573687a18
+		summarizeBy: none
+		sourceColumn: dv_business_service
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_unit
+		dataType: string
+		lineageTag: 23a82af2-36e3-464b-a144-778287d033f2
+		summarizeBy: none
+		sourceColumn: business_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_business_unit
+		dataType: string
+		lineageTag: 1711c60e-f25a-4e78-963f-98e938fce3a8
+		summarizeBy: none
+		sourceColumn: dv_business_unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_business_line
+		dataType: string
+		lineageTag: dcfd47d5-f907-4c01-8094-09c8a8d3846c
+		summarizeBy: none
+		sourceColumn: u_business_line
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_business_line
+		dataType: string
+		lineageTag: 27c3fdce-7df5-476a-85a1-c9cca48742d1
+		summarizeBy: none
+		sourceColumn: dv_u_business_line
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_catalog
+		dataType: string
+		lineageTag: 378c3f6a-033d-43de-855c-6ee8616f603a
+		summarizeBy: none
+		sourceColumn: u_catalog
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_catalog
+		dataType: string
+		lineageTag: 6d4ad0ad-3b65-435f-ab95-154afdf937bd
+		summarizeBy: none
+		sourceColumn: dv_u_catalog
+
+		annotation SummarizationSetBy = Automatic
+
+	column attr_based_planning
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e859b73e-c45f-4e95-a828-0f44c1ff1d91
+		summarizeBy: none
+		sourceColumn: attr_based_planning
+
+		annotation SummarizationSetBy = Automatic
+
+	column auto_save
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 633fd35e-950a-47dc-88e9-c43dfab3f1d7
+		summarizeBy: none
+		sourceColumn: auto_save
+
+		annotation SummarizationSetBy = Automatic
+
+	column contract
+		dataType: string
+		lineageTag: 9a5e134c-4f5d-4a30-979b-ad58c3a9854f
+		summarizeBy: none
+		sourceColumn: contract
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_contract
+		dataType: string
+		lineageTag: 7cd49461-3412-4680-9808-007c4a34f307
+		summarizeBy: none
+		sourceColumn: dv_contract
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_expense_type
+		dataType: string
+		lineageTag: 0e75a99c-f0f0-4694-9625-cb71c3c371d8
+		summarizeBy: none
+		sourceColumn: dv_expense_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_model_id
+		dataType: string
+		lineageTag: 2d552795-af55-4a4d-ba3e-f0d98c96d861
+		summarizeBy: none
+		sourceColumn: dv_model_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_software_model
+		dataType: string
+		lineageTag: 09853cd7-1c3b-4be4-ba68-64c88bb31735
+		summarizeBy: none
+		sourceColumn: dv_software_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_devops_manager
+		dataType: string
+		lineageTag: fb05ba1d-bed6-4a89-888c-610344ebc371
+		summarizeBy: none
+		sourceColumn: dv_u_devops_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_pmo_manager
+		dataType: string
+		lineageTag: 641acde6-eb56-4ff3-b8c6-677e5bf4047a
+		summarizeBy: none
+		sourceColumn: dv_u_pmo_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_qa_manager
+		dataType: string
+		lineageTag: b9cfd001-92ae-448f-8263-54d490543c49
+		summarizeBy: none
+		sourceColumn: dv_u_qa_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_rfp_phases
+		dataType: string
+		lineageTag: f97badee-c7d6-4690-bec5-d537b24f8c77
+		summarizeBy: none
+		sourceColumn: dv_u_rfp_phases
+
+		annotation SummarizationSetBy = Automatic
+
+	column expense_type
+		dataType: string
+		lineageTag: ae0b01cb-18d5-4ae3-bef8-c5d2509a5e0d
+		summarizeBy: none
+		sourceColumn: expense_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column group_resource_assignee
+		dataType: string
+		lineageTag: e1706dcd-85b6-4c44-8a78-809e3b3d1129
+		summarizeBy: none
+		sourceColumn: group_resource_assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column model_id
+		dataType: string
+		lineageTag: cd305bd3-34c7-47ae-b13a-2ba5702c539d
+		summarizeBy: none
+		sourceColumn: model_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column resource_assignee
+		dataType: string
+		lineageTag: 026b41ca-91dd-4f21-acc8-ad8a98ca46cc
+		summarizeBy: none
+		sourceColumn: resource_assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column software_model
+		dataType: string
+		lineageTag: 4cc37827-d045-4257-aebf-167341fa1afa
+		summarizeBy: none
+		sourceColumn: software_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_commented
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f5bf2e50-a3aa-44e7-8b8d-55dddc01565e
+		summarizeBy: none
+		sourceColumn: u_commented
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_devops_manager
+		dataType: string
+		lineageTag: 637fe296-fa94-44c3-9767-fb25cddb0f53
+		summarizeBy: none
+		sourceColumn: u_devops_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impacted_applications
+		dataType: string
+		lineageTag: 9fa26569-2906-47da-a455-aa5a7096c386
+		summarizeBy: none
+		sourceColumn: u_impacted_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_operational_committee_comment
+		dataType: string
+		lineageTag: cc9c03a5-7903-4f97-9118-5ffde353b998
+		summarizeBy: none
+		sourceColumn: u_operational_committee_comment
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_project_typology
+		dataType: string
+		lineageTag: 4ac7f209-3ddd-4897-bd2a-316548cdb10c
+		summarizeBy: none
+		sourceColumn: u_project_typology
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_qa_manager
+		dataType: string
+		lineageTag: f4c05782-d379-4b2b-b293-cd847618015f
+		summarizeBy: none
+		sourceColumn: u_qa_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_relevant_project_for_cio
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 4a7a766e-e03f-432c-a1a7-a9dc22d97ed0
+		summarizeBy: none
+		sourceColumn: u_relevant_project_for_cio
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_rfp_phases
+		dataType: string
+		lineageTag: cacf0535-da96-4bd5-ae2a-7a4cfd8a17af
+		summarizeBy: none
+		sourceColumn: u_rfp_phases
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_percent_complete_estimated
+		dataType: double
+		lineageTag: 0628418e-427e-46f8-be9f-ad84cba1fdc3
+		summarizeBy: sum
+		sourceColumn: u_percent_complete_estimated
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition ProyectosPadre-4ea73c40-b2b0-4f13-a87b-b12cf748ed16 = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_pm_project = Origen{[Schema="SERV_NOW",Item="pm_project"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_pm_project,{"allow_dates_outside_schedule", "approval", "dv_approval", "approval_history", "approval_set", "assumptions", "backlog_definition", "dv_backlog_definition", "barriers", "business_case", "delivery_plan", "dv_delivery_plan", "delivery_task", "dv_delivery_task", "discount_rate", "enablers", "in_scope", "investment_class", "dv_investment_class", "investment_type", "dv_investment_type", "out_of_scope", "rate_model", "dv_rate_model", "u_current_situation", "u_incidents_comments", "u_lessons_learned", "u_run_description", "end_date_derived_from", "dv_end_date_derived_from", "task_for", "dv_task_for", "u_benefits", "contact_type", "dv_contact_type", "correlation_display", "correlation_id", "u_completion_criteria", "u_pmo_manager", "html_description", "u_restrictions", "assigned_to", "dv_assigned_to", "assignment_group", "dv_assignment_group", "benefits", "business_capabilities", "business_duration", "dv_business_duration", "calculation_type", "dv_calculation_type", "calendar_duration", "dv_calendar_duration", "close_notes", "closed_by", "dv_closed_by", "cmdb_ci", "dv_cmdb_ci", "comments_and_work_notes", "company", "dv_company", "constraint_date", "critical_path", "department", "dv_department", "dependency", "due_date", "duration", "dv_duration", "effort", "dv_effort", "escalation", "dv_escalation", "estimate_to_completion", "execution_type", "dv_execution_type", "expected_start", "follow_up", "forecast_cost", "goal", "dv_goal", "goals", "group_list", "has_conflict", "impacted_business_units", "irr_value", "knowledge", "level", "location", "dv_location", "made_sla", "mpp_task_id", "npv_value", "opened_by", "dv_opened_by", "order", "orig_sys_id", "dv_orig_sys_id", "orig_top_task_id", "dv_orig_top_task_id", "override_status", "primary_program", "dv_primary_program", "project_schedule_date_format", "dv_project_schedule_date_format", "project_type", "dv_project_type", "reassignment_count", "rejection_goto", "dv_rejection_goto", "relation_applied", "dv_relation_applied", "remaining_duration", "dv_remaining_duration", "remaining_effort", "dv_remaining_effort", "resource_allocated_cost", "resource_planned_cost", "resources_from_resource_plan", "risk_of_not_performing", "risk_of_performing", "route_reason", "dv_route_reason", "run_calc_brs", "schedule", "dv_schedule", "score", "score_risk", "dv_score_risk", "score_size", "dv_score_size", "score_value", "dv_score_value", "service_offering", "dv_service_offering", "shadow", "show_on_program_status_report", "skills", "sla_due", "start_date_derived_from", "dv_start_date_derived_from", "strategic_objectives", "sys_class_name", "dv_sys_class_name", "sys_created_by", "sys_domain", "sys_domain_path", "sys_mod_count", "sys_tags", "sys_updated_by", "sys_updated_on", "time_card_at_top_task", "time_card_preference", "dv_time_card_preference", "time_component_from_planned", "time_constraint", "dv_time_constraint", "time_worked", "dv_time_worked", "time_zone", "title", "top_program", "dv_top_program", "u_acciona_priority", "u_ambito_global", "u_benefit_check", "u_changes", "u_changes_comments", "u_conditions_restrictions", "u_cost_comments", "u_deliverables", "u_deliverables_comments", "u_demand_type_description", "u_department", "dv_u_department", "u_dependencies", "u_deviation_in_costs", "u_deviation_in_duration", "u_digital_transformation", "u_eficiency_using_rrhh", "u_end_date_deviation", "u_external_vendor", "dv_u_external_vendor", "u_impacted_companies", "u_impacted_countries", "u_incidents", "u_indicator_1", "u_live_changes", "u_live_risks", "u_metal", "dv_u_metal", "u_monitoring_indicators", "u_outsourcing", "u_payroll_area", "dv_u_payroll_area", "u_phone", "u_planned_demand", "dv_u_planned_demand", "u_planned_resource_plan_effort", "u_previous_groups", "u_problems", "u_progress", "u_project_impact", "u_project_monitoring", "u_reasons_for_delay_reject", "dv_u_reasons_for_delay_reject", "u_ref_country", "dv_u_ref_country", "u_responded", "u_risks", "u_risks_comments", "u_run", "u_schedule", "u_schedule_comments", "u_suggestions_to_improve", "u_sum_planned_hours", "u_sum_time_cards", "u_targets", "u_tic_unit", "dv_u_tic_unit", "u_url", "u_version", "u_volume_of_impacted_users", "universal_request", "dv_universal_request", "update_actual_effort_from_time_card", "dv_update_actual_effort_from_time_card", "update_score_on_value_change", "dv_update_score_on_value_change", "upon_approval", "dv_upon_approval", "upon_reject", "dv_upon_reject", "user_input", "value", "variables", "version", "watch_list", "wbs", "wbs_order", "wf_activity", "dv_wf_activity", "work_cost", "work_duration", "dv_work_duration", "work_effort", "dv_work_effort", "work_notes", "work_notes_list", "x_29185_external_f_total_financed", "comments", "opex_estimate_to_completion"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each ([dv_u_project_type] = "Project")),
+				    #"Filas filtradas1" = Table.SelectRows(#"Filas filtradas", each ([demand] <> "")),
+				    #"Columna duplicada1" = Table.DuplicateColumn(#"Filas filtradas1", "closed_at", "closed_at - Copia"),
+				    #"Columna duplicada2" = Table.DuplicateColumn(#"Columna duplicada1", "opened_at", "opened_at - Copia"),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columna duplicada2",{{"closed_at - Copia", "Fecha Cierre"}, {"opened_at - Copia", "Fecha Apertura"}}),
+				    #"Fecha extraída" = Table.TransformColumns(#"Columnas con nombre cambiado",{{"Fecha Cierre", DateTime.Date, type date}, {"Fecha Apertura", DateTime.Date, type date}}),
+				    #"Columna duplicada" = Table.DuplicateColumn(#"Fecha extraída", "dv_priority", "_dv_priority - español"),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columna duplicada","1 - Critical","1 - Crítica",Replacer.ReplaceText,{"_dv_priority - español"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","2 - High","2 - Alta",Replacer.ReplaceText,{"_dv_priority - español"}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","3 - Moderate","3 - Moderada",Replacer.ReplaceText,{"_dv_priority - español"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","4 - Low","4 - Baja",Replacer.ReplaceText,{"_dv_priority - español"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","5 - Very Low","5 - Muy baja",Replacer.ReplaceText,{"_dv_priority - español"}),
+				    #"Columna duplicada3" = Table.DuplicateColumn(#"Valor reemplazado4", "dv_status", "dv_status - Copia"),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columna duplicada3",{{"dv_status - Copia", "_dv_status - español"}}),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Columnas con nombre cambiado1","Green","Verde",Replacer.ReplaceText,{"_dv_status - español"}),
+				    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","Yellow","Amarillo",Replacer.ReplaceText,{"_dv_status - español"}),
+				    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","Red","Rojo",Replacer.ReplaceText,{"_dv_status - español"}),
+				    #"Columna duplicada4" = Table.DuplicateColumn(#"Valor reemplazado7", "end_date", "end_date - Copia"),
+				    #"Columna duplicada5" = Table.DuplicateColumn(#"Columna duplicada4", "start_date", "start_date - Copia"),
+				    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columna duplicada5",{{"end_date - Copia", "_end_date - SoloFecha"}}),
+				    #"Fecha extraída1" = Table.TransformColumns(#"Columnas con nombre cambiado2",{{"_end_date - SoloFecha", DateTime.Date, type date}}),
+				    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Fecha extraída1",{{"start_date - Copia", "_start_date - SoloFecha"}}),
+				    #"Fecha extraída2" = Table.TransformColumns(#"Columnas con nombre cambiado3",{{"_start_date - SoloFecha", DateTime.Date, type date}}),
+				    #"Errores quitados" = Table.RemoveRowsWithErrors(#"Fecha extraída2", {"approved_end_date"}),
+				    #"Valor reemplazado8" = Table.ReplaceValue(#"Errores quitados","Development / Construction","Desarrollo / Construcción",Replacer.ReplaceText,{"dv_u_project_phase"}),
+				    #"Valor reemplazado9" = Table.ReplaceValue(#"Valor reemplazado8","Productive","Productivo",Replacer.ReplaceText,{"dv_u_project_phase"}),
+				    #"Valor reemplazado10" = Table.ReplaceValue(#"Valor reemplazado9","Functional analysis","Análisis Funcional",Replacer.ReplaceText,{"dv_u_project_phase"}),
+				    #"Valor reemplazado11" = Table.ReplaceValue(#"Valor reemplazado10","UAT tests","Pruebas UAT",Replacer.ReplaceText,{"dv_u_project_phase"}),
+				    #"Valor reemplazado12" = Table.ReplaceValue(#"Valor reemplazado11","Integrated Tests","Pruebas Integradas",Replacer.ReplaceText,{"dv_u_project_phase"}),
+				    #"Valor reemplazado13" = Table.ReplaceValue(#"Valor reemplazado12","Planning","Planificación",Replacer.ReplaceText,{"dv_u_project_phase"}),
+				    #"Valor reemplazado14" = Table.ReplaceValue(#"Valor reemplazado13","Deployment","Despliegue",Replacer.ReplaceText,{"dv_u_project_phase"}),
+				    #"Valor reemplazado15" = Table.ReplaceValue(#"Valor reemplazado14","Initial RFP","RFP Inicial",Replacer.ReplaceText,{"dv_u_project_phase"}),
+				    #"Columna duplicada6" = Table.DuplicateColumn(#"Valor reemplazado15", "work_start", "work_start_SoloFecha"),
+				    #"Fecha extraída3" = Table.TransformColumns(#"Columna duplicada6",{{"work_start_SoloFecha", DateTime.Date, type date}}),
+				    #"Columna duplicada7" = Table.DuplicateColumn(#"Fecha extraída3", "work_end", "work_end_SoloFecha"),
+				    #"Fecha extraída4" = Table.TransformColumns(#"Columna duplicada7",{{"work_end_SoloFecha", DateTime.Date, type date}}),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Fecha extraída4", {"demand"}, Demandas, {"sys_id"}, "Demandas", JoinKind.LeftOuter)
+				in
+				    #"Consultas combinadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

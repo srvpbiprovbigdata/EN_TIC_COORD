@@ -1,0 +1,143 @@
+table FORECAST
+	lineageTag: 058d6f37-3d43-4688-9615-dbf05c1954c4
+
+	column Año
+		dataType: string
+		lineageTag: cba26208-3f2e-423b-ba38-3d8e8514c36f
+		summarizeBy: none
+		sourceColumn: Año
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: string
+		lineageTag: 86e87d32-02f0-4c28-a5b3-31cb18658515
+		summarizeBy: none
+		sourceColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tagetik
+		dataType: string
+		lineageTag: fabb7fa5-b33c-4c1c-8b46-1785e8092bb1
+		summarizeBy: none
+		sourceColumn: Tagetik
+
+		annotation SummarizationSetBy = Automatic
+
+	column Proveedor
+		dataType: string
+		lineageTag: 869f4e90-747e-4daf-9929-922b9805cd1b
+		summarizeBy: none
+		sourceColumn: Proveedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Importe
+		dataType: double
+		lineageTag: a34c528b-43e7-42fa-83d6-7d88f2cca8bc
+		summarizeBy: sum
+		sourceColumn: Importe
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column KEY_BUDGET
+		dataType: string
+		lineageTag: b0becbb9-018c-445c-9ec4-4efc71e3e778
+		summarizeBy: none
+		sourceColumn: KEY_BUDGET
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes
+		dataType: string
+		lineageTag: 797a36fb-349b-4746-b124-dc9d4adc9f7d
+		summarizeBy: none
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column Coste
+		dataType: double
+		lineageTag: d4263a2d-b082-431d-ba81-ee0d5428acfa
+		summarizeBy: sum
+		sourceColumn: Coste
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Tabla Origen'
+		dataType: string
+		lineageTag: 4a822232-da12-4588-a952-7901925370e0
+		summarizeBy: none
+		sourceColumn: Tabla Origen
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 70355a16-16d8-489a-91cc-20b2085438bb
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Recepcionado
+		dataType: double
+		lineageTag: fbc9c070-fe82-4290-9395-0bcf0bc684f9
+		summarizeBy: sum
+		sourceColumn: Recepcionado
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Id Partida Detalle'
+		dataType: string
+		lineageTag: ad01791e-9357-4df2-a5e0-bff4477d4a4f
+		summarizeBy: none
+		sourceColumn: Id Partida Detalle
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción Partida Detalle'
+		dataType: string
+		lineageTag: c8dcb13c-d5e8-4cea-b4e7-56e3f0ca1b18
+		summarizeBy: none
+		sourceColumn: Descripción Partida Detalle
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FORECAST = m
+		mode: import
+		queryGroup: ARCHIVOS_TRATADOS
+		source =
+				let
+				    Source = FORECAST_RAW,
+				    Filtrado = Table.SelectRows(Source, each [Año] <> null and [Año] <> ""),
+				    Tipado = Table.TransformColumnTypes(Filtrado,{{"Tagetik", type text}, {"Orden", type text}, {"Año", type text}, {"Id Partida Detalle", type text}, {"Descripción Partida Detalle", type text}, {"Proveedor", type text}, {"Importe", type number}, {"Enero", type number}, {"Febrero", type number}, {"Marzo", type number}, {"Abril", type number}, {"Mayo", type number}, {"Junio", type number}, {"Julio", type number}, {"Agosto", type number}, {"Septiembre", type number}, {"Octubre", type number}, {"Noviembre", type number}, {"Diciembre", type number}}),
+				    #"Add KEY_BUDGET" = Table.AddColumn(Tipado, "KEY_BUDGET", each [Orden]&"_"&[Tagetik]),
+				    #"Divided Column" = Table.TransformColumns(#"Add KEY_BUDGET", {{"Recepcionado", each _ / 12, type number}}),
+				    #"Divided Column1" = Table.TransformColumns(#"Divided Column", {{"Importe", each _ / 12, type number}}),
+				    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Divided Column1", {"Año", "Orden", "Tagetik", "Id Partida Detalle", "Descripción Partida Detalle", "Proveedor", "Importe","Recepcionado", "KEY_BUDGET"}, "Attribute", "Value"),
+				    Renombrado = Table.RenameColumns(#"Unpivoted Columns",{{"Attribute", "Mes"}, {"Value", "Coste"}}),
+				    #"Add Fecha" = Table.AddColumn(Renombrado, "Fecha", each [Año]&"/"&[Mes]),
+				    #"Tipado 2" = Table.TransformColumnTypes(#"Add Fecha",{{"Fecha", type date}, {"Coste", type number}, {"KEY_BUDGET", type text}}),
+				    #"Filtered Rows1" = Table.SelectRows(#"Tipado 2", each true),
+				    #"Add TABLA_ORIGEN" = Table.AddColumn(Renombrado, "Tabla Origen", each "Forecast Plan", type text),
+				    #"Added Custom" = Table.AddColumn(#"Add TABLA_ORIGEN", "Date", each [Año]&"/"&[Mes]),
+				    #"Filtered Rows" = Table.SelectRows(#"Added Custom", each ([Date] <> "2024/Diciembre_1" and [Date] <> "2025/Diciembre_1")),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows",{{"Coste", type number}, {"Recepcionado", type number}, {"KEY_BUDGET", type text}, {"Date", type date}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
