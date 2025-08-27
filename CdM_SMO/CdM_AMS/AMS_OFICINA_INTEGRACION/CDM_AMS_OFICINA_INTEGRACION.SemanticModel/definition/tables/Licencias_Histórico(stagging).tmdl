@@ -1,0 +1,202 @@
+table Licencias_Histórico(stagging)
+	lineageTag: 944cf12c-8ec3-4cc0-8542-56f83606c681
+
+	column Extracción
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6fa05e4c-08fe-41bc-85c8-1dc3f664d467
+		summarizeBy: none
+		sourceColumn: Extracción
+
+		variation Variación
+			isDefault
+			relationship: 34726665-c153-4ae0-9c19-453ead9ae9c7
+			defaultHierarchy: LocalDateTable_e7994e58-7031-41d1-9da3-9321232f5c20.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'User ID'
+		dataType: string
+		lineageTag: 6b705477-82ca-4aa1-a054-d3c2d8281aaa
+		summarizeBy: none
+		sourceColumn: User ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Domain
+		dataType: string
+		lineageTag: ad1b17f1-c2af-447e-aa4d-0534b492f7af
+		summarizeBy: none
+		sourceColumn: Domain
+
+		annotation SummarizationSetBy = Automatic
+
+	column User
+		dataType: string
+		lineageTag: 633010b7-ba5f-476f-86bd-6247c26ef58d
+		summarizeBy: none
+		sourceColumn: User
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'WD ID'
+		dataType: string
+		lineageTag: c15c67f6-bbd7-4318-a956-35764fbe223b
+		summarizeBy: none
+		sourceColumn: WD ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'GDI ID'
+		dataType: string
+		lineageTag: a805c588-e16f-40e9-ac4c-a43b07892849
+		summarizeBy: none
+		sourceColumn: GDI ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		lineageTag: bd6e9c91-ffc9-4ce2-940a-4062ff46c786
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column Created
+		dataType: string
+		lineageTag: ccb62306-5ce6-484a-8218-af3894958b01
+		summarizeBy: none
+		sourceColumn: Created
+
+		annotation SummarizationSetBy = Automatic
+
+	column Updated
+		dataType: string
+		lineageTag: 58e348b3-03cf-4188-a250-9d8c29e40c8b
+		summarizeBy: none
+		sourceColumn: Updated
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Updated by'
+		dataType: string
+		lineageTag: 4985899f-5e67-4bbb-8699-d3a530012c22
+		summarizeBy: none
+		sourceColumn: Updated by
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: c12d3813-d7b9-4380-afe8-92cd294b2beb
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Catalogue
+		dataType: string
+		lineageTag: f678f8e3-1b3e-4464-9cbe-c39a4dab3c12
+		summarizeBy: none
+		sourceColumn: Catalogue
+
+		annotation SummarizationSetBy = Automatic
+
+	column Department
+		dataType: string
+		lineageTag: a128305d-c676-4ca6-93c4-c412a6b27f47
+		summarizeBy: none
+		sourceColumn: Department
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Business Line'
+		dataType: string
+		lineageTag: a16a14f3-3055-49f1-8fa1-9243a1cbe844
+		summarizeBy: none
+		sourceColumn: Business Line
+
+		annotation SummarizationSetBy = Automatic
+
+	column Company
+		dataType: string
+		lineageTag: 86a24f73-6f73-4cad-a01a-c2839b057646
+		summarizeBy: none
+		sourceColumn: Company
+
+		annotation SummarizationSetBy = Automatic
+
+	column Active
+		dataType: string
+		lineageTag: f9f3b1a9-dd5b-4406-b0ba-5e03ff482be6
+		summarizeBy: none
+		sourceColumn: Active
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Billable license date'
+		dataType: string
+		lineageTag: df7b4573-cfdd-4095-964e-88a096ffe89e
+		summarizeBy: none
+		sourceColumn: Billable license date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Language
+		dataType: string
+		lineageTag: 8fe747a9-7d00-4cf6-886a-162dcccca513
+		summarizeBy: none
+		sourceColumn: Language
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'My approver'
+		dataType: string
+		lineageTag: 19355b45-4437-4d48-8dc4-e3654836a2fb
+		summarizeBy: none
+		sourceColumn: My approver
+
+		annotation SummarizationSetBy = Automatic
+
+	column Company_1
+		dataType: string
+		lineageTag: 669e898d-bc97-489e-9d7e-dea9671d5fb6
+		summarizeBy: none
+		sourceColumn: Company_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		dataType: string
+		lineageTag: e5a01a6e-9c06-47ff-8702-1346664bc6d0
+		summarizeBy: none
+		sourceColumn: Año
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Licencias_Histórico(stagging)-78e2a47f-1a79-4502-adbd-c586da09bef7 = m
+		mode: import
+		queryGroup: 'Tablas No Modelo'
+		source =
+				let
+				    Origen = SharePoint.Files(sharepointFolder, [ApiVersion = 15]),
+				    #"Filas filtradas" = Table.SelectRows(Origen, each ([Folder Path] = folderLicencia)),
+				    #"Filas filtradas1" = Table.SelectRows(#"Filas filtradas", each ([Name] <> "20220701 - AMS_SNOW_DASH_Licences - Hired Fullfiller Count Architecture.xlsx" /*"20220103 - AMS_SNOW_DASH_Licences - Hired Fullfiller Count Architecture.xlsx"*/)),
+				    #"Invocar función personalizada1" = Table.AddColumn(#"Filas filtradas1", "Transformar archivo (2)", each #"Transformar archivo (2)"([Content])),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Invocar función personalizada1", {"Name", "Source.Name"}),
+				    #"Otras columnas quitadas1" = Table.SelectColumns(#"Columnas con nombre cambiado1", {"Source.Name", "Transformar archivo (2)"}),
+				    #"Se expandió Transformar archivo (2)1" = Table.ExpandTableColumn(#"Otras columnas quitadas1", "Transformar archivo (2)", {"User ID", "Domain", "User", "WD ID", "GDI ID", "Email", "Created", "Updated", "Updated by", "Country", "Catalogue", "Department", "Business Line", "Company", "Active", "Billable license date", "Language", "My approver", "Company_1"}, {"User ID", "Domain", "User", "WD ID", "GDI ID", "Email", "Created", "Updated", "Updated by", "Country", "Catalogue", "Department", "Business Line", "Company", "Active", "Billable license date", "Language", "My approver", "Company_1"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió Transformar archivo (2)1",{{"Source.Name", "Extracción"}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas con nombre cambiado"," - AMS_SNOW_DASH_Licences - Hired Fullfiller Count Architecture.xlsx","",Replacer.ReplaceText,{"Extracción"}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Valor reemplazado",{{"Extracción", type date}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado", "Año", each Date.Year([Extracción]))
+				in
+				    #"Personalizada agregada"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

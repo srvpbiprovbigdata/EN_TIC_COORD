@@ -1,0 +1,33 @@
+table PORTFOLIO_ENERGIA
+	lineageTag: f176032d-b315-4a19-bd8c-5fb384e6e4f4
+
+	column sys_id
+		dataType: string
+		lineageTag: dbb6f10a-48fb-4ef6-b5fe-28fbb01edc8f
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Portfolio
+		dataType: string
+		lineageTag: 0ed9fe3d-270e-4e87-935c-3d374980280f
+		summarizeBy: none
+		sourceColumn: Portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PORTFOLIO_ENERGIA-e288e42e-02d3-4ad4-8fbd-eed0448bdc4b = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WskgxN0w0tkhNSbI0tTAwNDBJMzAwNjNLTDOxNDO0NEhU0lFy9dMLLi0oyKlUcM5IzMxTio0FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t, Columna2 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", type text}, {"Columna2", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Columna1", "sys_id"}, {"Columna2", "Portfolio"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

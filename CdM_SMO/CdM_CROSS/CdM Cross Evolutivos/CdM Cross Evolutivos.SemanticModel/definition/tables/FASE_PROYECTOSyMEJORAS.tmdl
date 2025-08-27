@@ -1,0 +1,41 @@
+table FASE_PROYECTOSyMEJORAS
+	lineageTag: feec027a-d6ad-4bbc-8703-6fa18df6684b
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 342862eb-8219-4c70-992a-256d4c5e246b
+		summarizeBy: sum
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fase_en
+		dataType: string
+		lineageTag: c94b2ab5-6f71-417b-acd5-0f086b225292
+		summarizeBy: none
+		sourceColumn: Fase_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fase_es
+		dataType: string
+		lineageTag: 2984a6eb-fa49-4a57-b592-f6c324a18d5b
+		summarizeBy: none
+		sourceColumn: Fase_es
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FASE_PROYECTOSyMEJORAS-7c89d7f7-a6fc-44b4-a286-0dc081cb3c6d = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlTSUfLMyyzJTCzJzEuHcJIzE/NS8pVidaKVjIAiATmJeXkQSRAzMy0zOTE58/DmPLAKY6Cwa0VqcilUv2sWkI2QNgEbqRCQWFqcCpKFMBPBcqZAAeec/GKIRufM1KKiVLCEGYibmJecmpOTmgJnJ4LcFAsA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Index = _t, Fase_en = _t, Fase_es = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Index", Int64.Type}, {"Fase_en", type text}, {"Fase_es", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

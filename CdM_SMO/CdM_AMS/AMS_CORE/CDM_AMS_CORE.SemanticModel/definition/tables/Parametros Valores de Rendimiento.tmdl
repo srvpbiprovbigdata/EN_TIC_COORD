@@ -1,0 +1,97 @@
+table 'Parametros Valores de Rendimiento'
+	excludeFromModelRefresh
+	lineageTag: e2ce4a4c-90d0-473f-b383-4030a83d0150
+
+	measure 'Umbral Objetivo_M' = MIN('Parametros Valores de Rendimiento'[Objetivo])
+		formatString: 0
+		lineageTag: 8f4bef64-4b11-45ab-ba77-1c69ea6880ac
+
+	measure 'Umbral Admisible_M' = MIN('Parametros Valores de Rendimiento'[Admisible])
+		formatString: 0
+		lineageTag: 2e3b6e13-fbdb-4941-89f6-df084cdfabd6
+
+	measure 'Umbral Crítico_M' = MIN('Parametros Valores de Rendimiento'[Crítico])
+		formatString: 0
+		lineageTag: 12ab6cf6-2f5d-4d97-80e9-2af0b04bb419
+
+	measure 'Penalización del Periodo_M' =
+			IF(MAX(Fechas[SERVICE_P])=0,"N/A",(
+			IF([Total de Puntos Obtenidos KGIs_M]>=90,0,
+			IF([Total de Puntos Obtenidos KGIs_M]>=50,(([Total de Puntos Obtenidos KGIs_M]-[Umbral Admisible_M])/([Umbral Crítico_M]-[Umbral Admisible_M]))*[Penalización máxima_M],0.15))))
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 4cac1ff9-d849-4532-bc84-8697a36e7133
+
+	measure 'Penalización máxima_M' = MIN('Parametros Valores de Rendimiento'[Penalización Máxima])
+		lineageTag: 9ab2e71e-fa28-4557-862c-21bbf6108d05
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Penalización del Periodo_M_AV' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([Penalización del Periodo_M]))
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: bb1bf6cc-fbd8-428e-9374-e42971e21d96
+
+	column 'Umbral de rendimiento'
+		dataType: string
+		lineageTag: 825adbee-effa-4a9f-a18d-04561ad38801
+		summarizeBy: none
+		sourceColumn: Umbral de rendimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column Objetivo
+		dataType: int64
+		formatString: 0
+		lineageTag: 6fd3fd05-e65c-4d72-b8ad-ef5e7f2475ef
+		summarizeBy: sum
+		sourceColumn: Objetivo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Admisible
+		dataType: int64
+		formatString: 0
+		lineageTag: aea615a0-357f-410a-abf6-b7c8cd462b6b
+		summarizeBy: sum
+		sourceColumn: Admisible
+
+		annotation SummarizationSetBy = Automatic
+
+	column Crítico
+		dataType: int64
+		formatString: 0
+		lineageTag: 8f0e98b0-7757-47df-af6a-a47ce096a699
+		summarizeBy: sum
+		sourceColumn: Crítico
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Penalización Máxima'
+		dataType: double
+		lineageTag: d09a8e31-da2e-452d-be35-e5d5954c3766
+		summarizeBy: sum
+		sourceColumn: Penalización Máxima
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros Valores de Rendimiento-0ff8f2ac-8cd2-433f-9a20-8efcf1208fe3' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(sharepointRoot2 & tablaParametros & xlsx), null, true),
+				    #"Valores de rendimiento_Sheet" = Source{[Item="Valores de rendimiento",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Valores de rendimiento_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Umbral de rendimiento", type text}, {"Objetivo", Int64.Type}, {"Admisible", Int64.Type}, {"Crítico", Int64.Type}, {"Penalización Máxima", Percentage.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

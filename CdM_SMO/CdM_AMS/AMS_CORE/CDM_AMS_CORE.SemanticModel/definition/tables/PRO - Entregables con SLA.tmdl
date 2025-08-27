@@ -1,0 +1,164 @@
+table 'PRO - Entregables con SLA'
+	lineageTag: 1960b803-7601-4e25-afa7-6ef5dea00e66
+
+	column 'Breve descripción'
+		dataType: string
+		lineageTag: aaf01855-0965-4eca-a094-a37c0a561a9a
+		summarizeBy: none
+		sourceColumn: Breve descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de incumplimiento'
+		dataType: string
+		lineageTag: 9254062a-b066-4429-8bad-d52feb6af80e
+		summarizeBy: none
+		sourceColumn: Tipo de incumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de asignación'
+		dataType: string
+		lineageTag: 86c7bb9f-eafa-47fe-8871-c98040227deb
+		summarizeBy: none
+		sourceColumn: Grupo de asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asignado a'
+		dataType: string
+		lineageTag: a997c838-4aad-4207-bc2d-7afd7b380fe1
+		summarizeBy: none
+		sourceColumn: Asignado a
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: cff79172-09b9-4a61-aa90-af05fa2c43c1
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 18d65c5b-1b94-499f-9867-36e187e34fb2
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		variation Variation
+			isDefault
+			relationship: b9d48c39-dcfe-4137-8c9c-91e2c6f79971
+			defaultHierarchy: LocalDateTable_3e718696-db00-4452-8cd6-59f20fad0cce.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5e4bf839-fc1d-4f18-80e4-62ee6ad24f21
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: 9ea13dc7-cc57-4ade-8ad0-784c7f932c93
+			defaultHierarchy: LocalDateTable_5f08717d-33cc-4d9f-86dc-5fe56a53573d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Número
+		dataType: string
+		lineageTag: 7ec62af0-9db9-45d3-8303-643ec5e85ad7
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Número_1
+		dataType: string
+		lineageTag: 0f64527b-0320-4b21-bbfe-397b96301962
+		summarizeBy: none
+		sourceColumn: Número_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Alegación
+		dataType: string
+		lineageTag: 5f57f109-9553-4b93-8f85-0b842b27fd66
+		summarizeBy: none
+		sourceColumn: Estado_Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Entrada_Alegada
+		dataType: string
+		lineageTag: ceca897e-d0ea-4761-97c9-129b4a89186b
+		summarizeBy: none
+		sourceColumn: Entrada_Alegada
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANS
+		dataType: string
+		lineageTag: ece30ef0-65cc-4cf7-9410-db3e560878fc
+		summarizeBy: none
+		sourceColumn: ANS
+
+		annotation SummarizationSetBy = Automatic
+
+	column Acción
+		dataType: string
+		lineageTag: 26318cb9-a414-4d55-b29c-e6344e21b30f
+		summarizeBy: none
+		sourceColumn: Acción
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Entregables con SLA-6e5f01b0-87da-474e-adee-9c624107435f' = m
+		mode: import
+		queryGroup: KGIs_I
+		source = ```
+				let
+				    Source = Excel.Workbook(Web.Contents(sharepointRoot2 & entregaSN & xlsx), null, true),
+				    #"Page 1_Sheet" = Source{[Item="Page 1",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+				    
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Número", type text}, {"Número_1", type text}, {"Breve descripción", type text}, {"Prioridad", type text}, {"Grupo de asignación", type text}, {"Asignado a", type text}, {"Estado", type text}, {"Cerrado", type datetime}}),
+				    
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Changed Type", "Cerrado", "Cerrado - Copy"),
+				    #"Extracted Date" = Table.TransformColumns(#"Duplicated Column",{{"Cerrado - Copy", DateTime.Date, type date}}),
+				    #"Calculated Start of Month" = Table.TransformColumns(#"Extracted Date",{{"Cerrado - Copy", Date.StartOfMonth, type date}}),
+				    
+				    #"Replaced Value" = Table.ReplaceValue(#"Calculated Start of Month","1 - Crítica","Grave",Replacer.ReplaceText,{"Prioridad"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","2 - Alta","Grave",Replacer.ReplaceText,{"Prioridad"}),
+				    #"Replaced Value2" = Table.ReplaceValue(#"Replaced Value1","3 - Moderada","Grave",Replacer.ReplaceText,{"Prioridad"}),
+				    #"Replaced Value3" = Table.ReplaceValue(#"Replaced Value2","4 - Baja","Leve",Replacer.ReplaceText,{"Prioridad"}),
+				    #"Replaced Value4" = Table.ReplaceValue(#"Replaced Value3","5 - Muy Baja","Leve",Replacer.ReplaceText,{"Prioridad"}),
+				
+				    #"Renamed Columns" = Table.RenameColumns(#"Replaced Value4",{{"Prioridad", "Tipo de incumplimiento"}}),
+				
+				    //Une con las alegaciones
+				    #"Merged Queries" = Table.NestedJoin(#"Renamed Columns", {"Número_1"}, #"PRO - Alegaciones del Servicio KGI14", {"ID"}, "PRO - Alegaciones del Servicio", JoinKind.LeftOuter),
+				    #"Se expandió PRO - Alegaciones del Servicio1" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Alegaciones del Servicio", {"Entrada alegada", "ANS", "Acción", "Estado"}, {"PRO - Alegaciones del Servicio.Entrada alegada", "PRO - Alegaciones del Servicio.ANS", "PRO - Alegaciones del Servicio.Acción", "PRO - Alegaciones del Servicio.Estado"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió PRO - Alegaciones del Servicio1",{{"PRO - Alegaciones del Servicio.Entrada alegada", "Entrada_Alegada"}, {"PRO - Alegaciones del Servicio.ANS", "ANS"}, {"PRO - Alegaciones del Servicio.Acción", "Acción"}, {"PRO - Alegaciones del Servicio.Estado", "Estado_Alegación"}}),
+				    //Realiza la corrección sobre el cumplimiento de la columna "Rechazado" si la alegación es aceptada y pedida por el Proveedor
+				    #"Replaced Value5" = Table.ReplaceValue(#"Columnas con nombre cambiado",each [Estado],each if [Estado_Alegación] = "1 - Aprobada" and [Acción]= "Cambio Estado Entregable" and [Solicitante]= "Proveedor" then "Cerrado completo" else [Estado],Replacer.ReplaceValue,{"Estado"}),
+				
+				    #"Replaced Value6" = Table.ReplaceValue(#"Replaced Value5",each [Estado],each if [Estado_Alegación] = "1 - Aprobada" and [Acción]= "Cambio Estado Entregable" and [Solicitante]= "Acciona" then "Cerrado completo" else [Estado],Replacer.ReplaceValue,{"Estado"}),
+				
+				    #"Replaced Value7" = Table.ReplaceValue(#"Replaced Value6",each [Tipo de incumplimiento],each if [Estado_Alegación] = "1 - Aprobada" and [Acción]= "Cambio Prioridad a Grave" then "Grave" else [Tipo de incumplimiento],Replacer.ReplaceValue,{"Tipo de incumplimiento"}),
+				
+				    #"Replaced Value8" = Table.ReplaceValue(#"Replaced Value7",each [Tipo de incumplimiento],each if [Estado_Alegación] = "1 - Aprobada" and [Acción]= "Cambio Prioridad a Leve" then "Leve" else [Tipo de incumplimiento],Replacer.ReplaceValue,{"Tipo de incumplimiento"})
+				in
+				    #"Replaced Value8"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

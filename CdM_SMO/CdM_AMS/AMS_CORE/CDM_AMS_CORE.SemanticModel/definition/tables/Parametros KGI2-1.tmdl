@@ -1,0 +1,64 @@
+table 'Parametros KGI2-1'
+	excludeFromModelRefresh
+	lineageTag: 9ead9400-f71f-475b-a41c-ba6fd4179283
+
+	measure M_Controlsum = ```
+			sum('Parametros KGI2-1'[Pesos]) 
+			```
+		lineageTag: 5915d734-1276-4231-ae59-5ab5a680d5af
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Prioridad '
+		dataType: string
+		lineageTag: d9f2972e-5ad1-431f-a03a-1ae4653072b9
+		summarizeBy: none
+		sourceColumn: "Prioridad "
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo de Resolución N2 (Horas)'
+		dataType: int64
+		formatString: 0
+		lineageTag: c8972ef1-7244-4657-9f24-8f1213126fe8
+		summarizeBy: sum
+		sourceColumn: Tiempo de Resolución N2 (Horas)
+
+		annotation SummarizationSetBy = Automatic
+
+	column '% Cumplimiento'
+		dataType: double
+		lineageTag: 0a5d1f8a-f83b-410f-a3f6-d49936604ef9
+		summarizeBy: sum
+		sourceColumn: % Cumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Pesos
+		dataType: double
+		lineageTag: 5847484f-6565-4394-8da5-f457a6e9b7f4
+		summarizeBy: sum
+		sourceColumn: Pesos
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros KGI2-1-d8d182c8-aad2-4e18-a952-8d57205e7b59' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(sharepointRoot2 & tablaParametros & xlsx), null, true),
+				    #"Parametros KGI2-1_Sheet" = Origen{[Item="Parametros KGI2-1",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Parametros KGI2-1_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Prioridad ", type text}, {"Tiempo de Resolución N2 (Horas)", Int64.Type}, {"% Cumplimiento", type number}, {"Pesos", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

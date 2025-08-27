@@ -1,0 +1,77 @@
+expression Parámetro3 = #"Archivo de ejemplo (3)" meta [IsParameterQuery=true, BinaryIdentifier=#"Archivo de ejemplo (3)", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: 98183c53-19a0-43c0-a203-84c84fd1f857
+	queryGroup: 'Transformar archivo de Consulta1 (3)\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo de ejemplo (3)' =
+		let
+		    Origen = Excel.Workbook(Parámetro3, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+	lineageTag: 46c7d565-ad6e-4055-b196-24f6aabb136c
+	queryGroup: 'Transformar archivo de Consulta1 (3)'
+
+	annotation PBI_ResultType = Table
+
+expression 'Archivo de ejemplo (3)' =
+		let
+		    Origen = SharePoint.Files("https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRE/", [ApiVersion = 15]),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Extension] = ".xlsx") and ([Name] = "Aplicaciones_Evolutivos.xlsx")),
+		    Navegación1 = #"Filas filtradas"{0}[Content]
+		in
+		    Navegación1
+	lineageTag: ad449029-a8ce-4e48-866a-fdc5be312d96
+	queryGroup: 'Transformar archivo de Consulta1 (3)\Consultas auxiliares'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo (3)' =
+		let
+		    Origen = (Parámetro3 as binary) => let
+		    Origen = Excel.Workbook(Parámetro3, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+		in
+		    Origen
+	lineageTag: 6ccb493a-b51b-4efa-a00c-3d35bbde4534
+	queryGroup: 'Transformar archivo de Consulta1 (3)\Consultas auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression 'Última Fecha Actualizada' =
+		let
+		    Origen = DateTime.LocalNow
+		in
+		    Origen
+	lineageTag: 5273272d-5f0b-4a48-bc01-34c700e3ae3d
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Function
+
+expression Entorno = "PRE" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 11c45238-fc3f-47c9-8f01-eb92b16976a6
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 423a8ae3-74da-4a5b-8915-2d7c7477fc1e
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource2 = "/Documentos compartidos/CdM_SMO/CdM_CROSS/CdM Cross Evolutivos/03. Evolutivos/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 4b3dcb29-d181-4855-b866-e18aed994eeb
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+

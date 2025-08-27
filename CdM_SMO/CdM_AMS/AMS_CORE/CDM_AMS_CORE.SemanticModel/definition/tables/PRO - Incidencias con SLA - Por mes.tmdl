@@ -1,0 +1,45 @@
+table 'PRO - Incidencias con SLA - Por mes'
+	lineageTag: 919210e2-80f8-4f50-a97d-53b39b606e19
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f7fc4520-1db0-463a-ab36-487db7d59ab9
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: d68e965c-7067-4057-977a-99a7e156bf20
+			defaultHierarchy: LocalDateTable_7b91884d-b6e9-4139-beb3-3f8ffadf7562.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'No. de Incidencias'
+		dataType: double
+		lineageTag: 9c50a830-780e-41e8-8a44-ddef659cbfff
+		summarizeBy: sum
+		sourceColumn: No. de Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'PRO - Incidencias con SLA - Por mes-a77eb698-4c3b-4173-9faa-462ad69617ca' = m
+		mode: import
+		queryGroup: KGIs_II
+		source =
+				let
+				    Source = #"PRO - Incidencias con SLA (NY y MAD)",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Cerrado - Copy"}, {{"No. de Incidencias", each Table.RowCount(_), type number}}),
+				    #"Sorted Rows" = Table.Sort(#"Grouped Rows",{{"Cerrado - Copy", Order.Ascending}})
+				in
+				    #"Sorted Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,182 @@
+table 'Resumen KGI1-4 Final'
+	lineageTag: 62cc00df-1aa2-44ce-9c9c-43e09e46b2dd
+
+	measure 'Puntos de KGI14_M' =
+			
+			var _KGI14_V = MIN('Resumen KGI1-4 Final'[Puntos de KGI14])
+			return
+			IF(ISBLANK(_KGI14_V),5,_KGI14_V)
+		formatString: 0
+		lineageTag: 50e4d34e-50e3-4d84-8445-fae15ac9f038
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Peso Obtenido KGI14_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",1-SUM('Resumen KGI1-4 Final'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 69a0dae4-bc23-46f0-bdd8-5606e1bde56f
+
+	measure 'Puntos Obtenidos KGI14_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[Peso Obtenido KGI14_M]*[Puntos de KGI14_M])
+		formatString: 0
+		lineageTag: 18eb5237-66c7-4f1b-bb3d-40aecf5bb362
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Peso Obtenido KGI14_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreComp])),
+				CALCULATE([Peso Obtenido KGI14_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 755e1ae5-9944-4580-ae7e-26c38bba7018
+
+	measure 'Puntos Obtenidos KGI14_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([Puntos Obtenidos KGI14_M])
+			)
+		formatString: 0.0
+		lineageTag: 9a1e5871-0fbf-4c5d-84e4-796420efa226
+
+	column Tipo
+		dataType: string
+		lineageTag: 1f47ce55-f0c0-447f-a444-c34c4b102822
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resolved - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d61f4a39-d192-4710-ada4-c3a00e6e51a2
+		summarizeBy: none
+		sourceColumn: Resolved - Copy
+
+		variation Variation
+			isDefault
+			relationship: 66b56f45-65e7-4aa8-98ea-1fcd4d800dca
+			defaultHierarchy: LocalDateTable_20f2bdd5-6a4d-402f-9809-837d8372e528.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Total Entregables'
+		dataType: double
+		formatString: 0
+		lineageTag: b0120fbb-9221-4493-8a7e-19009109e1a3
+		summarizeBy: sum
+		sourceColumn: Total Entregables
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Entregables Incumplidos'
+		dataType: double
+		formatString: 0
+		lineageTag: ee7af79d-9759-4653-9552-b45bfb80f737
+		summarizeBy: sum
+		sourceColumn: Entregables Incumplidos
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Máxima %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 3622fbb6-ba3e-421c-927f-9c5992968177
+		summarizeBy: sum
+		sourceColumn: Tasa Máxima %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 5a73046c-aa2f-453d-bd2c-015776ed9666
+		summarizeBy: sum
+		sourceColumn: Peso %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI14'
+		dataType: int64
+		formatString: 0
+		lineageTag: b4821a55-c705-45a4-9b0d-da12d129e6a8
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI14
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 968797d9-e011-4583-ab6b-64bde1d89eef
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI1-4 Final'[Tasa Real %]<='Resumen KGI1-4 Final'[Tasa Máxima %],"Si","No")
+		lineageTag: ded72298-2f66-4703-9c0e-66aac6247fca
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Real %' = ('Resumen KGI1-4 Final'[Total Entregables]-'Resumen KGI1-4 Final'[Entregables Cumplidos])/'Resumen KGI1-4 Final'[Total Entregables]
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: b950da13-0da5-4395-95c9-86a3861e3192
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Entregables Cumplidos' = 'Resumen KGI1-4 Final'[Total Entregables]-'Resumen KGI1-4 Final'[Entregables Incumplidos]
+		formatString: 0
+		lineageTag: 687f615d-6ecc-4604-84bc-1fb5aaec6a1f
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI1-4 Final'[¿Cumple?]="No",'Resumen KGI1-4 Final'[Peso %],0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 88cd939a-2956-412f-a929-a72f7afbc486
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI1-4 Final'[¿Cumple?]="Si",'Resumen KGI1-4 Final'[Peso %],0)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 3b4fa19b-2988-4846-b31c-9cc9a2833950
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI1-4 Final-b2657ec0-165d-4b68-8fde-af396a2dddc5' = m
+		mode: import
+		queryGroup: Resumen
+		source =
+				let
+				    Source = #"PRO - Jira - Entregables con SLA",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Tipo", "Resolved - Copy"}, {{"Total Entregables", each Table.RowCount(_), type number}}),
+				
+				    #"Merged Queries" = Table.NestedJoin(#"Grouped Rows", {"Tipo", "Resolved - Copy"}, #"PRO - Jira - Entregables con SLA - Incumplidos", {"Tipo", "Cerrado - Copy"}, "PRO - Jira - Entregables con SLA - Incumplidos", JoinKind.LeftOuter),
+				    #"Expanded PRO - Jira - Entregables con SLA - Incumplidos" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Jira - Entregables con SLA - Incumplidos", {"Total Rechazados"}, {"PRO - Jira - Entregables con SLA - Incumplidos.Incumplidos"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded PRO - Jira - Entregables con SLA - Incumplidos",{{"PRO - Jira - Entregables con SLA - Incumplidos.Incumplidos", "Entregables Incumplidos"}}),
+				
+				    #"Merged Queries1" = Table.NestedJoin(#"Renamed Columns1", {"Tipo"}, #"Parametros KGI1-4", {"Tipo de incumplimiento"}, "Parametros KGI1-4", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI1-4" = Table.ExpandTableColumn(#"Merged Queries1", "Parametros KGI1-4", {"Tasa de Desviación Máxima", "Pesos %"}, {"Parametros KGI1-4.Tasa de Desviación Máxima", "Parametros KGI1-4.Pesos %"}),
+				    #"Renamed Columns2" = Table.RenameColumns(#"Expanded Parametros KGI1-4",{{"Parametros KGI1-4.Tasa de Desviación Máxima", "Tasa Máxima %"}, {"Parametros KGI1-4.Pesos %", "Peso %"}}),
+				
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns2", "Puntos KGI14", each 5),
+				    #"Renamed Columns3" = Table.RenameColumns(#"Added Custom",{{"Puntos KGI14", "Puntos de KGI14"}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns3",{{"Puntos de KGI14", Int64.Type}}),
+				    #"Added Custom1" = Table.AddColumn(#"Changed Type1", "KGI", each "KGI1-4")
+				in
+				    #"Added Custom1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

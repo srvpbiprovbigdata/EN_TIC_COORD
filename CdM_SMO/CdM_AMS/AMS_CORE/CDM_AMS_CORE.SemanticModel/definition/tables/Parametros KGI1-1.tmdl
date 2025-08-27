@@ -1,0 +1,57 @@
+table 'Parametros KGI1-1'
+	excludeFromModelRefresh
+	lineageTag: 7046cdfa-6a83-45d4-8b93-9cc5deaae065
+
+	column Prioridad
+		dataType: string
+		lineageTag: a8573ca4-bde8-4983-b103-bd54f4724945
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'T. Resolución Máximo (Jornadas laborales)'
+		dataType: int64
+		formatString: 0
+		lineageTag: 919dcc64-e157-4b6d-b911-29dc0559580d
+		summarizeBy: sum
+		sourceColumn: T. Resolución Máximo (Jornadas laborales)
+
+		annotation SummarizationSetBy = Automatic
+
+	column '% cumplimiento Objetivo'
+		dataType: double
+		lineageTag: 55838515-3a32-4eba-a636-da25e6c93b76
+		summarizeBy: sum
+		sourceColumn: % cumplimiento Objetivo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Pesos %'
+		dataType: double
+		lineageTag: 278d2e16-af58-42a4-9ebf-23a05519d62e
+		summarizeBy: sum
+		sourceColumn: Pesos %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros KGI1-1-efbac5a5-2860-4c30-9a16-04cd7ccd28f6' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(sharepointRoot2 & tablaParametros & xlsx), null, true),
+				    #"Parametros KGI1-1_Sheet" = Origen{[Item="Parametros KGI1-1",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Parametros KGI1-1_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Prioridad", type text}, {"T. Resolución Máximo (Jornadas laborales)", Int64.Type}, {"% cumplimiento Objetivo", type number}, {"Pesos %", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

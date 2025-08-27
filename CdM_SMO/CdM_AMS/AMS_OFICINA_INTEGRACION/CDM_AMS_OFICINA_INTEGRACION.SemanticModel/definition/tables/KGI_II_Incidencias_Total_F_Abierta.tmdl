@@ -1,0 +1,154 @@
+table KGI_II_Incidencias_Total_F_Abierta
+	lineageTag: 8c275a69-99a2-4d45-93d3-eb1a28008628
+
+	column 'Abierto mes'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 71b4a3e4-1563-4217-9054-578e231e33d3
+		summarizeBy: none
+		sourceColumn: Abierto mes
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: 90034a0d-11e5-4400-9de3-c41dbc8b7ca3
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID_KGI_2.3'
+		dataType: string
+		lineageTag: 8274f786-db28-444a-a62e-d97887ea6e37
+		summarizeBy: none
+		sourceColumn: ID_KGI_2.3
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID_KGI_2.4'
+		dataType: string
+		lineageTag: d4ba3985-aed4-48a7-8aa7-b18353dd3891
+		summarizeBy: none
+		sourceColumn: ID_KGI_2.4
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID_KGI_2.5'
+		dataType: string
+		lineageTag: 71a80da3-2eb9-49fc-9d01-3455a53a3a46
+		summarizeBy: none
+		sourceColumn: ID_KGI_2.5
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración acumulada'
+		dataType: double
+		lineageTag: 72c62fd2-9444-4994-9f0f-15a8fb6e2982
+		summarizeBy: sum
+		sourceColumn: Duración acumulada
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Subcategoría
+		dataType: string
+		lineageTag: 18bc8a5b-2b16-48ab-acda-5b945a9652b1
+		summarizeBy: none
+		sourceColumn: Subcategoría
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Prioridad grupo ANS1.3'
+		dataType: string
+		lineageTag: d3435cac-2a87-4349-8e74-c9261c62693c
+		summarizeBy: none
+		sourceColumn: Prioridad grupo ANS1.3
+
+		annotation SummarizationSetBy = Automatic
+
+	column Número
+		dataType: string
+		lineageTag: e6184789-96c3-4385-9985-70a427cfb18d
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de Solución'
+		dataType: string
+		lineageTag: 7fcd1ccc-0e0d-4265-811c-e91b3e6e14b8
+		summarizeBy: none
+		sourceColumn: Tipo de Solución
+
+		annotation SummarizationSetBy = Automatic
+
+	column Infringido_alegaciones
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1ec41f30-40f8-478e-850e-5f2e1d5b98cb
+		summarizeBy: none
+		sourceColumn: Infringido_alegaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Código de cierre'
+		dataType: string
+		lineageTag: 5d2a2f01-cf2d-4d6c-ba31-cb2e657a3097
+		summarizeBy: none
+		sourceColumn: Código de cierre
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Elemento de configuración'
+		dataType: string
+		lineageTag: 31ac4471-b9dd-47ee-85ff-97a022cd631d
+		summarizeBy: none
+		sourceColumn: Elemento de configuración
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierto por'
+		dataType: string
+		lineageTag: 1a33f58c-9636-4a51-8185-daad22a94019
+		summarizeBy: none
+		sourceColumn: Abierto por
+
+		annotation SummarizationSetBy = Automatic
+
+	column Alegaciones
+		dataType: string
+		lineageTag: 2397814b-adeb-4273-a24c-6dea6c85ecd6
+		summarizeBy: none
+		sourceColumn: Alegaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	partition KGI_II_Incidencias_Total_F_Abierta-5205b14a-08f1-455e-880f-2e6ea19c8942 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source = ```
+				let
+				    Origen = KGI_II_Incidencias_Total,
+				    ID_KGI_2.3 = Table.AddColumn(Origen, "ID_KGI_2.3", each "2-3-3-0"),
+				    ID_KGI_2.4 = Table.AddColumn(ID_KGI_2.3, 
+				                 "ID_KGI_2.4", 
+				                 each if [Prioridad] = "1 - Crítica" then "2-4-3-1" 
+				                      else if [Prioridad] = "2 - Alta" then "2-4-3-2" 
+				                      else null, 
+				                type text),
+				    #"Filas agrupadas" = Table.Group(ID_KGI_2.4, {"Número","Abierto mes", "Subcategoría","Prioridad grupo ANS1.3","Elemento de configuración","Infringido_alegaciones","Código de cierre","Tipo de Solución","ID_KGI_2.3", "ID_KGI_2.4", "ID_KGI_2.5", "Alegaciones", "Abierto por"}, {{"Recuento", each Table.RowCount(_), Int64.Type}, {"Duración acumulada", each List.Sum([Duración del negocio]), type nullable number}})
+				in
+				    #"Filas agrupadas"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

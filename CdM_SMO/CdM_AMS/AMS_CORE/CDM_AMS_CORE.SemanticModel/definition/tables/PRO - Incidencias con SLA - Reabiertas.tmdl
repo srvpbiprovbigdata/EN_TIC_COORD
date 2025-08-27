@@ -1,0 +1,56 @@
+table 'PRO - Incidencias con SLA - Reabiertas'
+	lineageTag: bf13a27c-df55-41a6-9d0c-aaf0113123cf
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0dba6938-e937-45b1-aa3f-ad45d4730e94
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: 1bccabf6-2ae0-4d75-8bbc-0c7a57e3e2b6
+			defaultHierarchy: LocalDateTable_c8a922c2-e840-43de-ac9d-ac1315bf27b0.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Reabierta
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a04466ac-7caa-490c-bf5c-4622e3ea6cf8
+		summarizeBy: none
+		sourceColumn: Reabierta
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Reabiertas'
+		dataType: double
+		lineageTag: babd2956-fd9d-4592-be6b-a6690a1f8440
+		summarizeBy: sum
+		sourceColumn: INCs Reabiertas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'PRO - Incidencias con SLA - Reabiertas-c7aaf3f5-587a-428e-acb3-1c83def8b4c3' = m
+		mode: import
+		queryGroup: KGIs_II
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA (NY y MAD) KGI22",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Cerrado - Copy", "Reabierta"}, {{"INCs Reabiertas", each Table.RowCount(_), type number}}),    
+				    #"Filtered Rows" = Table.SelectRows(#"Grouped Rows", each ([#"Cerrado - Copy"] <> null) and ([Reabierta] = true))
+				
+				in
+				    #"Filtered Rows"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

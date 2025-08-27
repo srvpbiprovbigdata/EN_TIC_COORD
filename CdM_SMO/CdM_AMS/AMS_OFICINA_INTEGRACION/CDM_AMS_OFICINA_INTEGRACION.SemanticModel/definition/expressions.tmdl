@@ -1,0 +1,1238 @@
+expression servicio = "OFICINA_INTEGRACION" meta [IsParameterQuery=true, List={"ServiceNow", "BI", "SNOW", "OFICINA_INTEGRACION"}, DefaultValue="OFICINA_INTEGRACION", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: fe0f8cda-6332-4ce1-96c8-17c7e0039d20
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_ResultType = Text
+
+expression FF = #date(2025, 4, 30) meta [IsParameterQuery=true, Type="Date", IsParameterQueryRequired=true]
+	lineageTag: 83de06a9-814a-4e0f-908c-8c819967f84e
+	queryGroup: 'Parámetros / Listas\Param. Temporales'
+
+	annotation PBI_ResultType = Date
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression KGI_II_Incidencias =
+		let
+		    Origen = KGI_II_Incidencias_Actuales_Histórico,
+		    #"Filas filtradas" = Table.SelectRows(Origen, let latest = List.Max(Origen[Extracción]) in each [Extracción] = latest),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Filas filtradas",{{"Número", type text}, {"Breve descripción", type text}, {"Subcategoría", type text}, {"Prioridad", type text}, {"Abierto", type datetime}, {"Cerrado", type datetime}, {"Resuelto", type datetime}, {"Duración", Int64.Type}, {"Duración del negocio", Int64.Type}, {"Infringido", type logical}, {"Tiempo original de incumplimiento", type number}, {"Estado de la incidencia", type text}, {"Etapa", type text}, {"Código de resolución", type text}, {"Volver a abrir recuento", Int64.Type}, {"Tipo de Solución", type text}, {"Duración_1", Int64.Type}, {"Porcentaje de negocio trascurrido", type number}}),
+		    #"Consultas combinadas" = Table.NestedJoin(#"Tipo cambiado", {"Número"}, Incidencias_Relacionadas, {"Incidente"}, "Incidencias_Relacionadas", JoinKind.LeftOuter),
+		    #"Se expandió Incidencias_Relacionadas" = Table.ExpandTableColumn(#"Consultas combinadas", "Incidencias_Relacionadas", {"Tarea"}, {"Incidencias_Relacionadas.Tarea"}),
+		    #"Columnas combinadas" = Table.CombineColumns(#"Se expandió Incidencias_Relacionadas",{"ID de correlación", "Principal", "Incidencias_Relacionadas.Tarea"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"Principal")
+		in
+		    #"Columnas combinadas"
+	lineageTag: 547e15ed-9684-41b6-8e67-ab9238aa2ad1
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression KGI_II_Incidencias_Previas =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & incidenciasHistFolder & folder_fileStartPath & incidenciasPrev & ".xlsx"), null, true),
+		    #"Page 1_Sheet" = Origen{[Name="Page 1"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Filas en blanco eliminadas" = Table.SelectRows(#"Encabezados promovidos", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Filas en blanco eliminadas",{{"Abierto", type datetime}, {"Cerrado", type datetime}, {"Resuelto", type datetime}}),
+		    Personalizado1 = Table.AddColumn(#"Tipo cambiado", "Extracción", each "01/06/2021",type date),
+		    #"Personalizada agregada" = Table.AddColumn(Personalizado1, "Infringido", each false),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Personalizada agregada",{{"Extracción", type date}})
+		in
+		    #"Tipo cambiado1"
+	lineageTag: 9767d264-1ff2-4256-94be-4a01c719b1b8
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression KGI_I_ST_Excecutions_Jira = ```
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & jira & xlsx) , null, true),
+		    #"ST Excecutions_Sheet" = Origen{[Name="ST_Executions"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"ST Excecutions_Sheet", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Created", type datetime}, {"Resolved", type datetime}}),
+		    #"Separación Linked-Issues" = Table.SplitColumn(#"Tipo cambiado", "Linked Issues", Splitter.SplitTextByDelimiter(";", QuoteStyle.Csv), {
+		        "Linked Issues.1",
+		        "Linked Issues.2",
+		        "Linked Issues.3",
+		        "Linked Issues.4",
+		        "Linked Issues.5",        
+		        "Linked Issues.6",        
+		        "Linked Issues.7",        
+		        "Linked Issues.8",       
+		        "Linked Issues.9",
+		        "Linked Issues.10"        
+		        }),
+		    #"Columna de anulación de dinamización" = Table.UnpivotOtherColumns(#"Separación Linked-Issues", {"Components", "Project", "Issue Type", "Key", "Summary", "Assignee", "Reporter", "Priority", "Status", "Created", "Sub-tasks", "Tipo de prueba", "Resolved"}, "Atributo", "Valor")
+		in
+		    #"Columna de anulación de dinamización"
+		```
+	lineageTag: d6541234-5607-454a-b59b-1aa19c9ebe33
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'KGI_I_Planificaciones MEJ' = ```
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & ENH & xlsx), null, true),
+		    #"Page 1_Sheet" = Origen{[Name="Page 1"]}[Data],
+		    #"Promoted Headers" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Demanda", type text}, {"Mejora", type text}, {"Aplicación de Negocio", type text}, {"Prioridad", type text}, {"Abierto por", type text}, {"Grupo de asignación", type text}, {"Fecha de inicio planificada", type datetime}, {"Fecha fin planificada", type datetime}, {"Principal", type text}, {"Fecha Inicio Estimada", type datetime}, {"Fecha Fin Estimada", type datetime}, {"Fecha de inicio real", type datetime}, {"Fecha fin real", type datetime}, {"Porcentaje completado", Int64.Type}, {"Duración planificada", Int64.Type}, {"Duración real", Int64.Type}, {"Breve descripción", type text}}),
+		    
+		    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Mejora", "Número"},
+		        //{"Nombre de subtarea",      "Tipo de Proyecto"},  
+		        {"Abierto por",             "Jefe de proyecto (Project Manager)"},
+		        {"Fecha Fin Estimada",             "Fin"},  
+		        //{"Grupo de asignación",     "Aplicación de Negocio "}, 
+		        {"Principal",               "Nombre"}, 
+		        {"Fecha Inicio Estimada",   "Inicio"}, 
+		        {"Breve descripción",       "Nombre de PRJ o MEJ"}}),
+		    
+		    #"Replaced Value2" = Table.ReplaceValue(#"Renamed Columns" , null, "",Replacer.ReplaceValue,{"Nombre"}),
+		    #"Tipo de proyecto añadido" = Table.AddColumn(#"Replaced Value2", "Tipo de Proyecto", each "Mejora")
+		in
+		    #"Tipo de proyecto añadido"
+		```
+	lineageTag: 5880c090-e518-4d18-984a-ab1f48fd0a22
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'KGI_I_Planificaciones EVO' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & EVO & xlsx), null, true),
+		    #"Page 1_Sheet" = Origen{[Name="Page 1"]}[Data],
+		    #"Promoted Headers" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Promoted Headers",{{"Fecha de finalización derivada de", "Fecha final derivada de"}}),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{{"Número", type text}, {"Número_1", type text}, {"Tipo de Proyecto", type text}, {"Prioridad", type text}, {"Jefe de proyecto (Project Manager)", type text}, {"Aplicación de Negocio ", type text}, {"Fecha de inicio planificada", type datetime}, {"Fecha fin planificada", type datetime}, {"Nombre de subtarea", type text}, {"Fecha de inicio derivada de", type datetime}, {"Fecha final derivada de", type datetime}, {"Fecha de inicio real", type datetime}, {"Fecha fin real", type datetime}, {"Porcentaje completado", Int64.Type}, {"Duración planificada", Int64.Type}, {"Duración real", Int64.Type}, {"Breve descripción", type text}}),
+		
+		    //Homologa cabeceras para realizar posterior Append con PRJs
+		    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Número", "Demanda"}, {"Número_1", "Número"}, {"Nombre de subtarea", "Nombre"}, {"Fecha de inicio derivada de", "Inicio"}, {"Fecha final derivada de", "Fin"}, {"Breve descripción", "Nombre de PRJ o MEJ"}, {"Aplicación de Negocio ", "Aplicación de Negocio"}})
+		
+		in
+		    #"Renamed Columns"
+	lineageTag: 242e0ac3-d3f7-4dec-8137-089beaa59758
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression KGI_I_Stories_Jira =
+		let
+		    URL = globalPath & jira & xlsx,
+		    Origen = Excel.Workbook(Web.Contents(URL), null, true),
+		    Stories_Sheet = Origen{[Name="Stories"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(Stories_Sheet, [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Resolved", type datetime}, {"Created", type datetime}}),
+		    #"Inicio de mes Resolved" = Table.AddColumn(#"Tipo cambiado", "Resolved mes", each Date.StartOfMonth([Resolved]), type datetime),
+		    #"Filas en blanco eliminadas" = Table.SelectRows(#"Inicio de mes Resolved", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null})))
+		in
+		    #"Filas en blanco eliminadas"
+	lineageTag: a9a7c849-9393-4df3-993c-78c3a3a9c570
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression Fechas_vacias =
+		let
+		    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMjDUByIjQwMDpdhYAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Date = _t]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Date", type date}})
+		in
+		    #"Tipo cambiado"
+	lineageTag: 46b944fa-53ed-4e9a-90de-9cdb973953a9
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression KGI_II_Incidencias_Estado_Abierto =
+		let
+		    Origen = Table.Combine({KGI_II_Incidencias, KGI_II_Incidencias_Previas}),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each true),
+		    #"Columnas renombradas" = Table.RenameColumns(#"Filas filtradas",{{"Volver a abrir recuento", "Reabierta"},  {"Código de resolución", "Código de cierre"}, {"Duración_1", "Duración SLA"}, /*{"Duración del negocio", "Duración real"},*/ {"Etapa", "Estado SLA"}, {"Resuelto", "Fecha de resolución"}}),
+		    #"Inicio del mes insertado" = Table.AddColumn(#"Columnas renombradas", "Inicio del mes", each Date.StartOfMonth([Abierto]), type datetime),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Inicio del mes insertado",{{"Inicio del mes", "Abierto mes"}}),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{{"Abierto mes", type date}, {"Reabierta", Int16.Type}, {"Duración del negocio", Int64.Type}, {"Infringido", Logical.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado",null,#date(2100, 1, 1),Replacer.ReplaceValue,{"Cerrado"}),
+		    #"Inicio del mes insertado1" = Table.AddColumn(#"Valor reemplazado", "Inicio del mes", each Date.StartOfMonth([Cerrado]), type datetime),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Inicio del mes insertado1",{{"Inicio del mes", "Cerrado mes"}}),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Columnas con nombre cambiado1",{{"Cerrado mes", type date},{"Cerrado", type date},{"Abierto", type date}}),
+		     #"Transforma Porcentaje negocio" = Table.TransformColumns(#"Valor reemplazado", {{"Porcentaje de negocio trascurrido", each _ / 100, Percentage.Type}}),
+		    #"Columna condicional agregada" = Table.AddColumn(#"Transforma Porcentaje negocio", "Prioridad grupo ANS1.3", each if [Prioridad] = "1 - Crítica" then "Crítica" else if [Prioridad] = "2 - Alta" then "Alta" else if [Prioridad] = "3 - Moderada" then "Media" else "Baja", type text),
+		    #"Columna condicional agregada1" = Table.AddColumn(#"Columna condicional agregada", "Estado_abierta", each if Date.Month([Cerrado]) > Date.Month([Abierto]) or Date.Year([Cerrado]) > Date.Year([Abierto]) then true else false),
+		    #"Cerrado mes" = Table.AddColumn(#"Columna condicional agregada1", "Cerrado mes", each Date.StartOfMonth([Cerrado]), type date),
+		    #"Otras columnas quitadas" = Table.SelectColumns(#"Cerrado mes",{"Número", "Abierto", "Abierto mes", "Cerrado", "Cerrado mes", "Prioridad grupo ANS1.3", "Subcategoría","Duración del negocio", "Estado_abierta"}),
+		    #"Filas filtradas1" = Table.SelectRows(#"Otras columnas quitadas", each ([Estado_abierta] = true)),
+		    #"Columna condicional agregada2" = Table.AddColumn(#"Filas filtradas1", "Lista_meses", each if [Estado_abierta] = true then #"Abierto mes" else null),
+		    #"Valores extraídos" = Table.TransformColumns(#"Columna condicional agregada2", {"Lista_meses", each Text.Combine(List.Transform(_, Text.From), ","), type text}),
+		    #"Dividir columna por delimitador" = Table.ExpandListColumn(Table.TransformColumns(#"Valores extraídos", {{"Lista_meses", Splitter.SplitTextByDelimiter(",", QuoteStyle.None), let itemType = (type nullable text) meta [Serialized.Text = true] in type {itemType}}}), "Lista_meses"),
+		    #"Tipo cambiado3" = Table.TransformColumnTypes(#"Dividir columna por delimitador",{{"Lista_meses", type date},{"Cerrado mes", type date}}),
+		    #"Columna condicional agregada3" = Table.AddColumn(#"Tipo cambiado3", "Activos por mes", each if [Lista_meses] >= [Abierto mes] and [Lista_meses] < [Cerrado mes]  then true else null),
+		    #"Filas filtradas2" = Table.SelectRows(#"Columna condicional agregada3", each ([Activos por mes] = true))
+		in
+		    #"Filas filtradas2"
+	lineageTag: 267257f5-db4b-4c10-a660-8e1fdd0719c1
+	queryGroup: 'Tablas Modelo'
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression sharepointRoot = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRE/Documentos compartidos/AMS_" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: ee8f758b-6e9d-431f-a952-5686f2b898d4
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression folderProvClien = "Ficheros Proveedor_Cliente/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b3d5d73a-a0a3-4c09-a806-150445cae1cd
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_ResultType = Text
+
+expression estimaciones = "S2_Estimaciones" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 300b45f7-4faa-414f-9066-74dc839d8808
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression jira = "S1_S2_Entregables, Pruebas y Defectos" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 9ce8e884-80d7-4977-90fd-cdf678cd7013
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression alegaciones = "Control de alegaciones" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 124c6601-482e-4019-b24b-5d6ec4b2efab
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression mejorasPropuestas = "S1_Mejoras propuestas" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 6b873331-7633-4fda-82e4-a2a1df9279a2
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression ENH = "S2_Planificaciones de MEJs" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 984e3951-5771-46b5-b4e8-45424898838e
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression EVO = "S2_Planificaciones de EVOs" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: a6e707b4-8c8b-42d2-b5f4-007243b1b828
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression PRJ = "S1_Planificaciones de PRJs" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 089bf201-7dac-48f1-8130-067777837d3e
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression incidenciasHistFolder = "S4_Incidencias_Histórico/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 53e091af-5ec5-44b5-9218-2d99cf0250b8
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_ResultType = Text
+
+expression incidenciasPrev = "S4_Incidencias_Previas" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: fe7979aa-5a5b-4a52-9c5e-1e286bd8008f
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression peticiones = "S3_Peticiones" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: c45a909f-af65-4edf-ba9e-c7a54abf78ea
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression encuestas = "S3_Encuestas" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 56ce0409-c638-4c85-9d33-9fe89e522fd4
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression tablaParametros = "Parámetros_KGIs" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 1e37e094-e8dd-4685-98db-8430b0205a76
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Exception
+
+expression componentesPath = "/Documentos compartidos/CdM_SMO/CdM_AMS/Archivos comunes/02. Jira/JQL" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 7b85160c-ee06-469b-9397-5be8f36ad16d
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression KGI_II_Incidencias_Actuales_Histórico =
+		let
+		/*
+		try
+		     SharePoint.Files(sharepointFolder, [ApiVersion = 15])
+		  otherwise
+		     Folder.Files(sharepointFolder)*/
+		     URL = sharepointSource & Entorno,
+		    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Folder Path] = globalPath & incidenciasHistFolder) and not (Text.Contains([Name],"Previas")) and not (Text.Contains([Name],"Relacionadas"))),
+		    #"Archivos ocultos filtrados1" = Table.SelectRows(#"Filas filtradas", each [Attributes]?[Hidden]? <> true),
+		    #"Invocar función personalizada1" = Table.AddColumn(#"Archivos ocultos filtrados1", "Transformar archivo (2)", each #"Transformar archivo (2)"([Content])),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Invocar función personalizada1", {"Name", "Source.Name"}),
+		    #"Otras columnas quitadas1" = Table.SelectColumns(#"Columnas con nombre cambiado1", {"Source.Name", "Transformar archivo (2)"}),
+		    #"Se expandió Transformar archivo (2)" = Table.ExpandTableColumn(#"Otras columnas quitadas1", "Transformar archivo (2)", {"Número", "Breve descripción", "Subcategoría", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Elemento de configuración", "Abierto por"}, {"Número", "Breve descripción", "Subcategoría", "Prioridad", "Abierta", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Elemento de configuración", "Abierto por"}),
+		    #"Filas filtradas1" = Table.SelectRows(#"Se expandió Transformar archivo (2)", each ([Número] <> null)),
+		    #"Abierta - Abierto" = Table.RenameColumns(#"Filas filtradas1",{{"Abierta", "Abierto"}}),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Abierta - Abierto",{{"Source.Name", type text}, {"Número", type text}, {"Breve descripción", type text}, {"Subcategoría", type text}, {"Prioridad", type text}, {"Abierto", type datetime}, {"Cerrado", type datetime}, {"Resuelto", type any}, {"Duración", Int64.Type}, {"Duración del negocio", Int64.Type}, {"Infringido", type logical}, {"Tiempo original de incumplimiento", type datetime}, {"Estado de la incidencia", type text}, {"Etapa", type text}, {"Código de resolución", type text}, {"Volver a abrir recuento", Int64.Type}, {"Tipo de Solución", type text}, {"Duración_1", Int64.Type}, {"Porcentaje de negocio trascurrido", type number}, {"ID de correlación", type any}, {"Principal", type text}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Source.Name", "Extracción"}}),
+		    #"Últimos caracteres extraídos" = Table.TransformColumns(#"Columnas con nombre cambiado", {{"Extracción", each Text.Start(Text.End(_, 11),6), type text}}),
+		    #"Rango de texto extraído" = Table.TransformColumns(#"Últimos caracteres extraídos", {{"Extracción", each "01/" & Text.Middle(_, 4, 2) & "/" & Text.Start(_, 4), type date}}),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Rango de texto extraído",{{"Extracción", type date}})
+		in
+		    #"Tipo cambiado1"
+		
+		
+		/*
+		let
+		    Origen = SharePoint.Files(Sharepoint_folder, [ApiVersion = 15]),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Folder Path] = Sharepoint_path1 & Servicio & Sharepoint_path_Incidencias)),
+		    #"Archivos ocultos filtrados1" = Table.SelectRows(#"Filas filtradas", each [Attributes]?[Hidden]? <> true),
+		    #"Invocar función personalizada1" = Table.AddColumn(#"Archivos ocultos filtrados1", "Transformar archivo (2)", each #"Transformar archivo (2)"([Content])),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Invocar función personalizada1", {"Name", "Source.Name"}),
+		    #"Otras columnas quitadas1" = Table.SelectColumns(#"Columnas con nombre cambiado1", {"Source.Name", "Transformar archivo (2)"}),
+		    #"Se expandió Transformar archivo (2)" = Table.ExpandTableColumn(#"Otras columnas quitadas1", "Transformar archivo (2)", {"Número", "Breve descripción", "Subcategoría", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal"}, {"Número", "Breve descripción", "Subcategoría", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal"}),
+		    #"Filas filtradas1" = Table.SelectRows(#"Se expandió Transformar archivo (2)", each ([Número] <> null)),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Filas filtradas1",{{"Source.Name", type text}, {"Número", type text}, {"Breve descripción", type text}, {"Subcategoría", type text}, {"Prioridad", type text}, {"Abierto", type datetime}, {"Cerrado", type datetime}, {"Resuelto", type any}, {"Duración", Int64.Type}, {"Duración del negocio", Int64.Type}, {"Infringido", type logical}, {"Tiempo original de incumplimiento", type datetime}, {"Estado de la incidencia", type text}, {"Etapa", type text}, {"Código de resolución", type text}, {"Volver a abrir recuento", Int64.Type}, {"Tipo de Solución", type text}, {"Duración_1", Int64.Type}, {"Porcentaje de negocio trascurrido", type number}, {"ID de correlación", type any}, {"Principal", type text}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Source.Name", "Extracción"}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas con nombre cambiado","AMS_SNOW_CDM_S4_Incidencias_","",Replacer.ReplaceText,{"Extracción"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado",".xlsx","",Replacer.ReplaceText,{"Extracción"}),
+		    #"Rango de texto extraído" = Table.TransformColumns(#"Valor reemplazado1", {{"Extracción", each "01/" & Text.Middle(_, 4, 2) & "/" & Text.Start(_, 4), type date}})
+		in
+		    #"Rango de texto extraído"
+		*/
+	lineageTag: cca3dae1-d035-4eb9-acf6-0ac6ee0917c0
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression sharepointFolder = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRE" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: fe59ea4d-3a19-4ae0-8873-fe97076768f6
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression Parámetro2 = KGI_II_Incidencias_Backlog meta [IsParameterQuery=true, BinaryIdentifier=#"Archivo de ejemplo (2)", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: 91a799d2-a963-405b-8a49-8e9b4900e0bd
+	queryGroup: 'Merge ficheros Incidencias Actuales\Consultas auxiliares'
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'Transformar archivo de ejemplo (2)' =
+		let
+		    Origen = Excel.Workbook(Parámetro2, null, true),
+		    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true])
+		in
+		    #"Encabezados promovidos"
+	lineageTag: 648cf98c-74e6-4801-88c3-76bd89671dcd
+	queryGroup: 'Merge ficheros Incidencias Actuales'
+
+	annotation PBI_ResultType = Table
+
+expression 'Archivo de ejemplo (2)' =
+		let
+		    URL = sharepointSource & Entorno,
+		    URLCompleta = URL & "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_OFICINA_INTEGRACION/Ficheros del Servicio/AMS_OFICINA_INTEGRACION_CDM_S4_Incidencias_Histórico/",
+		    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Folder Path] = URLCompleta)),
+		    #"Filas filtradas1" = Table.SelectRows(#"Filas filtradas", each not Text.Contains([Name], "Relacionadas") and not Text.Contains([Name], "Previas")),
+		    Navegación1 = #"Filas filtradas1"{0}[Content]
+		in
+		    Navegación1
+	lineageTag: db715d00-dbda-424e-96a4-739b095fc0ec
+	queryGroup: 'Merge ficheros Incidencias Actuales\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'Transformar archivo (2)' =
+		let
+		    Origen = (Parámetro2 as binary) => let
+		    Origen = Excel.Workbook(Parámetro2, null, true),
+		    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true])
+		in
+		    #"Encabezados promovidos"
+		in
+		    Origen
+	lineageTag: af441baf-3e67-4bed-810d-9a63b25cfe30
+	queryGroup: 'Merge ficheros Incidencias Actuales\Consultas auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression xlsx = ".xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 79c3c21d-45ee-444b-90d7-02db3656cae1
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_ResultType = Text
+
+expression lineaBase = "/Documentos compartidos/CdM_SMO/CdM_AMS/Archivos comunes/03. Línea Base Energía/Maestro CDM Integral TIC_2.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: a5cf1212-1a1c-44d9-8e46-b693d9c2e82d
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+/// Mes de comienzo del contrato.
+expression StartofFiscalYear = 5 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 84d35138-5d86-4828-aa4a-cee67dd40946
+	queryGroup: 'Parámetros / Listas\Param. Temporales'
+
+	annotation PBI_ResultType = Number
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression peticionesHistFolder = "S3_Peticiones_Histórico/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 0fc62be5-19e4-4339-8067-1b83b4fb8699
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression KGI_III_Peticiones_Actuales_Histórico =
+		let
+		    URL = sharepointSource & Entorno,
+		    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+		/*
+		try
+		     SharePoint.Files(sharepointFolder, [ApiVersion = 15])
+		  otherwise
+		     Folder.Files(sharepointFolder)*/
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Folder Path] = globalPath & peticionesHistFolder)),
+		    #"Archivos ocultos filtrados1" = Table.SelectRows(#"Filas filtradas", each [Attributes]?[Hidden]? <> true),
+		    #"Invocar función personalizada1" = Table.AddColumn(#"Archivos ocultos filtrados1", "Transformar archivo (2)", each #"Transformar archivo (2)"([Content])),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Invocar función personalizada1", {"Name", "Source.Name"}),
+		    #"Otras columnas quitadas1" = Table.SelectColumns(#"Columnas con nombre cambiado1", {"Source.Name", "Transformar archivo (2)"}),
+		    #"Se expandió Transformar archivo (2)" = Table.ExpandTableColumn(#"Otras columnas quitadas1", "Transformar archivo (2)", {"Elemento de solicitud", "Número", "Nombre", "Prioridad", "Abierto", "Cerrado", "Hora de inicio", "Hora de finalización", "Duración real", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado", "Etapa", "Número de reasignación", "Porcentaje de negocio trascurrido", "Duración", "Abierto por","Definición de SLA"}, {"Solicitar elemento", "Número", "Nombre", "Prioridad", "Abierta", "Cerrado", "Hora de inicio", "Hora de finalización", "Duración real", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado", "Etapa", "Número de reasignación", "Porcentaje de negocio trascurrido", "Duración", "Abierto por","Definición de SLA"}),
+		    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Se expandió Transformar archivo (2)",{{"Abierta", "Abierto"}}),
+		    #"Filas filtradas1" = Table.SelectRows(#"Columnas con nombre cambiado2", each ([Número] <> null)),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Filas filtradas1",{{"Source.Name", "Extracción"}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas con nombre cambiado","AMS_" & servicio & "_CDM_S3_Peticiones_","",Replacer.ReplaceText,{"Extracción"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado",".xlsx","",Replacer.ReplaceText,{"Extracción"}),
+		    #"Rango de texto extraído" = Table.TransformColumns(#"Valor reemplazado1", {{"Extracción", each "01/" & Text.Middle(_, 4, 2) & "/" & Text.Start(_, 4), type date}}),
+		    #"Valor reemplazado2" = Table.ReplaceValue(#"Rango de texto extraído","","En blanco",Replacer.ReplaceValue,{"Nombre"}),
+		    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2",null,"En blanco",Replacer.ReplaceValue,{"Nombre"}),
+		    #"Filas filtradas2" = Table.SelectRows(#"Valor reemplazado3", each ([Extracción] <> "01/OF/AMS_")),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Filas filtradas2",{{"Extracción", type date}})
+		in
+		    #"Tipo cambiado"
+	lineageTag: 113a9c83-3680-4c74-9fe6-908df32480b6
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression KGI_II_Incidencias_Backlog_bk = ```
+		let
+		    Origen = Table.Combine({KGI_II_Incidencias_Actuales_Histórico, KGI_II_Incidencias_Previas}),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Número] <> null)),
+		    #"Filas en blanco eliminadas" = Table.SelectRows(#"Filas filtradas", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+		    #"Columnas combinadas" = Table.CombineColumns(Table.TransformColumnTypes(#"Filas en blanco eliminadas", {{"Estado", type text}}, "es-ES"),{"Estado", "Estado de la incidencia"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"Estado"),
+		    #"Columnas renombradas" = Table.RenameColumns(#"Columnas combinadas",{{"Volver a abrir recuento", "Reabierta"}, {"Código de resolución", "Código de cierre"}, {"Duración_1", "Duración SLA"}, /*{"Duración del negocio", "Duración real"},*/ {"Etapa", "Estado SLA"}, {"Resuelto", "Fecha de resolución"}}),
+		    #"Columna combinada insertada" = Table.AddColumn(#"Columnas renombradas", "Combinada", each Text.Combine({[Número], "$", [Subcategoría], "$", [Principal]}), type text),
+		    #"Inicio del mes insertado" = Table.AddColumn(#"Columna combinada insertada", "Inicio del mes", each Date.StartOfMonth([Abierto]), type datetime),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Inicio del mes insertado",{{"Inicio del mes", "Abierto mes"}}),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{{"Abierto mes", type date}, {"Reabierta", Int16.Type}, {"Duración del negocio", Int64.Type}, {"Infringido", Logical.Type}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado",null,#date(2100, 1, 1),Replacer.ReplaceValue,{"Cerrado"}),
+		    #"Transforma Porcentaje negocio" = Table.TransformColumns(#"Valor reemplazado", {{"Porcentaje de negocio trascurrido", each _ / 100, Percentage.Type}}),
+		    #"Inicio del mes insertado1" = Table.AddColumn(#"Transforma Porcentaje negocio", "Inicio del mes", each Date.StartOfMonth([Cerrado]), type datetime),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Inicio del mes insertado1",{{"Inicio del mes", "Cerrado mes"}}),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Columnas con nombre cambiado1",{{"Cerrado mes", type date},{"Cerrado", type date},{"Abierto", type date}}),
+		    #"Columna condicional agregada" = Table.AddColumn(#"Tipo cambiado1", "Prioridad grupo ANS1.3", each if [Prioridad] = "1 - Crítica" then "Crítica" else if [Prioridad] = "2 - Alta" then "Alta" else if [Prioridad] = "3 - Moderada" then "Media" else "Baja", type text),
+		    ID_KGI_2.1 = Table.AddColumn(#"Columna condicional agregada", 
+		                 "ID_KGI2.1", 
+		                 each if [Prioridad] = "1 - Crítica" then "2-1-4-1" 
+		                      else if [Prioridad] = "2 - Alta" then "2-1-4-2" 
+		                      else if [Prioridad] = "3 - Moderada" then "2-1-4-3" 
+		                      else if [Prioridad] = "4 - Baja" then "2-1-4-4"
+		                      else if [Prioridad] = "5 - Muy Baja" then "2-1-4-4" 
+		                      else null, 
+		                type text),
+		    ID_KGI_2.5 = Table.AddColumn(ID_KGI_2.1, "ID_KGI_2.5", each Text.Replace([ID_KGI2.1], "2-1", "2-5"), type text),
+		/*    ID_KGI_3.2 = Table.AddColumn(#"ID_KGI_2.5", 
+		                 "ID_KGI3.2", 
+		                 each if [SLA_III_Peticiones.Prioridad] = "1 - Crítica" then "3-2-3-1" 
+		                      else if [SLA_III_Peticiones.Prioridad] = "2 - Alta" then "3-2-3-2" 
+		                      else if [SLA_III_Peticiones.Prioridad] = "3 - Moderada" then "3-2-3-2" 
+		                      else if [SLA_III_Peticiones.Prioridad] = "4 - Baja" then "3-2-3-3"
+		                      else if [SLA_III_Peticiones.Prioridad] = "5 - Muy Baja" then "3-2-3-3" 
+		                      else null, 
+		                type text),
+		*/
+		    #"Consultas combinadas2" = Table.NestedJoin(ID_KGI_2.5, {"Número"}, T_Alegaciones, {"ID"}, "T_Alegaciones", JoinKind.LeftOuter),
+		    #"Se expandió T_Alegaciones" = Table.ExpandTableColumn(#"Consultas combinadas2", "T_Alegaciones", {"ID Alegación", "ANS", "Estado", "Solicitante"}, {"T_Alegaciones.ID Alegación", "T_Alegaciones.ANS", "T_Alegaciones.Estado", "T_Alegaciones.Solicitante"}),
+		    #"Infringido con alegaciones" = Table.AddColumn(#"Se expandió T_Alegaciones", "Alegación_aceptada", each if /*[Infringido] = true and*/ [T_Alegaciones.Estado] = "1 - Aprobada" and [T_Alegaciones.ANS] = "KGI 2-5" then true else false, Logical.Type),
+		    #"Columna condicional agregada4" = Table.AddColumn(#"Infringido con alegaciones", "Estado_abierta", each if Date.Month([Cerrado]) > Date.Month([Abierto]) or Date.Year([Cerrado]) > Date.Year([Abierto]) then true else false),
+		    #"Otras columnas quitadas" = Table.SelectColumns(#"Columna condicional agregada4",{"Número", "Abierto", "Abierto mes", "Cerrado", "Cerrado mes", "Prioridad grupo ANS1.3", "Subcategoría","Duración del negocio", "Porcentaje de negocio trascurrido", "ID_KGI_2.5", "Extracción", "Estado_abierta","Alegación_aceptada"}),
+		    #"Filas filtradas1" = Table.SelectRows(#"Otras columnas quitadas", each ([Estado_abierta] = true)),
+		    #"Columna condicional agregada2" = Table.AddColumn(#"Filas filtradas1", "Lista_meses", each if [Estado_abierta] = true then #"Abierto mes" else null),
+		    #"Valores extraídos" = Table.TransformColumns(#"Columna condicional agregada2", {"Lista_meses", each Text.Combine(List.Transform(_, Text.From), ","), type text})
+		in
+		    #"Valores extraídos"
+		```
+	lineageTag: d7a85a8a-08d5-42e4-bb00-0cec74e2f116
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression ficherosServicio = "/Ficheros del Servicio/" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: e8735cd8-c672-4976-b73b-af3669d117cf
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression peticionesInfoAdic = "S3_Peticiones Información Adicional" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 9b8c00ef-ba5d-4815-b0cf-41f49e027ea9
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression globalPath =
+		let
+		    Origen = sharepointSource & Entorno & sharepointSource2 & folder_fileStartPath
+		in
+		    Origen
+	lineageTag: 839b3fed-2a3b-490f-921a-9479af0a3148
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression folder_fileStartPath =
+		let
+		    Origen = "AMS_" & servicio & "_CDM_"
+		in
+		    Origen
+	lineageTag: c65b8d19-0194-46de-9329-340846214693
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression 'T_Alegaciones (stagging)' =
+		let
+		    Origen = #"T_Alegaciones (doublestagging)",
+		    #"Filas en blanco eliminadas" = Table.SelectRows(#"T_Alegaciones (doublestagging)", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Filas en blanco eliminadas",{{"KGI", "ANS"}}),
+		    #"Consulta anexada" = Table.Combine({#"Columnas con nombre cambiado", #"Control alegaciones_new"}),
+		    #"Columna condicional agregada" = Table.AddColumn(#"Consulta anexada", "Alegacion_aceptada", each if [Estado] = "1 - Aprobada" then [ANS] else null)
+		in
+		    #"Columna condicional agregada"
+	lineageTag: 3bb77b98-9432-40d0-b217-c26c26c5443c
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression incrementalesProvClien =
+		let
+		    Origen = sharepointSource & Entorno & sharepointSource2 & folder_fileStartPath & folderProvClien & folder_fileStartPath
+		in
+		    Origen
+	lineageTag: 6d8160dd-3019-4b3c-ae23-99247452587a
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression 'KGI_I_Planificaciones PRJ' =
+		let
+		    Source = Excel.Workbook(Web.Contents(globalPath & PRJ & xlsx), null, true),
+		    #"Page 1_Sheet" = Source{[Name="Page 1"]}[Data]
+		
+		in
+		    #"Page 1_Sheet"
+	lineageTag: 0322edcd-cebf-4e7e-b2de-3a2591291877
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'KGI_I_Tests_Jira (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & jira  & xlsx), null, true),
+		    Tests_Sheet = Origen{[Name="Tests"]}[Data]
+		in
+		    Tests_Sheet
+	lineageTag: 62cdd58e-31b6-4dd6-8b3d-b236735cf584
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'KGI_I_Mejoras propuestas (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(incrementalesProvClien & mejorasPropuestas & ".xlsx"), null, true),
+		    T_Mejoras_Table = Origen{[Name="T_Mejoras"]}[Data]
+		in
+		    T_Mejoras_Table
+	lineageTag: 5313ab41-c05d-436b-bb3f-1ea15aaa1a78
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'KGI_I_Bugs_Jira (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & jira & xlsx), null, true),
+		    Bugs = Origen{[Name="Bugs"]}[Data]
+		
+		in
+		    #"Bugs"
+	lineageTag: 37eccef7-ff42-4983-b158-39dccb3b24e9
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'KGI_I_Entregables_Jira (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & jira & xlsx), null, true),
+		    Entregables = Origen{[Name="Entregables"]}[Data]
+		in
+		    Entregables
+	lineageTag: 08f9999a-c2d5-4676-bd11-dbf4be3eec4d
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'KGI_I_Estimaciones (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & estimaciones & xlsx), null, true),
+		    #"Page 1" = Origen{[Name="Page 1"]}[Data]
+		in
+		    #"Page 1"
+	lineageTag: 389a9e45-4a5b-4537-9e8c-bac60669d01e
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression T_Alegaciones_Resumen =
+		let
+		    Origen = #"T_Alegaciones (stagging)",
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Alegacion_aceptada] <> null)),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Filas filtradas",{"ID Alegación", "Entrada alegada", "Sistema Afectado", "Periodo de Medida del ANS alegado", "Clasificación", "ANS", "Fecha", "Estado", "Comentarios"}),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"ID", "Solicitante", "Alegacion_aceptada"}),
+		    #"Filas agrupadas" = Table.Group(#"Columnas reordenadas", { "ID", "Solicitante"}, {{"Alegaciones", each Text.Combine([Alegacion_aceptada],","), type nullable text}})
+		in
+		    #"Filas agrupadas"
+	lineageTag: 4551148c-bcbb-4723-a66a-4cb446bc0703
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Incidencias_Relacionadas =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & incidenciasHistFolder & folder_fileStartPath & incidenciasRel & ".xlsx"), null, true),
+		    #"Page 1_Sheet" = Origen{[Name="Page 1"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Filas en blanco eliminadas" = Table.SelectRows(#"Encabezados promovidos", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null})))
+		in
+		    #"Filas en blanco eliminadas"
+	lineageTag: b9e26dfa-3d65-4146-ac65-19cf7f21e133
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression incidenciasRel = "Incidencias_Relacionadas" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 92db353a-8c44-46e7-ac32-3d3a7194d85e
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression Usuario =
+		let
+		    Source = Folder.Contents("C:\Users\"),
+		    #"Expanded Attributes" = Table.ExpandRecordColumn(Source, "Attributes", {"Hidden", "Directory", "ChangeTime"}, {"Hidden", "Directory", "ChangeTime"}),
+		    #"Filtered Directories not hidden" = Table.SelectRows(#"Expanded Attributes", each ([Directory] = true) and ([Hidden] = false)),
+		    #"Removed Errors" = Table.RemoveRowsWithErrors(#"Filtered Directories not hidden", {"ChangeTime"}),
+		    #"Filtered Rows" = Table.SelectRows(#"Removed Errors", each ([Name] <> "Public") and ([Name] <> "adminsopra")),
+		    #"Username" = #"Filtered Rows"{0}[Name]
+		in
+		    #"Username"
+	lineageTag: ff25b1f5-f89e-4a13-b1e4-e40e0a02a86c
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'Control alegaciones_new' = ```
+		let
+		    Origen = #"Control alegaciones_new (stagging)",
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Control alegaciones_new (stagging)", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Elemento de solicitud", type text}, {"Número", type text}, {"Elemento", type text}, {"Grupo de asignación", type text}, {"Pedido para", type text}, {"Asignado a", type text}, {"Catálogo", type text}, {"País", type text}, {"Estado", type text}, {"Id del registro alegado JIRA", type text}, {"Id del registro alegado ServiceNow", type text}, {"Herramienta donde se ubica el registro", type text}, {"KGI Afectado", type text}, {"Clasificación", type text}, {"Inicio real", type date}, {"Ámbito del servicio", type text}, {"Describe detalladamente tu petición", type text}, {"Aplicación", type text}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado",".","-",Replacer.ReplaceText,{"KGI Afectado"}),
+		    #"Columnas combinadas" = Table.CombineColumns(#"Valor reemplazado",{"Id del registro alegado JIRA", "Id del registro alegado ServiceNow"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"ID"),
+		    #"Dividir columna por delimitador" = Table.ExpandListColumn(Table.TransformColumns(#"Columnas combinadas", {{"KGI Afectado", Splitter.SplitTextByDelimiter(", ", QuoteStyle.Csv), let itemType = (type nullable text) meta [Serialized.Text = true] in type {itemType}}}), "KGI Afectado"),
+		    #"Cambio estado" = Table.ReplaceValue(
+		#"Dividir columna por delimitador", 
+		each [Estado],
+		each if [Estado] = "Cerrado completo" then "1 - Aprobada" 
+		else if [Estado] = "Abierto" then "0 - Pendiente"
+		else if [Estado] = "Cerrado omitido" then "2 - Rechazada" 
+		else [Estado],
+		Replacer.ReplaceValue,{"Estado"}
+		),
+		    #"Columna condicional agregada" = Table.AddColumn(#"Cambio estado", "Entrada alegada", each if Text.StartsWith([ID], "DTASK") then "Estimación" else if Text.StartsWith([ID], "ENH") then "Evolutivo" else if Text.StartsWith([ID], "PRJTASK") then "Evolutivo" else if Text.StartsWith([ID], "RITM") then "Petición" else if Text.Contains([ID], "-") then "Defecto" else if Text.StartsWith([ID], "INC") then "Incidencia" else null),
+		    #"Filas filtradas" = Table.SelectRows(#"Columna condicional agregada", each Text.Contains([Grupo de asignación], "SERVICENOW")),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Filas filtradas",{"Elemento de solicitud", "Número", "Elemento", "Grupo de asignación", "Pedido para", "Asignado a", "Catálogo", "País", "Herramienta donde se ubica el registro", "Ámbito del servicio", "Aplicación"}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas quitadas",{{"KGI Afectado", "ANS"}, {"Describe detalladamente tu petición", "Comentarios"}, {"Inicio real", "Fecha"}}),
+		    #"Solicitante - Proveedor" = Table.AddColumn(#"Columnas con nombre cambiado", "Solicitante", each "Proveedor"),
+		    #"Sistema Afectado" = Table.AddColumn(#"Solicitante - Proveedor", "Sistema Afectado", each "ServiceNow"),
+		    #"Índice agregado" = Table.AddIndexColumn(#"Sistema Afectado", "Índice", 50, 1, Int64.Type),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Índice agregado",{{"Índice", type text}}),
+		    #"ID Alegación" = Table.AddColumn(#"Tipo cambiado1", "ID Alegación", each "ALS0" & [Índice]),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"ID Alegación",{"Índice"}),
+		    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas quitadas1","SCTASK1427921","RITM1355321",Replacer.ReplaceText,{"ID"}),
+		    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","SCTASK1435905","RITM1362397",Replacer.ReplaceText,{"ID"})
+		in
+		    #"Valor reemplazado2"
+		```
+	lineageTag: 5686fe45-1249-43fd-b20a-43da95468ee2
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression alegacionesFolder = "Alegaciones/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 919fcd23-750b-4de3-8747-ca8c7bf46a70
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression alegaciones_new = "Control de alegaciones_new" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: d378f5e9-7a15-424b-9a6f-8df25093189f
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression 'T_Alegaciones (doublestagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & alegacionesFolder & folder_fileStartPath & alegaciones & ".xlsx"), null, true),
+		    T_Alegaciones_Table = Origen{[Item="T_Alegaciones",Kind="Table"]}[Data]
+		in
+		    T_Alegaciones_Table
+	lineageTag: c6ad9606-0b2a-4396-b84a-904423d54a95
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Control alegaciones_new (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & alegacionesFolder & folder_fileStartPath & alegaciones_new & ".xlsx"), null, true),
+		    Hoja1_Sheet = Origen{[Item="Page 1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+	lineageTag: 7687be1a-16bc-4ca4-a5a2-b61c3f00f07f
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Registro de Cambios (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & "Informe Solicitud de Cambio AM" & xlsx), null, true),
+		    #"Registro de Cambios_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Registro de Cambios_Sheet", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Fecha Activación Cambio", type date}, {"Fecha Aprobación Comité Operativo", type date}, {"Fecha Aprobación Comité Táctico", type date}, {"Fecha Aprobación Comité Estratégico", type date}, {"Fecha Aprobación Bajo Demanda", type date}}),
+		    #"Índice agregado" = Table.AddIndexColumn(#"Tipo cambiado", "Índice", 3, 1, Int64.Type),
+		    #"Columna condicional agregada" = Table.AddColumn(#"Índice agregado", "Personalizado", each if [Índice] <= 10 then "ID00" else "ID0"),
+		    #"Columnas combinadas" = Table.CombineColumns(Table.TransformColumnTypes(#"Columna condicional agregada", {{"Índice", type text}}, "es-ES"),{"Personalizado", "Índice"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"Id Cambio"),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas combinadas",{{"Descripción detallada de la solicitud", "Descripción"}, {"Impacto", "Impacto en el Servicio"}, {"Ámbito", "Ámbito afectado del Servicio"}, {"Fecha Activación Cambio", "Fecha"}, {"Estado", "Estado del Cambio"}, {"Descripción Impacto", "Descripción del impacto en el Servicio"}, {"Tipo de Cambio", "Tipo de Cambio Solicitado"}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado",{"Elemento", "Elemento de solicitud", "Número"}),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas quitadas","Cerrado completo","Aprobado",Replacer.ReplaceText,{"Estado del Cambio"}),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Valor reemplazado",{"Abierto por"}),
+		    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas1", each Text.Contains([Grupo de asignación], "SNOW")),
+		    #"Columnas quitadas2" = Table.RemoveColumns(#"Filas filtradas",{"Cerrado", "Fecha Aprobación Comité Operativo", "Fecha Aprobación Comité Estratégico", "Fecha Aprobación Bajo Demanda", "Instrucciones especiales", "Línea de Negocio", "Grupo de asignación"})
+		in
+		    #"Columnas quitadas2"
+	lineageTag: f213c27a-b874-4856-a79f-75cc73097ccc
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression folder_fileStartPath_roadmap =
+		let
+		    Origen = "AMS_" & servicio & "_DASH_"
+		in
+		    Origen
+	lineageTag: f1977da8-3578-4c53-ab83-90f4bcfefd2d
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression 'RM_Estimaciones_ACC (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath_roadmap & "ME_Estimaciones DTASK ACC" & xlsx), null, true),
+		    #"Page 1" = Origen{[Name="Page 1"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Parent", type text}, {"Number", type text}, {"Business Application", type text}, {"Short description", type text}, {"Short description_1", type text}, {"Priority", type text}, {"Demand manager", type text}, {"State", type text}, {"Assigned to", type text}, {"Assignment group", type text}, {"Additional comments", type text}, {"Created", type number}, {"Closed", type number}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Parent", "Código"}, {"Number", "Número"}, {"Short description", "Nombre proyecto"}, {"Short description_1", "Breve descripción"}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Tipo", each "Estimación"),
+		    #"Personalizada agregada1" = Table.AddColumn(#"Personalizada agregada", "Project Type", each "Estimación"),
+		    #"Columna condicional agregada" = Table.AddColumn(#"Personalizada agregada1", "Percent complete", each if Text.Contains([State], "Closed") then 100 else if Text.Contains([State], "Rejected") then 0 else null),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columna condicional agregada",{{"Demand manager", "Abierto por"}}),
+		    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columnas con nombre cambiado1",{{"Created", "Actual start date"}, {"Closed", "Actual end date"}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado2",{"Assignment group", "Additional comments"}),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"Código", "Número", "Business Application", "Nombre proyecto", "Breve descripción", "Tipo", "Project Type", "Priority", "Abierto por", "State", "Assigned to", "Percent complete", "Actual end date", "Actual start date"}),
+		    #"Personalizada agregada3" = Table.AddColumn(#"Columnas reordenadas", "Planned start date", each null),
+		    #"Personalizada agregada4" = Table.AddColumn(#"Personalizada agregada3", "Planned end date", each null)
+		in
+		    #"Personalizada agregada4"
+	lineageTag: dca5093b-cad1-475c-863d-45850a26119c
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression globalPath_roadmap =
+		let
+		    Origen = sharepointRoot & servicio & ficherosServicio & folder_fileStartPath_roadmap
+		in
+		    Origen
+	lineageTag: 9da78246-36f1-4357-b4ca-f4f34a7e060e
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression 'RM_Estimaciones_PROV (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath_roadmap & "ME_Estimaciones DTASK PROV" & xlsx), null, true),
+		    #"Page 1" = Origen{[Name="Page 1"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Parent", type text}, {"Number", type text}, {"Business Application", type text}, {"Short description", type text}, {"Short description_1", type text}, {"Priority", type text}, {"Demand manager", type text}, {"State", type text}, {"Assigned to", type text}, {"Assignment group", type text}, {"Additional comments", type text}, {"Created", type number}, {"Closed", type number}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Parent", "Código"}, {"Number", "Número"}, {"Short description", "Nombre proyecto"}, {"Short description_1", "Breve descripción"}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Tipo", each "Estimación"),
+		    #"Personalizada agregada1" = Table.AddColumn(#"Personalizada agregada", "Project Type", each "Estimación"),
+		    #"Columna condicional agregada" = Table.AddColumn(#"Personalizada agregada1", "Percent complete", each if Text.Contains([State], "Closed") then 100 else if Text.Contains([State], "Rejected") then 0 else null),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columna condicional agregada",{{"Demand manager", "Abierto por"}}),
+		    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columnas con nombre cambiado1",{{"Created", "Actual start date"}, {"Closed", "Actual end date"}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado2",{"Assignment group", "Additional comments"}),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"Código", "Número", "Business Application", "Nombre proyecto", "Breve descripción", "Tipo", "Project Type", "Priority", "Abierto por", "State", "Assigned to", "Percent complete", "Actual end date", "Actual start date"}),
+		    #"Personalizada agregada3" = Table.AddColumn(#"Columnas reordenadas", "Planned start date", each null),
+		    #"Personalizada agregada4" = Table.AddColumn(#"Personalizada agregada3", "Planned end date", each null)
+		in
+		    #"Personalizada agregada4"
+	lineageTag: d65fd294-76cd-44b1-b287-d1e55daef719
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Mejoras (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath_roadmap & "ME_Evolutivos ENH PROV  ACC" & xlsx), null, true),
+		    #"Page 1" = Origen{[Name="Page 1"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Number", type text}, {"Enhancement", type text}, {"Business Application", type text}, {"Short description", type text}, {"Priority", type text}, {"Opened by", type text}, {"Enhancement Status", type text}, {"Assigned to", type text}, {"Percent complete", Int64.Type}, {"Comments and Work notes", type text}, {"Created", type number}, {"Planned end date", type number}, {"Actual end date", type number}, {"Planned start date", type number}, {"Actual start date", type number}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Number", "Código"}, {"Enhancement", "Número"}, {"Short description", "Nombre proyecto"}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Breve descripción", each null),
+		    #"Personalizada agregada1" = Table.AddColumn(#"Personalizada agregada", "Tipo", each "Mejora"),
+		    #"Personalizada agregada2" = Table.AddColumn(#"Personalizada agregada1", "Project Type", each "Mejora"),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Personalizada agregada2",{{"Opened by", "Abierto por"}, {"Enhancement Status", "State"}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado1",{"Comments and Work notes", "Created"}),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"Código", "Número", "Business Application", "Nombre proyecto", "Breve descripción", "Tipo", "Project Type", "Priority", "Abierto por", "State", "Assigned to", "Percent complete", "Actual end date", "Actual start date", "Planned start date", "Planned end date"})
+		in
+		    #"Columnas reordenadas"
+	lineageTag: 7336b81f-cb4d-4b04-8fd4-19a699c2f0f8
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Evolutivos (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath_roadmap & "ME_Evolutivos_PRJTASK PROV  ACC" & xlsx), null, true),
+		    #"Page 1" = Origen{[Name="Page 1"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Number", type text}, {"Number_1", type text}, {"Business Application ", type text}, {"Project Name", type text}, {"Short description", type text}, {"Project Type", type text}, {"Priority", type text}, {"Project manager", type text}, {"State", type text}, {"Assigned to", type text}, {"Percent complete", type number}, {"Comments and Work notes", type text}, {"Created", type number}, {"Planned end date", type number}, {"Actual end date", type number}, {"Planned start date", type number}, {"Actual start date", type number}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Number", "Código"}, {"Number_1", "Número"}, {"Project Name", "Nombre proyecto"}, {"Short description", "Breve descripción"}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Tipo", each "Evolutivo"),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Personalizada agregada",{{"Project manager", "Abierto por"}}),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas con nombre cambiado1", each [Actual start date], each if [Actual start date] = null then [Created] else [Actual start date], Replacer.ReplaceValue,{"Actual start date"} ),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Valor reemplazado",{"Comments and Work notes", "Created"}),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"Código", "Número", "Business Application ", "Nombre proyecto", "Breve descripción", "Tipo", "Project Type", "Priority", "Abierto por", "State", "Assigned to", "Percent complete", "Actual end date", "Actual start date", "Planned start date", "Planned end date"}),
+		    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columnas reordenadas",{{"Business Application ", "Business Application"}})
+		in
+		    #"Columnas con nombre cambiado2"
+	lineageTag: c8f30223-d692-4181-8db5-702a66320728
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Proyectos_I (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath_roadmap & "PRJ_Proyectos PRJs PROV  ACC" & xlsx), null, true),
+		    #"Page 1" = Origen{[Name="Page 1"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Number", type text}, {"Number_1", type text}, {"Business Application ", type text}, {"Project Name", type text}, {"Description", type text}, {"Project Type", type text}, {"Priority", type text}, {"Project manager", type text}, {"State", type text}, {"Percent complete", Int64.Type}, {"Comments and Work notes", type any}, {"Created", type number}, {"Planned end date", type number}, {"Actual End Date", type number}, {"Planned start date", type number}, {"Actual Start Date", type number}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Number", "Código"}, {"Number_1", "Número"}, {"Project Name", "Nombre proyecto"}, {"Description", "Breve descripción"}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Tipo", each "Proyecto"),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Personalizada agregada",{{"Project manager", "Abierto por"}}),
+		    #"Personalizada agregada1" = Table.AddColumn(#"Columnas con nombre cambiado1", "Assigned to", each null),
+		    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Personalizada agregada1",{{"Actual End Date", "Actual end date"}, {"Actual Start Date", "Actual start date"}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado2",{"Comments and Work notes", "Created"}),
+		    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"Código", "Número", "Business Application ", "Nombre proyecto", "Breve descripción", "Tipo", "Project Type", "Priority", "Abierto por", "State", "Assigned to", "Percent complete", "Actual end date", "Actual start date", "Planned start date", "Planned end date"}),
+		    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Columnas reordenadas",{{"Business Application ", "Business Application"}})
+		in
+		    #"Columnas con nombre cambiado3"
+	lineageTag: 2ebd7d31-8c7d-4c6f-90e8-75f79a0486b2
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Total (stagging)' =
+		let
+		    Origen = Table.Combine({#"RM_Estimaciones_new (stagging)", #"RM_Mejoras_new (stagging)", #"RM_Evolutivos_new (stagging)", #"RM_Proyectos_I_new (stagging)"}),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Breve descripción", type text}, {"Tipo", type text}, {"Project Type", type text}}),
+		    Personalizado1 = Table.TransformColumns(#"Tipo cambiado", {{"Porcentaje completado", each _ / 100, Percentage.Type}}),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(Personalizado1,{{"Fecha fin real", type datetime}, {"Fecha de inicio real", type datetime}, {"Fecha de inicio planificada", type datetime}, {"Fecha fin planificada", type datetime}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado1", "Tipo fecha", each "Real"),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Personalizada agregada","","N/A",Replacer.ReplaceValue,{"Project Type"})
+		in
+		    #"Valor reemplazado"
+	lineageTag: b139b186-db64-425d-b967-33221bf42adc
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Planned (stagging)' =
+		let
+		    Origen = Table.Combine({#"RM_Estimaciones_new (stagging)", #"RM_Mejoras_new (stagging)", #"RM_Evolutivos_new (stagging)", #"RM_Proyectos_I_new (stagging)"}),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Breve descripción", type text}, {"Tipo", type text}, {"Project Type", type text}}),
+		    Personalizado1 = Table.TransformColumns(#"Tipo cambiado", {{"Porcentaje completado", each _ / 100, Percentage.Type}}),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(Personalizado1,{{"Fecha fin real", type datetime}, {"Fecha de inicio real", type datetime}, {"Fecha de inicio planificada", type datetime}, {"Fecha fin planificada", type datetime}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado1", "Tipo fecha", each "Planificada")
+		in
+		    #"Personalizada agregada"
+	lineageTag: c443a427-4c54-44dd-9411-f64f05227521
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Estimaciones_new (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & "ME_Estimaciones DTASK" & xlsx), null, true),
+		    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Parent", type text}, {"Número", type text}, {"Aplicación de Negocio", type text}, {"Breve descripción", type text}, {"Breve descripción_1", type text}, {"Prioridad", type text}, {"Gestor de Demanda", type text}, {"Estado", type text}, {"Asignado a", type text}, {"Grupo de Asignación", type text}, {"Observaciones adicionales", type text}, {"Creado", type datetime}, {"Cerrado", type datetime}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Parent", "Código"}, {"Breve descripción", "Nombre proyecto"}, {"Breve descripción_1", "Breve descripción"}}),
+		    #"Personalizada agregada2"  = Table.AddColumn(#"Columnas con nombre cambiado", "Tipo", each "Estimación"),
+		    #"Personalizada agregada1" = Table.AddColumn(#"Personalizada agregada2", "Project Type", each "Estimación"),
+		    #"Columna condicional agregada" = Table.AddColumn(#"Personalizada agregada1", "Porcentaje completado", each if Text.Contains([Estado], "Cerrado") then 100 else if Text.Contains([Estado], "Rechazado") then 0 else null),
+		    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columna condicional agregada",{{"Creado", "Fecha de inicio real"}, {"Cerrado", "Fecha fin real"}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado2",{"Grupo de Asignación", "Observaciones adicionales"}),
+		    #"Personalizada agregada3" = Table.AddColumn(#"Columnas quitadas", "Fecha de inicio planificada", each null),
+		    #"Personalizada agregada4" = Table.AddColumn(#"Personalizada agregada3", "Fecha fin planificada", each null)
+		in
+		    #"Personalizada agregada4"
+	lineageTag: 5c87c7b0-f811-43fe-9c0f-7fc95a171efc
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Mejoras_new (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & "ME_Evolutivos ENH" & xlsx), null, true),
+		    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Demanda", type text}, {"Mejora", type text}, {"Aplicación de Negocio", type text}, {"Breve descripción", type text}, {"Prioridad", type text}, {"Abierto por", type text}, {"Estado de la Mejora", type text}, {"Asignado a", type text}, {"Porcentaje completado", Int64.Type}, {"Comentarios y notas de trabajo", type text}, {"Creado", type datetime}, {"Fecha fin planificada", type datetime}, {"Fecha fin real", type datetime}, {"Fecha de inicio planificada", type datetime}, {"Fecha de inicio real", type datetime}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Demanda", "Código"}, {"Mejora", "Número"}, {"Estado de la Mejora", "Estado"}}),
+		    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado",{"Comentarios y notas de trabajo", "Creado"}),
+		    Personalizado1 = Table.AddColumn(#"Columnas quitadas", "Tipo", each "Mejora"),
+		    Personalizado2 = Table.AddColumn(#"Personalizado1", "Project Type", each "Mejora")
+		in
+		    Personalizado2
+	lineageTag: 9fe80e51-16c4-45b0-b8ee-cbcceeec4ede
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Evolutivos_new (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & "ME_Evolutivos_PRJTASK" & xlsx), null, true),
+		    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Número", type text}, {"Proyecto principal", type text}, {"Demanda", type text}, {"Demand", type text}, {"Breve descripción", type text}, {"Breve descripción_1", type text}, {"Tipo de Proyecto", type text}, {"Prioridad", type text}, {"Jefe de proyecto", type text}, {"Estado", type text}, {"Asignado a", type text}, {"Porcentaje completado", type number}, {"Comentarios y notas de trabajo", type text}, {"Creado", type number}, {"Fecha fin planificada", type number}, {"Fecha fin real", type number}, {"Fecha de inicio planificada", type number}, {"Fecha de inicio real", type number}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Número", "Número"}, {"Proyecto principal", "Código"}}),
+		    Personalizado1 = Table.AddColumn(#"Columnas con nombre cambiado", "Tipo", each "Evolutivo"),
+		    Personalizado2 = Table.ReplaceValue(#"Personalizado1", each [Fecha de inicio real], each if [Fecha de inicio real] = null then [Creado] else [Fecha de inicio real], Replacer.ReplaceValue,{"Fecha de inicio real"} ),
+		    #"Columnas quitadas" = Table.RemoveColumns(Personalizado2,{"Comentarios y notas de trabajo", "Creado"}),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Columnas quitadas",{{"Fecha fin planificada", type datetime}, {"Fecha fin real", type datetime}, {"Fecha de inicio planificada", type datetime}, {"Fecha de inicio real", type datetime}}),
+		    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado1", each ([Tipo de Proyecto] <> "Proyecto"))
+		in
+		    #"Filas filtradas"
+	lineageTag: 91272e3b-b4db-41c6-b00e-84c2810ceaf1
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Proyectos_I_new (stagging)' =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & "PRJ_Proyectos PRJs" & xlsx), null, true),
+		    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Demanda", type text}, {"Número", type text}, {"Aplicación de Negocio ", type text}, {"Nombre de proyecto", type text}, {"Descripción", type text}, {"Tipo de Proyecto", type text}, {"Prioridad", type text}, {"Jefe de proyecto (Project Manager)", type text}, {"Fase", type text}, {"Estado de la Fase (State)", type text}, {"Porcentaje completado", type number}, {"Comentarios y notas de trabajo", type text}, {"Creado", type number}, {"Fecha límite planificada", type number}, {"Fecha fin real", type number}, {"Fecha de inicio planificada", type number}, {"Fecha de inicio real", type number}}),
+		    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Demanda", "Código"}, {"Fecha límite planificada", "Fecha fin planificada"}}),
+		    Personalizado1 = Table.AddColumn(#"Columnas con nombre cambiado", "Tipo", each "Proyecto"),
+		    #"Filas filtradas" = Table.SelectRows(Personalizado1, each ([Tipo de Proyecto] = "Proyecto"))
+		in
+		    #"Filas filtradas"
+	lineageTag: f2d46a07-32c6-4f2d-8b13-8dce47b89ce4
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Planned (stagging) (2)' =
+		let
+		    Origen = Table.Combine({#"RM_Estimaciones_new (stagging)", #"RM_Mejoras_new (stagging)", #"RM_Evolutivos_new (stagging)", #"RM_Proyectos_I_new (stagging)"}),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Breve descripción", type text}, {"Tipo", type text}, {"Project Type", type text}}),
+		    Personalizado1 = Table.TransformColumns(#"Tipo cambiado", {{"Porcentaje completado", each _ / 100, Percentage.Type}}),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(Personalizado1,{{"Fecha fin real", type datetime}, {"Fecha de inicio real", type datetime}, {"Fecha de inicio planificada", type datetime}, {"Fecha fin planificada", type datetime}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado1", "Tipo fecha", each "Planificada")
+		in
+		    #"Personalizada agregada"
+	lineageTag: 56790ede-8ab4-42e3-a6c4-0ea34f104225
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'RM_Total (stagging) (2)' =
+		let
+		    Origen = Table.Combine({#"RM_Estimaciones_new (stagging)", #"RM_Mejoras_new (stagging)", #"RM_Evolutivos_new (stagging)", #"RM_Proyectos_I_new (stagging)"}),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Breve descripción", type text}, {"Tipo", type text}, {"Project Type", type text}}),
+		    Personalizado1 = Table.TransformColumns(#"Tipo cambiado", {{"Porcentaje completado", each _ / 100, Percentage.Type}}),
+		    #"Tipo cambiado1" = Table.TransformColumnTypes(Personalizado1,{{"Fecha fin real", type datetime}, {"Fecha de inicio real", type datetime}, {"Fecha de inicio planificada", type datetime}, {"Fecha fin planificada", type datetime}}),
+		    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado1", "Tipo fecha", each "Real"),
+		    #"Valor reemplazado" = Table.ReplaceValue(#"Personalizada agregada","","N/A",Replacer.ReplaceValue,{"Project Type"})
+		in
+		    #"Valor reemplazado"
+	lineageTag: b787669a-bc14-4d26-9ddd-485cb693bc8a
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+/// Carpeta de Cabeceras
+expression Cabeceras = "https://acciona365.sharepoint.com/sites/msteams_5a0007-AccionaSMOWorkspace/Shared Documents/Acciona SMO Workspace/1. Otras Iniciativas\Cabeceras Presupuestarias\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 0fc23e57-7287-4e96-a0d6-5d572d539286
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_ResultType = Text
+
+expression KGI_III_Encuestas_new2 =
+		let
+		    URL = globalPath & encuestas & xlsx,
+		    Origen = Excel.Workbook(Web.Contents(URL), null, true),
+		    #"Page 1_Sheet" = Origen{[Name="Page 1"]}[Data]
+		in
+		    #"Page 1_Sheet"
+	lineageTag: e28c2f48-3864-4d67-b7b1-aa5e3d34eed7
+	queryGroup: 'Tablas No Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression Encuestas_New(2) =
+		let
+		    Origen = Excel.Workbook(Web.Contents(globalPath & encuestas & xlsx), null, true),
+		    #"Page 1_Sheet" = Origen{[Name="Page 1"]}[Data],
+		    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Cerrado", type date}, {"Actualizado", type date}})
+		in
+		    #"Tipo cambiado"
+	lineageTag: f347b12a-8ae8-4cba-8847-be83b8464abe
+	queryGroup: 'Tablas Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression 'Peticiones (2)' =
+		let
+		    Origen = KGI_III_Peticiones,
+		    #"Columnas quitadas" = Table.RemoveColumns(Origen,{"Extracción", "Número", "Nombre", "Prioridad", "Abierto", "Hora de inicio", "Hora de finalización", "Duración real", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado", "Etapa", "Número de reasignación", "Porcentaje de negocio trascurrido", "Duración", "Cerrado mes", "Prioridad grupo", "Abierto mes", "Alegaciones", "ID_KGI_3.1", "ID_KGI_3.2", "ID_KGI_3.3", "Infringido_alegaciones", "Duración excedida", "Incidencia.Número", "Incidencia.Breve descripción", "Incidencia.Subcategoría", "Incidencia.Tipo de Solución", "Incidencia.Alegaciones", "KGI_III_Encuestas.Cerrado", "KGI_III_Encuestas.Valoración", "ID_KGI_3.4"}),
+		    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas quitadas",{{"Solicitar elemento", "Número"}}),
+		
+		    // Combinamos con el de encuestas_new(2) para sacar aquellas encuestas contestadas y poder eliminarlas porque ya están en la tabla de encuestas new
+		    #"Consultas combinadas" = Table.NestedJoin(#"Columnas con nombre cambiado1", {"Número"}, #"Encuestas_New(2)", {"Número"}, "Encuestas_New(2)", JoinKind.LeftOuter),
+		    #"Se expandió Encuestas_new(2)" = Table.ExpandTableColumn(#"Consultas combinadas", "Encuestas_New(2)", {"Instancia"}, {"Encuestas_New(2).Instancia"}),
+		    #"Filas filtradas" = Table.SelectRows(#"Se expandió Encuestas_new(2)", each ([#"Encuestas_New(2).Instancia"] = null)),
+		    #"Columnas quitadas1" = Table.RemoveColumns(#"Filas filtradas",{"Encuestas_New(2).Instancia"}),
+		    #"Duplicados quitados" = Table.Distinct(#"Columnas quitadas1", {"Número"})
+		in
+		    #"Duplicados quitados"
+	lineageTag: d57a460b-af98-46b8-9ead-cfb0f1971740
+	queryGroup: 'Tablas Modelo'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
+expression LB = "LB/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: e084acb3-a12e-4141-a156-abd235f8ad71
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression globalPathLB =
+		let
+		    Origen = sharepointRoot & servicio & ficherosServicio & folder_fileStartPath & LB & folder_fileStartPath
+		in
+		    Origen
+	lineageTag: a57eac4b-ef68-4ec1-8998-aa8b21f94731
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression Prueba = "AM_ServiceNow_VolumetriasLineaBase_202212" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: bc5c8191-7290-4cad-9025-df06f82ed74a
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression volumetriasLB = "AM ServiceNow - Volumetrías Línea Base - " meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 78c2de84-3a1b-4dd1-9dcd-53818957e5f1
+	queryGroup: 'Parámetros / Listas\Param. Tablas'
+
+	annotation PBI_ResultType = Text
+
+expression xlsm = ".xlsm" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: fd2fbe3a-d6bf-4ef3-b707-65e03d012a4b
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_ResultType = Text
+
+expression folderLicencia = "https://acciona365.sharepoint.com/sites/msteams_5a0007-AccionaSMOWorkspace/Shared Documents/Acciona SMO Workspace/1. Otras Iniciativas/Cabeceras Presupuestarias/Licencia SNOW/" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 9f7e4897-3de8-4466-b564-d42cfc45ae73
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression globalPath2 = "sharepointRoot & servicio & ficherosServicio & folder_fileStartPath" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 20180d1e-04d8-47b0-8311-5c937a88cbe2
+	queryGroup: 'Parámetros / Listas\Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression Entorno = "PRE" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: ac83005a-e2fc-403a-a48c-d86e5097d11f
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 0a749785-a238-40de-8ac0-c203a3cb3961
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource2 = "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_OFICINA_INTEGRACION/Ficheros del Servicio/" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 5a476d21-934c-4f3c-8f6b-9787f5e247dd
+	queryGroup: 'Parámetros / Listas'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+

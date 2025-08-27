@@ -1,0 +1,177 @@
+table '_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'
+	lineageTag: 0eaa1a31-9cad-4e25-b18e-7bc069484c13
+
+	measure AcumuladoTotal =
+			
+			CALCULATE(
+			    Sum('_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[Util_AbiertosTotal])+0,
+			    FILTER(ALLSELECTED('_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'),
+			    '_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[Fecha]<=MAX('_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[Fecha]))
+			)
+		formatString: 0
+		lineageTag: 6abac61f-825c-409c-95e8-8388dac261ac
+
+	column _BackLOG_EVOL_MYMesAño-Abierto
+		lineageTag: 851388bf-eaee-461f-ab36-14180e5deb9d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: SERV_NOW dmn_demand[_BackLOG_EVOL_MYMesAño-Abierto]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbiertosTotal
+		formatString: 0
+		lineageTag: 96f4f506-410c-4c15-99cf-095d598eb43d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AbiertosTotal]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbiertosTotal_XS
+		formatString: 0
+		lineageTag: ced4e3ab-f3c6-4032-b3ed-1d939cc3d692
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AbiertosTotal_XS]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbiertosTotal_S
+		formatString: 0
+		lineageTag: 8a2b97a5-8d7c-4db3-984b-fd9655795255
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AbiertosTotal_S]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbiertosTotal_M
+		formatString: 0
+		lineageTag: 3583ca28-f7a2-4531-bfd5-213d09bfc09b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AbiertosTotal_M]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbiertosTotal_L
+		formatString: 0
+		lineageTag: 7f2826a1-86b3-4f63-9b67-b3d62fa1c8b4
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AbiertosTotal_L]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbiertosTotal_XL
+		formatString: 0
+		lineageTag: a2964e45-ca2a-481e-8e59-15a0bb81a793
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AbiertosTotal_XL]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbiertosTotal_XXL
+		formatString: 0
+		lineageTag: 18bd272b-0578-4e51-aa93-ca8358770f94
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AbiertosTotal_XXL]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Util_AbiertosTotal = if('_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[AbiertosTotal]=BLANK(), 0, '_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[AbiertosTotal])
+		formatString: 0
+		lineageTag: a26a52c9-bb9b-48ba-a5e2-7a86490749ea
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha = DATE('_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[Año], '_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[NroMes], 1)
+		formatString: Short Date
+		lineageTag: f9aaa9a3-a84f-4878-834f-2cc53a7b5d86
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 2f141691-c080-440a-8ad2-79a381b83316
+			defaultHierarchy: LocalDateTable_f0efd6ff-5ec2-43a6-ac46-64c4f32baac1.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesesPasadosTotal = [AcumuladoTotal]-'_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[Util_AbiertosTotal]
+		formatString: 0
+		lineageTag: d237c86e-004c-4e84-8b6f-64d51963b853
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_Cerrados =
+			CALCULATE(COUNTROWS('SERV_NOW dmn_demand'),
+			FILTER ('SERV_NOW dmn_demand', and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si", AND
+			('_backlog_EVOLUTIVOS_SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto] = 'SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto],
+			'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Cerrado"))))
+		formatString: 0
+		lineageTag: 984c1181-46be-4776-9c06-2c31c977bd7a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column NroMes
+		formatString: 0
+		lineageTag: 71db7e5f-6a1f-4724-8c80-a328b4ffcb89
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_fd55a4ce-928a-47c6-9538-9d0f679f74b3[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 9464b56e-93b6-409a-9c20-310b423e17eb
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_fd55a4ce-928a-47c6-9538-9d0f679f74b3[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbiertosTotal_EnBlanco
+		formatString: 0
+		lineageTag: 83754b72-e8d2-4185-b2d9-8f4ec723f59f
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AbiertosTotal_EnBlanco]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '_backlog_EVOLUTIVOS_SERV_NOW dmn_demand-38347e86-94d3-4971-9833-cc526b9aa2f8' = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'SERV_NOW dmn_demand',
+				    'SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto],
+				    'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha].[NroMes], 
+				    'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha].[Año],
+				    "AbiertosTotal", CALCULATE(COUNT('SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto]),
+				    FILTER('SERV_NOW dmn_demand',and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si",'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Abierto"))),
+				    "AbiertosTotal_EnBlanco", CALCULATE(COUNT('SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto]),
+				    FILTER('SERV_NOW dmn_demand',and(and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si",'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Abierto"),'SERV_NOW dmn_demand' [_dv_size - SoloLetra]="(En blanco)"))),
+				    "AbiertosTotal_XS", CALCULATE(COUNT('SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto]),
+				    FILTER('SERV_NOW dmn_demand',and(and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si",'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Abierto"),'SERV_NOW dmn_demand' [_dv_size - SoloLetra]="XS"))),
+				    "AbiertosTotal_S", CALCULATE(COUNT('SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto]),
+				    FILTER('SERV_NOW dmn_demand',and(and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si",'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Abierto"),'SERV_NOW dmn_demand'[_dv_size - SoloLetra]="S"))),
+				    "AbiertosTotal_M", CALCULATE(COUNT('SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto]),
+				    FILTER('SERV_NOW dmn_demand',and(and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si",'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Abierto"),'SERV_NOW dmn_demand'[_dv_size - SoloLetra]="M"))),
+				    "AbiertosTotal_L", CALCULATE(COUNT('SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto]),
+				    FILTER('SERV_NOW dmn_demand',and(and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si",'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Abierto"),'SERV_NOW dmn_demand'[_dv_size - SoloLetra]="L"))),
+				    "AbiertosTotal_XL", CALCULATE(COUNT('SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto]),
+				    FILTER('SERV_NOW dmn_demand',and(and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si",'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Abierto"),'SERV_NOW dmn_demand'[_dv_size - SoloLetra]="XL"))),
+				    "AbiertosTotal_XXL", CALCULATE(COUNT('SERV_NOW dmn_demand'[_BackLOG_EVOL_MYMesAño-Abierto]),
+				    FILTER('SERV_NOW dmn_demand',and(and('SERV_NOW dmn_demand'[_BackLOG_EVOL_UTIL]="Si",'SERV_NOW dmn_demand'[_BackLOG_EVOL_EstadoGeneral]="Abierto"),'SERV_NOW dmn_demand'[_dv_size - SoloLetra]="XXL"))))
+				```
+
+	annotation PBI_Id = d6f9f6a8f7fd4c77b6da3e7ca065201b
+

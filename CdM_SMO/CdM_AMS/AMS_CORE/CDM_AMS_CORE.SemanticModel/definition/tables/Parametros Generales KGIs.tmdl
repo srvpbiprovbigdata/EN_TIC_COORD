@@ -1,0 +1,67 @@
+table 'Parametros Generales KGIs'
+	excludeFromModelRefresh
+	lineageTag: 3f65c1dc-178c-4ac9-8afa-706d8e272b41
+
+	measure 'Total de Puntos Obtenidos KGIs_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A", [Puntos Obtenidos KGI11_M]+[Puntos Obtenidos KGI12_M]+[Puntos_obtenidos KGI13]+[Puntos Obtenidos KGI14_M]+[Puntos Obtenidos KG21_M]+[Puntos Obtenidos KGI22_M]+[Puntos Obtenidos KGI23_M])
+		formatString: 0.0
+		lineageTag: fe2cd49c-0f96-44b0-8f16-b3932dd172c0
+
+	measure 'Umbral alcanzado' = IF([Total de Puntos Obtenidos KGIs_M]="N/A","N/A",IF([Total de Puntos Obtenidos KGIs_M]>=90,"OBJETIVO",IF([Total de Puntos Obtenidos KGIs_M]>=50,"ADMISIBLE","CRÍTICO")))
+		lineageTag: b8b0c6c8-e325-4336-913f-fcd21ac59596
+
+	measure 'Total de Puntos Obtenidos KGIs_M_AV' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([Total de Puntos Obtenidos KGIs_M]))
+		formatString: 0.0
+		lineageTag: 79f5845a-6ea5-4a92-bfe6-96f69ac135fd
+
+	column KGI
+		dataType: string
+		lineageTag: 683114b2-9bc2-4f19-9b3c-953c8498fe93
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: 6dc82422-320d-4d0d-b9cd-3d52c5d3ff5c
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos por KGI'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3cbf34f9-6b45-4d13-8079-92baf4567a38
+		summarizeBy: sum
+		sourceColumn: Puntos por KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos Obtenidos' = ('Parametros Generales KGIs'[Puntos por KGI]*1)
+		formatString: 0
+		lineageTag: 24b18c1b-49a8-4007-b2ba-5f6e2dbb354e
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros Generales KGIs-0a9d686e-8b1f-4685-94bc-a1c8ecae7c87' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(sharepointRoot2 & tablaParametros & xlsx), null, true),
+				    #"Parametros Generales KGIs_Sheet" = Source{[Item="Parametros Generales KGIs",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Parametros Generales KGIs_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"KGI", type text}, {"Descripción", type text}, {"Puntos por KGI", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,39 @@
+table 'Parametros KGI2-3'
+	excludeFromModelRefresh
+	lineageTag: c27cf905-475f-4e5e-8b2a-44201f35740f
+
+	column '% Cumplimiento Tasa de Reducción'
+		dataType: double
+		lineageTag: f7acc998-bdc4-45df-a77b-0e675dd50b45
+		summarizeBy: sum
+		sourceColumn: % Cumplimiento Tasa de Reducción
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Peso
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d859327-762b-45d3-adf1-f0dee984dbfd
+		summarizeBy: sum
+		sourceColumn: Peso
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI2-3-87c0cf2b-912d-4a84-8e3b-b7a89b21be8a' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(sharepointRoot2 & tablaParametros & xlsx), null, true),
+				    #"Parametros KGI2-3_Sheet" = Source{[Item="Parametros KGI2-3",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Parametros KGI2-3_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"% Cumplimiento Tasa de Reducción", type number}, {"Peso", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

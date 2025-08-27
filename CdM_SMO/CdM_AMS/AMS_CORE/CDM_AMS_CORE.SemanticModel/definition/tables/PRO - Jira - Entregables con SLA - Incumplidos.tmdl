@@ -1,0 +1,59 @@
+table 'PRO - Jira - Entregables con SLA - Incumplidos'
+	lineageTag: 81e08541-81b6-4f3f-915a-b576acaff76b
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3b3c9bad-a826-45de-b3ba-27daef2c7fdd
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: fc800287-705d-44f1-a0f8-a0617be6321a
+			defaultHierarchy: LocalDateTable_c595a741-e95d-40af-83eb-30316d9983ec.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Tipo
+		dataType: string
+		lineageTag: 9977dc8a-cddb-43e6-9db6-8f5db78ec320
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Rechazados'
+		dataType: double
+		lineageTag: 16f2a3b8-dcc6-4fa4-8869-72e7350f94a0
+		summarizeBy: sum
+		sourceColumn: Total Rechazados
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'PRO - Jira - Entregables con SLA - Incumplidos-a0ec8ef5-5165-4edc-96f1-6be501ba5561' = m
+		mode: import
+		queryGroup: KGIs_I
+		source = ```
+				let
+				    Source = #"PRO - Jira - Entregables con SLA",
+				
+				    #"Renamed Columns" = Table.RenameColumns(Source,{{"Resolved - Copy", "Cerrado - Copy"}}),
+				   
+				    //Filtra solamente por los entregables que han sido rechazados
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Rechazado] = true)),
+				
+				    //Agrupa el total de entregables rechazados por mes y tipo de gravedad
+				    #"Grouped Rows" = Table.Group(#"Filtered Rows", {"Cerrado - Copy", "Tipo"}, {{"Total Rechazados", each Table.RowCount(_), type number}})
+				in
+				    #"Grouped Rows"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,195 @@
+table T_Mejoras
+	lineageTag: 145c730d-a9d5-4430-9e47-1e49161844db
+
+	measure 'Cuenta de Numero' = COUNT(T_Mejoras[Número])
+		formatString: 0
+		lineageTag: c637e4fb-fc94-43b3-bbfa-1c925011028f
+
+	column Número
+		dataType: string
+		lineageTag: d58df3a9-33c0-4ff3-b661-69bb6f75aa86
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: a418569a-2fa0-4ad6-8f65-3ec3d43420cf
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de asignación'
+		dataType: string
+		lineageTag: 7d8741ea-6841-4ead-b330-0f8666526b7f
+		summarizeBy: none
+		sourceColumn: Grupo de asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asignado a'
+		dataType: string
+		lineageTag: 7d035ada-e966-4288-ad8f-8f7cf837df41
+		summarizeBy: none
+		sourceColumn: Asignado a
+
+		annotation SummarizationSetBy = Automatic
+
+	column Catálogo
+		dataType: string
+		lineageTag: a58b5993-8da9-4ecf-894f-445b9511882d
+		summarizeBy: none
+		sourceColumn: Catálogo
+
+		annotation SummarizationSetBy = Automatic
+
+	column País
+		dataType: string
+		lineageTag: 5fb79471-94c4-4ffa-8ab7-e7056121d7d6
+		summarizeBy: none
+		sourceColumn: País
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado de Aprobación'
+		dataType: string
+		lineageTag: 386308f3-86b9-4da2-bbb5-5afbbd303eee
+		summarizeBy: none
+		sourceColumn: Estado de Aprobación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abierto
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c5abb84b-e8d0-4e16-b2fd-0ecf4f44528f
+		summarizeBy: none
+		sourceColumn: Abierto
+
+		variation Variación
+			isDefault
+			relationship: 051edde7-7fc7-4dd6-902e-9f9c2a69ab6d
+			defaultHierarchy: LocalDateTable_61fafc48-590e-41f2-a618-47a02f4ec847.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Tiempo de resolución'
+		dataType: string
+		lineageTag: 461f7573-2c9f-472d-b1d1-04e75318f23b
+		summarizeBy: none
+		sourceColumn: Tiempo de resolución
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Aprobación / Rechazo'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 1960f795-50ea-43f5-bbd4-1a0adbc57ae2
+		summarizeBy: none
+		sourceColumn: Fecha de Aprobación / Rechazo
+
+		variation Variación
+			isDefault
+			relationship: 736fa6ce-a506-47e7-9a6c-09caaed05ecc
+			defaultHierarchy: LocalDateTable_bbdf4494-3d7f-4e89-924f-b1e011fca822.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 68a3f921-f147-404d-99c3-3aa2aaee4261
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Pedido para'
+		dataType: string
+		lineageTag: 92d4ed3d-a0e6-4bb2-af72-e7960370d52d
+		summarizeBy: none
+		sourceColumn: Pedido para
+
+		annotation SummarizationSetBy = Automatic
+
+	column Actualizado
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 00a4fa58-3873-4d7e-8c0b-4068876c6ebe
+		summarizeBy: none
+		sourceColumn: Actualizado
+
+		variation Variación
+			isDefault
+			relationship: 52f11ee9-6902-4783-bfa0-cce53ded1c5b
+			defaultHierarchy: LocalDateTable_a3e5d335-2245-446d-9293-0e9d0d26bd6e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Describe detalladamente tu petición'
+		dataType: string
+		lineageTag: c0e4162f-d470-4d8a-a2dc-6e60343d2ead
+		summarizeBy: none
+		sourceColumn: Describe detalladamente tu petición
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nombre
+		dataType: string
+		lineageTag: 76c9af82-835c-4aa5-8c21-e31efe6f6455
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Responsable
+		dataType: string
+		lineageTag: 7a764f1f-664d-45b5-bedb-2b2b2c5d02a2
+		summarizeBy: none
+		sourceColumn: Responsable
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Elemento de solicitud'
+		dataType: string
+		lineageTag: ba0ed486-0a43-4210-98d8-0cb8c6de9a17
+		summarizeBy: none
+		sourceColumn: Elemento de solicitud
+
+		annotation SummarizationSetBy = Automatic
+
+	partition T_Mejoras-f4878d3d-acb8-4d77-b5ee-ededd9b30771 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents( globalPath & "Mejoras" & xlsx ), null, true),
+				    Hoja2_Sheet = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Hoja2_Sheet, [PromoteAllScalars=true]),
+				    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Encabezados promovidos",{{"Notas de trabajo", "Describe detalladamente tu petición"}}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado3",{{"Abierto", type date}, {"Actualizado", type date}}),
+				    #"Columna duplicada" = Table.DuplicateColumn(#"Tipo cambiado", "Abierto", "Abierto - Copia"),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Columna duplicada",{{"Abierto - Copia", type date}}),
+				    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Tipo cambiado1",{{"Elemento", "Nombre"}}),
+				    #"Inicio del mes calculado" = Table.TransformColumns(#"Columnas con nombre cambiado2",{{"Abierto - Copia", Date.StartOfMonth, type datetime}}),
+				    #"Índice agregado" = Table.AddIndexColumn(#"Inicio del mes calculado", "Índice", 0, 1, Int64.Type),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Índice agregado",{{"Índice", "ID"}}),
+				    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas con nombre cambiado",{"ID", "Número", "Elemento de solicitud", "Descripción", "Grupo de asignación", "Asignado a", "Catálogo", "País", "Estado", "Abierto", "Tiempo de resolución", "Describe detalladamente tu petición", "Nombre", "Abierto - Copia"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas reordenadas","En curso","0 - Pendiente",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Cerrado Completo","1 - Aprobada",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","Cerrado omitido","2 - Rechazado",Replacer.ReplaceText,{"Estado"}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Valor reemplazado2", "Responsable", each "Proveedor"),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Personalizada agregada",{{"Estado", "Estado de Aprobación"}, {"Abierto - Copia", "Fecha de Aprobación / Rechazo"}})
+				in
+				    #"Columnas con nombre cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

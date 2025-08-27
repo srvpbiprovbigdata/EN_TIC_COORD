@@ -1,0 +1,121 @@
+table LB_Pivot
+	lineageTag: cf095dda-c7df-4ad8-990b-a7b58b5670dc
+
+	column 'Ámbito del Servicio'
+		dataType: string
+		lineageTag: 781a45c3-e3b5-4f70-a6d7-a3cf479aa5c4
+		summarizeBy: none
+		sourceColumn: Ámbito del Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción Ámbito Servicio'
+		dataType: string
+		lineageTag: b03a44b4-eedd-4b23-9744-a6f1a20536bd
+		summarizeBy: none
+		sourceColumn: Descripción Ámbito Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Período
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8082d139-5364-4d75-be0e-9e87357d8c0b
+		summarizeBy: none
+		sourceColumn: Período
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'LB tipo.1'
+		dataType: string
+		lineageTag: 4c67006d-5944-430b-b135-c9be379e4aac
+		summarizeBy: none
+		sourceColumn: LB tipo.1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LB tipo.2'
+		dataType: string
+		lineageTag: 2dcd89a4-009a-4bf5-b446-1ca37e220108
+		summarizeBy: none
+		sourceColumn: LB tipo.2
+
+		annotation SummarizationSetBy = Automatic
+
+	column Valor
+		dataType: double
+		lineageTag: 6c9e97f8-93c9-4846-95c2-ba361536f51f
+		summarizeBy: sum
+		sourceColumn: Valor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'ID Ámbito Servicio'
+		dataType: string
+		lineageTag: 995d101e-c0d2-449f-b33d-dcc5ba69896a
+		summarizeBy: none
+		sourceColumn: ID Ámbito Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipología
+		dataType: string
+		lineageTag: 7238f54b-916b-4a09-8694-63e4ceadc824
+		summarizeBy: none
+		sourceColumn: Tipología
+
+		annotation SummarizationSetBy = Automatic
+
+	column Currency_Volume
+		dataType: string
+		lineageTag: c036eb6b-dbcd-4896-92ad-818fd255e74b
+		summarizeBy: none
+		sourceColumn: Currency_Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column Periodo_fin_mes
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b63a088a-a8e2-4c3f-a209-b9b523073fd9
+		summarizeBy: none
+		sourceColumn: Periodo_fin_mes
+
+		variation Variación
+			isDefault
+			relationship: b21b8000-7d7a-4dd5-9d2b-d9e4b0ffe564
+			defaultHierarchy: LocalDateTable_30826109-a74e-4680-ac47-05975d786663.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition LB_Pivot-a9739532-f9fa-4184-88e8-1931907b299a = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = #"LB € y volumétrica",
+				    #"Columnas quitadas" = Table.RemoveColumns(Origen,{"Servicio TIC"}),
+				    #"Columna de anulación de dinamización" = Table.UnpivotOtherColumns(#"Columnas quitadas", {"Ámbito del Servicio", "Descripción Ámbito Servicio", "Período"}, "Atributo", "Valor"),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columna de anulación de dinamización",{{"Atributo", "LB tipo"}}),
+				    #"Dividir columna por delimitador" = Table.SplitColumn(#"Columnas con nombre cambiado", "LB tipo", Splitter.SplitTextByEachDelimiter({" "}, QuoteStyle.Csv, true), {"LB tipo.1", "LB tipo.2"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Dividir columna por delimitador","Evolutivos","Evolutivo",Replacer.ReplaceText,{"Descripción Ámbito Servicio"}),
+				    #"Columna combinada insertada" = Table.AddColumn(#"Valor reemplazado", "ID Ámbito Servicio", each if [Descripción Ámbito Servicio] <> "Peticiones de Servicio" then Text.Combine({[Ámbito del Servicio], ". Mantenimiento ", [Descripción Ámbito Servicio]}) else Text.Combine({[Ámbito del Servicio], ". ", [Descripción Ámbito Servicio]}), type text),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Columna combinada insertada", "Tipología", each if [LB tipo.2] = "€" then "Línea Base - Financiera €" else if [LB tipo.2] = "Volumen" then "Línea Base - Volumetría" else null),
+				    #"Columna condicional agregada1" = Table.AddColumn(#"Columna condicional agregada", "Currency_Volume", each if [LB tipo.2] = "€" then "Currency" else if [LB tipo.2] = "Volumen" then "Volume" else null, type text),
+				    #"Fin de mes insertado" = Table.AddColumn(#"Columna condicional agregada1", "Periodo_fin_mes", each Date.EndOfMonth([Período]), type date),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Fin de mes insertado",{{"Valor", type number}}),
+				    #"Errores reemplazados" = Table.ReplaceErrorValues(#"Tipo cambiado", {{"Valor", null}}),
+				    #"Filas filtradas" = Table.SelectRows(#"Errores reemplazados", each [Valor] <> null and [Valor] <> "")
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

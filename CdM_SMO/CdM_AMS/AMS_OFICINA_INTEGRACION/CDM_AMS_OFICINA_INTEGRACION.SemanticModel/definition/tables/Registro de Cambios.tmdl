@@ -1,0 +1,141 @@
+table 'Registro de Cambios'
+	lineageTag: 5d807e54-b233-4a1f-a508-c55972bc1302
+
+	column 'Estado del Cambio'
+		dataType: string
+		lineageTag: 725cd19a-d01e-433e-9a2f-21784ee47f5b
+		summarizeBy: none
+		sourceColumn: Estado del Cambio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Servicio Afectado'
+		dataType: string
+		lineageTag: 14bad418-10d8-434b-81c7-9bc3753e6aa7
+		summarizeBy: none
+		sourceColumn: Servicio Afectado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción del impacto en el Servicio'
+		dataType: string
+		lineageTag: fd160b82-85c1-4253-acf6-197b1a1b0311
+		summarizeBy: none
+		sourceColumn: Descripción del impacto en el Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: 56ec0cff-602e-4aa6-b7e8-a3cb6226e9df
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 04211d51-f71c-4be7-bdba-6568016d6051
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Ámbito afectado del Servicio'
+		dataType: string
+		lineageTag: 912320ba-553f-4328-84bf-3354c56b09d4
+		summarizeBy: none
+		sourceColumn: Ámbito afectado del Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de Cambio Solicitado'
+		dataType: string
+		lineageTag: 42dabb1a-9aff-4161-8dd3-499d7ea65f8a
+		summarizeBy: none
+		sourceColumn: Tipo de Cambio Solicitado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Urgencia
+		dataType: string
+		lineageTag: 81c5cd83-7f97-4930-8cfc-168b4262d80e
+		summarizeBy: none
+		sourceColumn: Urgencia
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Impacto en el Servicio'
+		dataType: string
+		lineageTag: 2d54e83f-9af1-48b2-bdcc-b90d3900531b
+		summarizeBy: none
+		sourceColumn: Impacto en el Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Aprobación Comité Táctico'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 869da889-0280-4ab0-863a-52ec4bc4f088
+		summarizeBy: none
+		sourceColumn: Fecha Aprobación Comité Táctico
+
+		variation Variación
+			isDefault
+			relationship: 1110e82c-53de-4a46-9b63-ced20435d637
+			defaultHierarchy: LocalDateTable_b92b5836-44ab-4f70-bb21-c7dabffac2d4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Id Cambio'
+		dataType: string
+		lineageTag: 20734566-0d42-42a0-aa3f-95c4faa072ce
+		summarizeBy: none
+		sourceColumn: Id Cambio
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI =
+			
+			
+			var _inicio1 = FIND("KGI",'Registro de cambios'[Descripción], 1, 1)
+			var _extraenumber1 = MID('Registro de cambios'[Descripción], _inicio1, 7)
+			var _onlykginum1 = RIGHT(_extraenumber1, 3)
+			
+			var _isvalue = NOT(ISERROR(VALUE(RIGHT(_onlykginum1, 1))))
+			
+			var _inicio2 = FIND("KGI",'Registro de cambios'[Descripción del impacto en el Servicio], 1, 1)
+			var _extraenumber2 = MID('Registro de cambios'[Descripción del impacto en el Servicio], _inicio2, 7)
+			var _onlykginum2 = RIGHT(_extraenumber2, 3)
+			
+			var _isvalue2 = NOT(ISERROR(VALUE(RIGHT(_onlykginum2, 1))))
+			
+			var _kgidirty = if( _isvalue = TRUE(), _onlykginum1, if( _isvalue2 = TRUE(), _onlykginum2, BLANK()))
+			var _kgi = SUBSTITUTE(_kgidirty, ".", "-")
+			
+			RETURN
+			
+			IF(_kgi = BLANK(), "Sin KGI",
+			"KGI " & _kgi)
+		lineageTag: e6896f63-5c3f-4516-a67c-c9102cf9da8c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Registro de Cambios-4a2bc6d6-b8a0-4ebe-a84b-55802a479c58' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = #"Registro de Cambios (stagging)",
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Fecha", type date}, {"Id Cambio", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+

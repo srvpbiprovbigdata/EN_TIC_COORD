@@ -1,0 +1,57 @@
+table 'PRO - Incidencias con SLA (NY y MAD)-Relacionadas'
+	lineageTag: 158ef2eb-4963-4d30-a5c8-332b95ec0568
+
+	column Prioridad
+		dataType: string
+		lineageTag: 34ba2142-748c-4ebd-a7a1-ced25c3e130d
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: f17e8198-09f1-4114-8518-78709daf0700
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PRO - Planificaciones PRJ y ENH con SLA.Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a5cee456-d4c9-44fe-835f-6e510df3f3be
+		summarizeBy: none
+		sourceColumn: PRO - Planificaciones PRJ y ENH con SLA.Fecha fin real - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'PRO - Incidencias con SLA (NY y MAD)-Relacionadas-185c9dc6-f7b0-496e-8cb5-21020ddd8c46' = m
+		mode: import
+		queryGroup: KGIs_II
+		source =
+				let
+				    Origen = #"PRO - Incidencias con SLA (NY y MAD)",
+				
+				    //Combinamos para sacar las incidencias relacionadas a un evolutivo
+				    #"Consultas combinadas" = Table.NestedJoin(Origen, {"Número"}, Incidencias_relacionadas, {"Incidente"}, "Incidencias_relacionadas", JoinKind.LeftOuter),
+				    #"Se expandió Incidencias_relacionadas" = Table.ExpandTableColumn(#"Consultas combinadas", "Incidencias_relacionadas", {"Tarea"}, {"Incidencias_relacionadas.Tarea"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Se expandió Incidencias_relacionadas", each ([Incidencias_relacionadas.Tarea] <> null)),
+				
+				    // Sacamos la prioridad que tiene el evolutivo para sustituir la prioridad de la incidencia con la del evolutivo.
+				    #"Consultas combinadas1" = Table.NestedJoin(#"Filas filtradas", {"Incidencias_relacionadas.Tarea"}, #"PRO - Planificaciones PRJ y ENH con SLA", {"Número"}, "PRO - Planificaciones PRJ y ENH con SLA", JoinKind.LeftOuter),
+				    #"Se expandió PRO - Planificaciones PRJ y ENH con SLA" = Table.ExpandTableColumn(#"Consultas combinadas1", "PRO - Planificaciones PRJ y ENH con SLA", {"Prioridad", "Fecha fin real - Copy"}, {"PRO - Planificaciones PRJ y ENH con SLA.Prioridad", "PRO - Planificaciones PRJ y ENH con SLA.Fecha fin real - Copy"}),
+				    #"Columnas quitadas1" = Table.RemoveColumns(#"Se expandió PRO - Planificaciones PRJ y ENH con SLA",{"Cerrado - Copy"}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas quitadas1",{"Prioridad"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas quitadas",{{"PRO - Planificaciones PRJ y ENH con SLA.Prioridad", "Prioridad"}}),
+				    #"Filas agrupadas" = Table.Group(#"Columnas con nombre cambiado", {"Prioridad", "PRO - Planificaciones PRJ y ENH con SLA.Fecha fin real - Copy"}, {{"Recuento", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Filas agrupadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

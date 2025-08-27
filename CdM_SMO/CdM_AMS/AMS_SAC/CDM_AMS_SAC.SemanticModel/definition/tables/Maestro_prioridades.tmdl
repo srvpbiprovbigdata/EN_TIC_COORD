@@ -1,0 +1,46 @@
+table Maestro_prioridades
+	lineageTag: 87232fb8-f268-4ff3-83df-0fb2d9aadcb3
+
+	column Prioridad
+		dataType: string
+		lineageTag: 74354572-c535-44b6-8bb0-7aa61ef7c842
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad_grupo
+		dataType: string
+		lineageTag: 1781000f-40ef-4579-a9bf-eb97153839e1
+		summarizeBy: none
+		sourceColumn: Prioridad_grupo
+		sortByColumn: Orden_prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden_prioridad
+		dataType: double
+		lineageTag: 43ae89b0-0b2c-4b6b-b8ff-5dc0d384dd22
+		summarizeBy: none
+		sourceColumn: Orden_prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Maestro_prioridades-982ef0a3-e124-4853-ad18-2942fcadd663 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlTQVXAuOry2JDM5UUlHCc6M1YlWMgLKOeaUgMTBFEjMGCjmm5+SWpSYAhL3TU3JhEiYACWcErNAgmAKJGYKUlxaqZCELB4LAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Prioridad = _t, Prioridad_grupo = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Prioridad", type text}, {"Prioridad_grupo", type text}}),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Tipo cambiado", "Personalizado", each if [Prioridad_grupo] = "Crítica" then 1 else if [Prioridad_grupo] = "Alta" then 2 else if [Prioridad] = "3 - Moderada" then 3 else if [Prioridad_grupo] = "Baja" then 4 else if [Prioridad_grupo] = "Grave" then 1 else if [Prioridad] = "Medium" then 2 else if [Prioridad_grupo] = "Leve" then 3 else null, type number),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columna condicional agregada",{{"Personalizado", "Orden_prioridad"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

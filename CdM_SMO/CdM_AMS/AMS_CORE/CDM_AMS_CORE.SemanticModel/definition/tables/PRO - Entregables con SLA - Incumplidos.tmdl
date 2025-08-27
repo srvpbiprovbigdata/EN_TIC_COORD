@@ -1,0 +1,62 @@
+table 'PRO - Entregables con SLA - Incumplidos'
+	lineageTag: 7ed29311-9e8e-4a6f-a130-7cf77f8c9fb2
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2aebd5c5-4754-475a-8993-b831332d4b62
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: 43737cd4-36ac-41e7-8427-dc0b4adf6bf8
+			defaultHierarchy: LocalDateTable_16a13b0e-d4c1-475b-9b03-ae546f9305ab.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Estado
+		dataType: string
+		lineageTag: 75cb2f94-5888-4ee3-b6f2-324a0d2e7ad9
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Incumplidos
+		dataType: double
+		lineageTag: a86cdd97-ef3b-402c-b864-eead4412ce55
+		summarizeBy: sum
+		sourceColumn: Incumplidos
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Tipo de incumplimiento'
+		dataType: string
+		lineageTag: 24d90014-e966-47c1-9c76-f0f49c5f1aca
+		summarizeBy: none
+		sourceColumn: Tipo de incumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Entregables con SLA - Incumplidos-d3e43e21-7438-43eb-8d85-0b3a182947ae' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Source = #"PRO - Entregables con SLA",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Tipo de incumplimiento", "Cerrado - Copy", "Estado"}, {{"Incumplidos", each Table.RowCount(_), type number}}),
+				
+				    #"Filtered Rows" = Table.SelectRows(#"Grouped Rows", each ([Estado] = "Cerrado incompleto"))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

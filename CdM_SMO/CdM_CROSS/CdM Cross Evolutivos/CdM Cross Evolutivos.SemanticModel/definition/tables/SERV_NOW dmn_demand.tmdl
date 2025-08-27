@@ -1,0 +1,2099 @@
+table 'SERV_NOW dmn_demand'
+	lineageTag: 74c8654c-e6dd-4be3-bbf6-072bd65c7593
+
+	measure '_% Percent_complete_SIN_ERROR' = ((SUM('SERV_NOW dmn_demand'[_percent_complete_EVOLUTIVOS_ESTADO_ENCURSO])/[LINEAS_ENERGIA])/100)+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 64985bc3-d089-45d9-acbb-1342029aae7e
+
+	measure LINEAS_ENERGIA = COUNTX('SERV_NOW dmn_demand','SERV_NOW dmn_demand'[GRADO_AVANCE_LineasCandidatas])
+		formatString: 0
+		lineageTag: 3e2bd041-8306-42d3-bccf-bdc1e42f5582
+
+	measure '_% comparativo entre teorico y real_SIN_ERROR' = (AVERAGE('SERV_NOW dmn_demand'[% comparativo entre teorico y real]))+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 90c6adfe-0c38-4cc2-bc4f-1fad3fef1de4
+
+	measure 'MES_ACTUAL_Abiertos - Evolutivos'
+		lineageTag: 605b64d7-1431-4b5c-a0f4-c05fa72cfaf4
+
+	measure 'LINEAS_ENERGIA_SIN REPETIR' =
+			CALCULATE(
+			    DISTINCTCOUNT('SERV_NOW dmn_demand'[DEMANDA_NUMBER_FICTICIO]),
+			    FILTER('SERV_NOW dmn_demand','SERV_NOW dmn_demand'[GRADO_AVANCE_LineasCandidatas] = "Candidata"))
+		formatString: 0
+		lineageTag: 06571c51-1cee-486f-811f-7213817be76c
+
+	measure '_% Percent_complete_LineasNoREpetidas_SIN_ERROR' = ((SUM('SERV_NOW dmn_demand'[_percent_complete_EVOLUTIVOS_ESTADO_ENCURSO])/[LINEAS_ENERGIA_SIN REPETIR])/100)+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 61810c32-5ca3-478f-b782-700a565c7f91
+
+	measure '_% comparativo entre teorico y real_LineasNoREpetidas_SIN_ERROR' = (SUM('SERV_NOW dmn_demand'[% comparativo entre teorico y real])/[LINEAS_ENERGIA_SIN REPETIR])+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: bb367d4b-ad19-45d7-9c4a-b428d574dbf9
+
+	measure GradoAvanceMedio_DemandasRepetidasConNoRepetidas = ```
+			
+			var GradoAvanceMedio_DemandasRepetidas =
+			SUMMARIZE(
+			    'SERV_NOW dmn_demand', 
+			    'SERV_NOW Demandas_Unicas'[DEMANDA_NUMBER_FICTICIO],
+			    "Media", AVERAGE('SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_percent_complete])
+			    )
+			RETURN
+			    AVERAGEX(GradoAvanceMedio_DemandasRepetidas, [Media])/100
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 05db9ee9-9a0d-423f-9418-4076f20e99c6
+
+	measure PRUEBA_GradoAvanceMedio_DemandasNORepetidas = ```
+			
+			 IF('SERV_NOW dmn_demand'[LINEAS_ENERGIA_SIN REPETIR]>0, 
+			AVERAGE ( 'SERV_NOW dmn_demand'[_percent_complete_EVOLUTIVOS_ESTADO_ENCURSO])+0,0)
+			```
+		lineageTag: 824eed4b-aa5f-4d0c-927c-2d1011e08e9c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure DesviacionMedia_DemandasRepetidasConNoRepetidas = ```
+			
+			var DesviacionMedia_DemandasRepetidas =
+			SUMMARIZE(
+			    'SERV_NOW dmn_demand', 
+			    'SERV_NOW Demandas_Unicas'[DEMANDA_NUMBER_FICTICIO],
+			    "Media", AVERAGE('SERV_NOW dmn_demand'[% comparativo entre teorico y real])
+			    )
+			RETURN
+			    AVERAGEX(DesviacionMedia_DemandasRepetidas, [Media])
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 388d2849-ee18-4442-86fc-02bd9096c242
+
+	column active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2ca114de-2972-496e-83bc-e82d959b2f3b
+		summarizeBy: none
+		sourceColumn: active
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_applications
+		dataType: string
+		lineageTag: df450a07-8318-464c-b5f1-9f89f1045572
+		summarizeBy: none
+		sourceColumn: business_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column capital_budget
+		dataType: double
+		lineageTag: 7b03a491-3372-4b44-937c-5f68ab1965ce
+		summarizeBy: sum
+		sourceColumn: capital_budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column capital_outlay
+		dataType: double
+		lineageTag: a93116a5-c943-4349-8ce2-b1a111063efb
+		summarizeBy: sum
+		sourceColumn: capital_outlay
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column category
+		dataType: string
+		lineageTag: b03f39ca-a901-44c2-acb5-6cea5a274cd5
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_category
+		dataType: string
+		lineageTag: 1dfb22d0-e7f0-49dd-9a17-757bd46335b4
+		summarizeBy: none
+		sourceColumn: dv_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column closed_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 449722dc-a704-4d91-9212-dc76485154c1
+		summarizeBy: none
+		sourceColumn: closed_at
+
+		variation Variación
+			isDefault
+			relationship: 3b61196b-5944-4358-b7fd-c3e9eae79da4
+			defaultHierarchy: LocalDateTable_7bb8312a-bf41-46cb-8d74-b3c3e124a12e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmdb_ci_business_app
+		dataType: string
+		lineageTag: 8ae6b76f-e3ec-4bd2-8750-104cf582e38c
+		summarizeBy: none
+		sourceColumn: cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_cmdb_ci_business_app
+		dataType: string
+		lineageTag: 80981644-d1f3-4503-80c6-dd3a232b9bcc
+		summarizeBy: none
+		sourceColumn: dv_cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column demand
+		dataType: string
+		lineageTag: da754e0c-5084-4f94-9282-c48ccb72317f
+		summarizeBy: none
+		sourceColumn: demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column demand_actual_cost
+		dataType: double
+		lineageTag: 7ab14955-ca74-471d-8015-b31783c0cd05
+		summarizeBy: sum
+		sourceColumn: demand_actual_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column enhancement
+		dataType: string
+		lineageTag: 273652dd-d40b-4c4d-b617-42d5322a4218
+		summarizeBy: none
+		sourceColumn: enhancement
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_enhancement
+		dataType: string
+		lineageTag: 772ba7b5-2c3a-4d84-92c3-5f3f8df314ef
+		summarizeBy: none
+		sourceColumn: dv_enhancement
+
+		annotation SummarizationSetBy = Automatic
+
+	column financial_benefit
+		dataType: double
+		lineageTag: 745b3a88-8eff-4424-8c00-6b17b95ff3b3
+		summarizeBy: sum
+		sourceColumn: financial_benefit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column financial_return
+		dataType: double
+		lineageTag: c4da6913-b7c2-4fb6-b3d8-934d839fb5b9
+		summarizeBy: sum
+		sourceColumn: financial_return
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column impact
+		dataType: int64
+		formatString: 0
+		lineageTag: b16d549a-feb8-4f57-8bfb-57030f4ad1e0
+		summarizeBy: sum
+		sourceColumn: impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_impact
+		dataType: string
+		lineageTag: 0e1e32ba-7be4-4fbf-adf1-337b382c456a
+		summarizeBy: none
+		sourceColumn: dv_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column impacted_business_units
+		dataType: string
+		lineageTag: dd55fdbc-02e4-45df-8364-44ac64f0ff9c
+		summarizeBy: none
+		sourceColumn: impacted_business_units
+
+		annotation SummarizationSetBy = Automatic
+
+	column number
+		dataType: string
+		lineageTag: 4970b5b9-0d18-43e5-b24e-d545ca66d478
+		summarizeBy: none
+		sourceColumn: number
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2316beb3-5353-41be-bd77-db6b621ca096
+		summarizeBy: none
+		sourceColumn: opened_at
+
+		variation Variación
+			isDefault
+			relationship: ea4d6abe-cee9-4591-95b7-a1bbd33d30f9
+			defaultHierarchy: LocalDateTable_c19a516f-0680-4ea7-9716-519994106a4c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column operational_budget
+		dataType: double
+		lineageTag: 3134c5b9-bd5e-477b-b2b1-57fd701d93b8
+		summarizeBy: sum
+		sourceColumn: operational_budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column operational_outlay
+		dataType: double
+		lineageTag: b7fb8950-50ad-454a-b846-883f363cdd60
+		summarizeBy: sum
+		sourceColumn: operational_outlay
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column parent
+		dataType: string
+		lineageTag: 0aa3df1e-6b79-4ad5-b22b-5dd5b0c67d3d
+		summarizeBy: none
+		sourceColumn: parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column portfolio
+		dataType: string
+		lineageTag: 35d94513-dad2-49cd-b546-dff0c63f8e61
+		summarizeBy: none
+		sourceColumn: portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_portfolio
+		dataType: string
+		lineageTag: 709919c3-8467-425f-ae9a-2947878ef265
+		summarizeBy: none
+		sourceColumn: dv_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column priority
+		dataType: int64
+		formatString: 0
+		lineageTag: 65263e0c-d837-4fec-8e22-1688836b5f6f
+		summarizeBy: sum
+		sourceColumn: priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_priority
+		dataType: string
+		lineageTag: 60fcab60-8efe-4ba7-8c5a-24d3fa8bb00f
+		summarizeBy: none
+		sourceColumn: dv_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column project
+		dataType: string
+		lineageTag: 6a7195f2-3bdf-4615-8db2-8885e6a9d8f7
+		summarizeBy: none
+		sourceColumn: project
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_project
+		dataType: string
+		lineageTag: 87253965-ad5b-4f6a-b0a2-43165666d147
+		summarizeBy: none
+		sourceColumn: dv_project
+
+		annotation SummarizationSetBy = Automatic
+
+	column related_records
+		dataType: string
+		lineageTag: 80089a5e-5c44-430c-a0b1-5a68c06c077f
+		summarizeBy: none
+		sourceColumn: related_records
+
+		annotation SummarizationSetBy = Automatic
+
+	column short_description
+		dataType: string
+		lineageTag: daea8f0f-2503-4de4-96a5-9bb8344a6689
+		summarizeBy: none
+		sourceColumn: short_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column size
+		dataType: string
+		lineageTag: 2c6cc70f-949f-4106-903a-ce6b18eb97b2
+		summarizeBy: none
+		sourceColumn: size
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_size
+		dataType: string
+		lineageTag: 0059c607-874b-4ffd-8cbf-a3dad38c5496
+		summarizeBy: none
+		sourceColumn: dv_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 236095ce-ddbf-4920-9eb0-dcf20b48c023
+		summarizeBy: none
+		sourceColumn: start_date
+
+		variation Variación
+			isDefault
+			relationship: 9f0b0ef4-2b4a-4736-b861-9c457e86f540
+			defaultHierarchy: LocalDateTable_3d6758ed-0cc6-46b4-9c40-1d376517ceb9.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: int64
+		formatString: 0
+		lineageTag: cb3746ba-56dc-4a13-9b3c-8d28ef9a90fd
+		summarizeBy: sum
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_state
+		dataType: string
+		lineageTag: 55ae1ddb-ceee-4bd1-9de3-bf12ba8ee783
+		summarizeBy: none
+		sourceColumn: dv_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column submitted_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 224ac848-bbb1-46d1-92f5-41d67a3c1688
+		summarizeBy: none
+		sourceColumn: submitted_date
+
+		variation Variación
+			isDefault
+			relationship: 530f2a14-60a1-4b0d-a224-43b36bd4429c
+			defaultHierarchy: LocalDateTable_5b5141e1-5b8b-4135-ab8a-927b9fdf6dfe.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3c63746f-5756-47f3-bb76-f57505902502
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: 7ce17381-1521-478c-a1af-eb3e45b174af
+			defaultHierarchy: LocalDateTable_904a74df-c117-43ad-ac43-fd2321908a24.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: fdd7c44f-e464-43c8-b43f-cedf02f95595
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_updated_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: eb386a7b-eb2b-4245-9b5a-9d825954a0f1
+		summarizeBy: none
+		sourceColumn: sys_updated_on
+
+		variation Variación
+			isDefault
+			relationship: 72e8c3db-c664-4ea1-8042-565004950c38
+			defaultHierarchy: LocalDateTable_2253aca5-200d-4707-b268-fed9099adc40.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_effective_number
+		dataType: string
+		lineageTag: f0102793-7dee-4795-90b8-fd158da8dc39
+		summarizeBy: none
+		sourceColumn: task_effective_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_costs
+		dataType: double
+		lineageTag: 3ef92cb9-bcaa-4c0f-aa6f-0c4f680486cb
+		summarizeBy: sum
+		sourceColumn: total_costs
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column type
+		dataType: string
+		lineageTag: 3e5c89a0-7989-4253-a8ee-f7085db9e6bd
+		summarizeBy: none
+		sourceColumn: type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_type
+		dataType: string
+		lineageTag: a600e9ec-7515-4118-b760-7a8805de5754
+		summarizeBy: none
+		sourceColumn: dv_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_actual_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3522c6d4-51be-4f62-9eef-a5b3d35af24c
+		summarizeBy: none
+		sourceColumn: u_actual_end_date
+
+		variation Variación
+			isDefault
+			relationship: e80302a5-8099-4067-a338-2a7329a59ef7
+			defaultHierarchy: LocalDateTable_86e1fe16-e217-48fc-95a3-debfd7aeb7cc.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_actual_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e3d84f9a-eea5-4618-9f5b-a374589f5fa6
+		summarizeBy: none
+		sourceColumn: u_actual_start_date
+
+		variation Variación
+			isDefault
+			relationship: c5112baa-7be0-483d-b78c-f0e809813499
+			defaultHierarchy: LocalDateTable_92260b07-2223-465d-b43a-afd1d1b8c27c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_affected_portfolios
+		dataType: string
+		lineageTag: 55ec5c2e-6741-4424-bd4e-45eb813ab5e2
+		summarizeBy: none
+		sourceColumn: u_affected_portfolios
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_approved_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: eff5a0e3-3572-4cdb-8750-aadf539ebc17
+		summarizeBy: none
+		sourceColumn: u_approved_date
+
+		variation Variación
+			isDefault
+			relationship: 5383cdcd-29a0-4520-8193-8f188308de6f
+			defaultHierarchy: LocalDateTable_ade084cc-d45e-4d31-870a-abf64b98662f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_business_applications
+		dataType: string
+		lineageTag: fd93b3c9-dd66-4964-92ea-2696855ba7d6
+		summarizeBy: none
+		sourceColumn: u_business_applications
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_demand_category
+		dataType: string
+		lineageTag: a9f1a08d-b623-44fc-864d-81a63d596a01
+		summarizeBy: none
+		sourceColumn: u_demand_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_demand_category
+		dataType: string
+		lineageTag: cf8dfe1a-873e-4daf-8a1c-d328fb179ca3
+		summarizeBy: none
+		sourceColumn: dv_u_demand_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_impact
+		dataType: string
+		lineageTag: 6c935ac5-996b-40f5-9bf2-5c3d260b1f15
+		summarizeBy: none
+		sourceColumn: u_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_impact
+		dataType: string
+		lineageTag: 91427370-3c09-48a1-9321-6b33ebafe59f
+		summarizeBy: none
+		sourceColumn: dv_u_impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_is_parent
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2e216211-e4fe-445e-a341-e6c608356eca
+		summarizeBy: none
+		sourceColumn: u_is_parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_metal
+		dataType: string
+		lineageTag: c1c216a0-dd4a-4e24-bcbb-4237a65372f5
+		summarizeBy: none
+		sourceColumn: u_metal
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_metal
+		dataType: string
+		lineageTag: 08a5fa68-e32f-48d6-a74b-71698b2750e8
+		summarizeBy: none
+		sourceColumn: dv_u_metal
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_module
+		dataType: string
+		lineageTag: 8efaec8f-bcfb-4125-8878-4efbb55ca9fe
+		summarizeBy: none
+		sourceColumn: u_module
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_module
+		dataType: string
+		lineageTag: 91ac94db-f189-45f5-93f7-9dda0365272a
+		summarizeBy: none
+		sourceColumn: dv_u_module
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_old_state
+		dataType: string
+		lineageTag: 2cd1ebc5-46ca-48a3-ba8d-d4a17314137c
+		summarizeBy: none
+		sourceColumn: u_old_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_openned_up
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b6e88e49-7a22-45a8-ad4c-7980ff74db7c
+		summarizeBy: none
+		sourceColumn: u_openned_up
+
+		variation Variación
+			isDefault
+			relationship: aef4996a-5d2a-48f7-b856-13e5db5a0771
+			defaultHierarchy: LocalDateTable_862cca90-43c7-4102-8904-ba76b48ed725.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_progress
+		dataType: double
+		lineageTag: 56052a4f-1723-4569-b07e-c332d667d6e1
+		summarizeBy: sum
+		sourceColumn: u_progress
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_project_manager
+		dataType: string
+		lineageTag: 4ef8dedb-096e-4dc5-85ce-a3f9a4a92106
+		summarizeBy: none
+		sourceColumn: u_project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_project_manager
+		dataType: string
+		lineageTag: 3b5cbc46-69ce-4dbc-b184-68b560c77214
+		summarizeBy: none
+		sourceColumn: dv_u_project_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_qualification_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4fa6ebb5-e6dd-4644-bf7c-d43b67b2a214
+		summarizeBy: none
+		sourceColumn: u_qualification_date
+
+		variation Variación
+			isDefault
+			relationship: fb04e7f6-04df-476a-9204-f0b13531a25c
+			defaultHierarchy: LocalDateTable_72ade629-19ff-4738-9664-962f0b277356.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_rejected_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c5e90360-fb1c-434c-b38f-31292df149bc
+		summarizeBy: none
+		sourceColumn: u_rejected_date
+
+		variation Variación
+			isDefault
+			relationship: 155be8a7-b302-4167-bf45-517af8798042
+			defaultHierarchy: LocalDateTable_bf44329b-26a1-4fcc-9786-6c14c41e1d92.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_relevant
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 09d856d3-61ef-4a51-8d3c-f38ab56aa959
+		summarizeBy: none
+		sourceColumn: u_relevant
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_responded
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9ea03740-4ee0-4f87-8651-64287be7c804
+		summarizeBy: none
+		sourceColumn: u_responded
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_rfp
+		dataType: string
+		lineageTag: be397804-3886-4a66-a5d8-7dfa2e69ef1e
+		summarizeBy: none
+		sourceColumn: u_rfp
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_rfp
+		dataType: string
+		lineageTag: bed96d32-4448-4a61-84ec-84ad83e939e6
+		summarizeBy: none
+		sourceColumn: dv_u_rfp
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_run
+		dataType: double
+		lineageTag: 3c2e1d67-b424-4bdb-ab9d-efc6846e4520
+		summarizeBy: sum
+		sourceColumn: u_run
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_run_description
+		dataType: string
+		lineageTag: af201567-c186-4143-b59a-b098a60397e9
+		summarizeBy: none
+		sourceColumn: u_run_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_size
+		dataType: string
+		lineageTag: 0ce34d97-c4f9-4884-8c6e-0a320352b05c
+		summarizeBy: none
+		sourceColumn: u_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_size
+		dataType: string
+		lineageTag: 861279a0-1b38-473d-9776-b969c7b1e30f
+		summarizeBy: none
+		sourceColumn: dv_u_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_sourcing
+		dataType: string
+		lineageTag: 15762e85-8d52-457d-9bf2-7afda5602610
+		summarizeBy: none
+		sourceColumn: u_sourcing
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d59f5498-dd7c-45d8-94fe-f2e2f9d51fc2
+		summarizeBy: none
+		sourceColumn: u_start_date
+
+		variation Variación
+			isDefault
+			relationship: 1dfc5cd5-0427-48a7-8b78-841008ca1a6b
+			defaultHierarchy: LocalDateTable_31bd2598-55b6-4bf3-94b8-8ab6a386436f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_state_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 35335e78-cf5e-4083-9392-79c336d4f5fd
+		summarizeBy: none
+		sourceColumn: u_state_date
+
+		variation Variación
+			isDefault
+			relationship: a583203f-2bdc-47dc-bf02-2a141b334a8e
+			defaultHierarchy: LocalDateTable_ce25b91e-f998-46cb-8206-5ce7d42aa4a6.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_status_report
+		dataType: string
+		lineageTag: 73d13600-21ff-4363-a292-2678f9f864f2
+		summarizeBy: none
+		sourceColumn: u_status_report
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_subcategory
+		dataType: string
+		lineageTag: fb228062-c8e3-424e-9c35-105a5c6615c0
+		summarizeBy: none
+		sourceColumn: u_subcategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_subcategory
+		dataType: string
+		lineageTag: b977814e-9464-48b7-881f-86cf03c35c90
+		summarizeBy: none
+		sourceColumn: dv_u_subcategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_submission_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7a0c04d3-d2b3-4d1b-8c3f-77beffec1f51
+		summarizeBy: none
+		sourceColumn: u_submission_date
+
+		variation Variación
+			isDefault
+			relationship: 9759d45a-125b-4228-9bb1-db88c2d918ad
+			defaultHierarchy: LocalDateTable_b66a620c-b675-47be-86a3-79b548608513.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_total_budget
+		dataType: double
+		lineageTag: 812189f9-db95-4c3f-bd4d-b07a4a63ce7f
+		summarizeBy: sum
+		sourceColumn: u_total_budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_total_planned_hours
+		dataType: double
+		lineageTag: e69642f8-5695-4c94-845a-01254a9690ec
+		summarizeBy: sum
+		sourceColumn: u_total_planned_hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column urgency
+		dataType: int64
+		formatString: 0
+		lineageTag: 22db1ddc-bbaa-4f46-a6fa-8ad7086b4e66
+		summarizeBy: sum
+		sourceColumn: urgency
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_urgency
+		dataType: string
+		lineageTag: d505942c-399a-415b-8a7b-cb9f556a12f7
+		summarizeBy: none
+		sourceColumn: dv_urgency
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 428a8c14-b305-4d9c-a08e-a6f86e3d8707
+		summarizeBy: none
+		sourceColumn: work_end
+
+		variation Variación
+			isDefault
+			relationship: 5bff0c48-4e59-4d9b-a3aa-a1c46a14c1e3
+			defaultHierarchy: LocalDateTable_21124b62-d5f3-4ea1-8461-993aa2fec42f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a7588030-fe87-4347-bec3-15117b8a9019
+		summarizeBy: none
+		sourceColumn: work_start
+
+		variation Variación
+			isDefault
+			relationship: fa6c1c39-ac19-4340-a367-f332f88a294b
+			defaultHierarchy: LocalDateTable_d903d40f-149e-4053-8435-867acd756c19.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project.phase'
+		dataType: string
+		lineageTag: 7ecd7eda-bfcf-4a09-8cd5-4ca677da75c5
+		summarizeBy: none
+		sourceColumn: SERV_NOW pm_project.phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project.priority'
+		dataType: int64
+		formatString: 0
+		lineageTag: b0a1d92b-b02f-4d0d-ac26-2a8ff1d2cb04
+		summarizeBy: sum
+		sourceColumn: SERV_NOW pm_project.priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project.state'
+		dataType: int64
+		formatString: 0
+		lineageTag: aa69f7f7-b4bf-4a75-9110-0ea4466fb2f2
+		summarizeBy: sum
+		sourceColumn: SERV_NOW pm_project.state
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DEMANDAS-MEJORAS.priority'
+		dataType: int64
+		formatString: 0
+		lineageTag: baaab22b-77a8-4cc0-bb06-9a1cb5c01317
+		summarizeBy: sum
+		sourceColumn: DEMANDAS-MEJORAS.priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DEMANDAS-MEJORAS.state'
+		dataType: int64
+		formatString: 0
+		lineageTag: f6a5d860-14c7-4843-a830-392ed8a6de4a
+		summarizeBy: sum
+		sourceColumn: DEMANDAS-MEJORAS.state
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project.dv_cmdb_ci_business_app'
+		dataType: string
+		lineageTag: 97704450-307f-4e43-a6e8-44a3bc21abaf
+		summarizeBy: none
+		sourceColumn: SERV_NOW pm_project.dv_cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DEMANDAS-MEJORAS.dv_u_business_application'
+		dataType: string
+		lineageTag: 6612564b-68ca-420a-8356-0e55b7dc75e7
+		summarizeBy: none
+		sourceColumn: DEMANDAS-MEJORAS.dv_u_business_application
+
+		annotation SummarizationSetBy = Automatic
+
+	column DMN-APLIC-ES-ENERGIA = if(CONTAINS(Aplicaciones, Aplicaciones[Aplicación de Negocio],'SERV_NOW dmn_demand'[Aplicaciones_Energia_DEFINITIVAS]), TRUE(), FALSE())
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5dd4e148-7b9d-465b-a164-3cd03517752d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJs_ENHs_end_date
+		dataType: string
+		lineageTag: fccb50a4-1d51-4668-afbc-2698da61dcbf
+		summarizeBy: none
+		sourceColumn: PRJs_ENHs_end_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJs_ENHs_percent_complete
+		dataType: string
+		lineageTag: 6733dfaf-f09e-4942-b549-a94408b7934f
+		summarizeBy: none
+		sourceColumn: PRJs_ENHs_percent_complete
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJs_ENHs_start_date
+		dataType: string
+		lineageTag: 456873ff-2fa5-40f2-8cb2-4532e7057435
+		summarizeBy: none
+		sourceColumn: PRJs_ENHs_start_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project - Mto.sys_id'
+		dataType: string
+		lineageTag: 56fcb7e4-4424-4c81-ad1f-eecfe82b8ee0
+		summarizeBy: none
+		sourceColumn: SERV_NOW pm_project - Mto.sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column DMNs_TASKs_AplicacionNegocio
+		dataType: string
+		lineageTag: a866ebae-b3b9-41c6-bdf1-a60726ba342a
+		summarizeBy: none
+		sourceColumn: DMNs_TASKs_AplicacionNegocio
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJs_TOPTASKs_dv_u_project_type
+		dataType: string
+		lineageTag: c9b9d8bb-c40c-46ae-b74b-32e0e2873811
+		summarizeBy: none
+		sourceColumn: PRJs_TOPTASKs_dv_u_project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJs_ENHs-ID
+		dataType: string
+		lineageTag: 6c00a7ad-600c-4d9a-b573-53cdc2620167
+		summarizeBy: none
+		sourceColumn: PRJs_ENHs-ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project - Mto.number'
+		dataType: string
+		lineageTag: ab2ea15b-d559-4092-9450-977c9319c365
+		summarizeBy: none
+		sourceColumn: SERV_NOW pm_project - Mto.number
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS-ConTareasSinDemanda
+		dataType: string
+		lineageTag: bf8461a9-41c8-4322-b91a-65858417a767
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS-ConTareasSinDemanda
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_Number
+		dataType: string
+		lineageTag: 4f1b812c-dbc0-4598-b405-7118148c82e6
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_dv_priority
+		dataType: string
+		lineageTag: a23c0594-ce05-49af-a2ca-7ec89bcecf12
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_dv_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_dv_state
+		dataType: string
+		lineageTag: 4d82ca17-7f4c-40e2-a282-45f36ed2a381
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_dv_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_opened_at
+		dataType: string
+		lineageTag: f116cf9f-b466-4d33-818e-3f6bf88a5dc1
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_opened_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_closed_at
+		dataType: string
+		lineageTag: c727828b-4f65-4f41-ac29-2b2fde78ff12
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_closed_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_dv_size - SoloLetra'
+		dataType: string
+		lineageTag: cfa4e69f-c3ca-4c0b-bd51-fa6532324c87
+		summarizeBy: none
+		sourceColumn: _dv_size - SoloLetra
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_dv_size - Texto'
+		dataType: string
+		lineageTag: 94b9e32d-0a40-457b-9614-dd2bd4cdbbf8
+		summarizeBy: none
+		sourceColumn: _dv_size - Texto
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_FINAL_dv_priority
+		dataType: string
+		lineageTag: 12eeed80-db01-4103-817c-b189059cea61
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_FINAL_dv_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'EVOLUTIVOS_COMPLETO_Number - URL'
+		dataType: string
+		lineageTag: af1667be-0f2a-43e0-b5af-2e52656aad25
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_Number - URL
+
+		annotation SummarizationSetBy = Automatic
+
+	column TABLA_SEGUN_ID
+		dataType: string
+		lineageTag: bcb2622f-9359-4afe-bf80-33fdab94a409
+		summarizeBy: none
+		sourceColumn: TABLA_SEGUN_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_URL = ```
+			if ('SERV_NOW dmn_demand'[TABLA_SEGUN_ID] = "Tarea", CONCATENATE("https://acciona.service-now.com/pm_project_task.do?sysparm_query=number%3d",'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_Number]), 
+			if ('SERV_NOW dmn_demand'[TABLA_SEGUN_ID] = "Mejora", CONCATENATE("https://acciona.service-now.com/rm_enhancement.do?sysparm_query=number%3d",'SERV_NOW dmn_demand'[PRJs_ENHs-ID]), 
+			CONCATENATE("https://acciona.service-now.com/pm_project.do?sysparm_query=number%3d",'SERV_NOW dmn_demand'[PRJs_ENHs-ID])))
+			```
+		lineageTag: c2b4315a-9820-4a2d-863b-da58c678c1bc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column DEMANDAS_URL = CONCATENATE("https://acciona.service-now.com/dmn_demand.do?sysparm_query=number%3d",'SERV_NOW dmn_demand'[number])
+		lineageTag: c8a49662-c284-45ae-9f73-7905a0d897a0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project.short_description'
+		dataType: string
+		lineageTag: f287cd09-95ff-48f9-906a-fa8ad4c8278f
+		summarizeBy: none
+		sourceColumn: SERV_NOW pm_project.short_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJs_ENHs_closed_at
+		dataType: string
+		lineageTag: 1f898d16-49e3-4d97-adfb-a825832920e1
+		summarizeBy: none
+		sourceColumn: PRJs_ENHs_closed_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJs_ENHs_opened_at
+		dataType: string
+		lineageTag: 063c7bc9-d43b-4473-8dd1-a2be38d4e37c
+		summarizeBy: none
+		sourceColumn: PRJs_ENHs_opened_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column PJRs_ENHs_Prioridad
+		dataType: string
+		lineageTag: abe41a44-ee30-481c-bfb0-1a1358f5bf4c
+		summarizeBy: none
+		sourceColumn: PJRs_ENHs_Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJs_ENHs_Estado
+		dataType: string
+		lineageTag: fbc1b296-c6d5-4156-90bc-91d4f43511e8
+		summarizeBy: none
+		sourceColumn: PRJs_ENHs_Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DEMANDAS-MEJORAS.short_description'
+		dataType: string
+		lineageTag: cb04db7d-c787-4d88-b61f-2011fee1c9a5
+		summarizeBy: none
+		sourceColumn: DEMANDAS-MEJORAS.short_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0bb4e563-7c26-4219-ba2c-d0006b9bf1f3
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_end_date
+
+		variation Variación
+			isDefault
+			relationship: de3a45f9-9516-4e5f-bd7f-ec298f5ca7ac
+			defaultHierarchy: LocalDateTable_f5d6deb6-77ac-4ba3-8da0-684589a389c6.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW TAREAS - ConDemanda.dv_parent'
+		dataType: string
+		lineageTag: f72b76a8-ba65-45d9-b425-8d632863ce1f
+		summarizeBy: none
+		sourceColumn: SERV_NOW TAREAS - ConDemanda.dv_parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_percent_complete
+		dataType: double
+		lineageTag: 7e927b31-6348-4963-8a0a-847b1ee63654
+		summarizeBy: sum
+		sourceColumn: EVOLUTIVOS_COMPLETO_percent_complete
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column EVOLUTIVOS_COMPLETO_short_description
+		dataType: string
+		lineageTag: 3b35a21e-c86d-4bc4-a112-72e772879ccf
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_short_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f24530e1-1bc7-49d2-98cd-e061730e74eb
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_start_date
+
+		variation Variación
+			isDefault
+			relationship: b0c80202-1dcc-4d7e-aea3-24a5e5efcdcb
+			defaultHierarchy: LocalDateTable_28e279e7-9e28-48fa-860d-b39a5c9a1a47.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW TAREAS - ConDemanda.dv_top_task'
+		dataType: string
+		lineageTag: 858a7e91-a918-4893-b679-bfd966ba6dcb
+		summarizeBy: none
+		sourceColumn: SERV_NOW TAREAS - ConDemanda.dv_top_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column TAREAS-SINDEMANDA-dv_parent
+		dataType: string
+		lineageTag: 6f4af168-50be-4b58-bd8c-09301271233a
+		summarizeBy: none
+		sourceColumn: TAREAS-SINDEMANDA-dv_parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column TAREAS-SINDEMANDA-dv_top_task
+		dataType: string
+		lineageTag: af81f212-1b77-4076-ad5b-d254026d0b10
+		summarizeBy: none
+		sourceColumn: TAREAS-SINDEMANDA-dv_top_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.dv_cmdb_ci_business_app'
+		dataType: string
+		lineageTag: f546442f-3ce4-4c1a-ae16-1edd8d735a2e
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.dv_cmdb_ci_business_app
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.dv_demand'
+		dataType: string
+		lineageTag: fcea08b7-6f77-4c10-8a23-0cd7fc3d18e1
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.dv_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.number'
+		dataType: string
+		lineageTag: 5ff1bc1c-43fa-476e-9758-e92d4d50cd6a
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.dv_parent'
+		dataType: string
+		lineageTag: 6d9478a1-5c85-4a20-a705-b064572436dc
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.dv_parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.dv_phase'
+		dataType: string
+		lineageTag: 14f52046-88ca-49bc-826e-b983bf9414d4
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.dv_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.sys_id'
+		dataType: string
+		lineageTag: 0eea0e19-b449-42b5-be6c-86e2f9d1ed83
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.dv_top_task'
+		dataType: string
+		lineageTag: 47105809-a6e0-44e3-9863-542f12b2ed2f
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.dv_top_task
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.dv_u_project_phase'
+		dataType: string
+		lineageTag: 063465e0-f88f-467f-88ea-91689e24f556
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.dv_u_project_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.dv_u_project_type'
+		dataType: string
+		lineageTag: b56fd894-09bb-4987-88f2-73be43dd22d3
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.dv_u_project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW PROYECTOS - Mto.dv_u_project_typology'
+		dataType: string
+		lineageTag: a8a15abb-5af6-4753-8ed8-efe4b450e917
+		summarizeBy: none
+		sourceColumn: SERV_NOW PROYECTOS - Mto.dv_u_project_typology
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project - Multitarea.dv_phase'
+		dataType: string
+		lineageTag: ca8b5bc9-ebb8-4f89-8610-ea07e6c2ff48
+		summarizeBy: none
+		sourceColumn: SERV_NOW pm_project - Multitarea.dv_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SERV_NOW pm_project - Multitarea.dv_u_project_type'
+		dataType: string
+		lineageTag: 9fbbc293-0997-4527-a436-eba7114d8810
+		summarizeBy: none
+		sourceColumn: SERV_NOW pm_project - Multitarea.dv_u_project_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_FINAL_dv_state
+		dataType: string
+		lineageTag: 2758c8ee-0cad-4072-940b-b37d1cfab53b
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_FINAL_dv_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'EVOLUTIVOS_COMPLETO_Fecha Apertura'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 9fc24a0d-fe21-401d-8477-c20d9e0ca0ca
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_Fecha Apertura
+
+		variation Variación
+			isDefault
+			relationship: f9f3fd4f-36c9-4eaa-82fc-dba35ef96a90
+			defaultHierarchy: LocalDateTable_a8b62b19-8126-46f5-b54c-fab66a190961.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'EVOLUTIVOS_COMPLETO_Fecha Cierre ConFormato'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1d03c0ef-231c-4e00-bc07-c9ce0fcd2583
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_Fecha Cierre ConFormato
+
+		variation Variación
+			isDefault
+			relationship: 513aab71-cbb7-4a4d-85e2-35682bff88a5
+			defaultHierarchy: LocalDateTable_5671e9a5-1c5e-4911-933e-c325a46294c3.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'EVOLUTIVOS_COMPLETO_Fecha Cierre'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: c95e821d-5d2f-4132-b3cf-87b0296f3599
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_Fecha Cierre
+
+		variation Variación
+			isDefault
+			relationship: e22bc6e7-efdd-45a2-bdd8-381b5352a902
+			defaultHierarchy: LocalDateTable_2350b540-1837-4f5d-896f-f047aefbf52b.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column '_dv_type - español'
+		dataType: string
+		lineageTag: cb3858ef-eee5-4321-855d-bf8b2e34b0b3
+		summarizeBy: none
+		sourceColumn: _dv_type - español
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PRJs_TOPTASKs_dv_u_project_type - español'
+		dataType: string
+		lineageTag: fd571181-7753-43f5-80ee-dddc09ced4ae
+		summarizeBy: none
+		sourceColumn: PRJs_TOPTASKs_dv_u_project_type - español
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_top_portfolio
+		dataType: string
+		lineageTag: 710ff3db-66ee-4517-a835-f193b6c30b93
+		summarizeBy: none
+		sourceColumn: dv_top_portfolio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'TAREAS-SINDEMANDA-Proyectos_Padre_Evo4&5.dv_phase'
+		dataType: string
+		lineageTag: 53df1ad8-7619-4255-bcd3-8916f96f8305
+		summarizeBy: none
+		sourceColumn: TAREAS-SINDEMANDA-Proyectos_Padre_Evo4&5.dv_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase
+		dataType: string
+		lineageTag: ea6e9d8c-ad94-4819-b226-68d97c87512c
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase-español
+		dataType: string
+		lineageTag: 695f921d-7860-4e4c-92a7-294286545125
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase-español
+
+		annotation SummarizationSetBy = Automatic
+
+	column MEJORAS_FASE_FICTICIA_2 = if ('SERV_NOW dmn_demand'[MEJORAS_FASE_FICTICIA_1] = "Borrador", "Iniciando", if([MEJORAS_FASE_FICTICIA_1] = "En Análisis", "Ejecución", if([MEJORAS_FASE_FICTICIA_1] = "En Proceso", "Ejecución", if([MEJORAS_FASE_FICTICIA_1] = "En Pruebas", "Ejecución", if([MEJORAS_FASE_FICTICIA_1] = "Despliegue", "Ejecución", if([MEJORAS_FASE_FICTICIA_1] = "En espera", "En Pausa", if([MEJORAS_FASE_FICTICIA_1] = "Cerrado completo", "Cierre", if([MEJORAS_FASE_FICTICIA_1] = "Cancelado", "Cancelado"))))))))
+		lineageTag: 3f89cf76-dbac-4b54-9517-8b999f149828
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_Fase = CONCATENATE('SERV_NOW dmn_demand'[EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase-español], 'SERV_NOW dmn_demand'[MEJORAS_FASE_FICTICIA_2])
+		lineageTag: 611c2809-84e6-44f3-9523-efa85aef74fe
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column MEJORAS_FASE_FICTICIA_1 = if('SERV_NOW dmn_demand'[TABLA_SEGUN_ID] = "Mejora", 'SERV_NOW dmn_demand'[EVOLUTIVOS_FINAL_dv_state])
+		lineageTag: 577cd96d-f51d-4d87-bf60-4d5261fba913
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_% Percent_complete_EVOLUTIVOS_ESTADO_ENCURSO' = (('SERV_NOW dmn_demand'[_percent_complete_EVOLUTIVOS_ESTADO_ENCURSO])/100)+0
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: d565abb4-ffc7-4652-93d4-df995212a3bd
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_FINAL_EstadoGenerico = LOOKUPVALUE(ESTADO_Evolutivos[Estado_Generico], ESTADO_Evolutivos[Estado_es], [EVOLUTIVOS_FINAL_dv_state])
+		lineageTag: dc728bc8-cd41-4b7e-a346-93878460d7c8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _percent_complete_EVOLUTIVOS_ESTADO_ENCURSO = if(and('SERV_NOW dmn_demand'[EVOLUTIVOS_FINAL_EstadoGenerico] ="En curso", 'SERV_NOW dmn_demand'[DMN-APLIC-ES-ENERGIA] =TRUE()), 'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_percent_complete], 0)
+		formatString: 0.00
+		lineageTag: 3ec89e92-14b2-490a-bad4-75126d9f88d1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column GRADO_AVANCE_LineasCandidatas = if(and('SERV_NOW dmn_demand'[EVOLUTIVOS_FINAL_EstadoGenerico]="En curso", 'SERV_NOW dmn_demand'[DMN-APLIC-ES-ENERGIA] =TRUE()), "Candidata")
+		lineageTag: 076ba965-e381-4c80-8e5e-cf6d85321c54
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column DuracionProyecto = IF('SERV_NOW dmn_demand'[GRADO_AVANCE_LineasCandidatas] = "Candidata", (DATEDIFF('SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_end_date],'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_start_date],DAY)*(-1)))
+		formatString: 0
+		lineageTag: 07ffb3f7-1aed-407e-a28e-0f13638c3ebc
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dias de avance teorico' = ```
+			IF('SERV_NOW dmn_demand'[GRADO_AVANCE_LineasCandidatas] = "Candidata",
+			IF('SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_end_date]<TODAY(), 
+			(DATEDIFF('SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_end_date], 'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_start_date],DAY)*(-1)), 
+			(DATEDIFF(TODAY(),'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_start_date],DAY)*(-1))))
+			```
+		formatString: 0
+		lineageTag: 1bc2637a-99ee-4b1f-b9d9-9353e73fe8bb
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column '% avance teorico' = IF('SERV_NOW dmn_demand'[GRADO_AVANCE_LineasCandidatas] = "Candidata", DIVIDE('SERV_NOW dmn_demand'[Dias de avance teorico], 'SERV_NOW dmn_demand'[DuracionProyecto], 0))
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 84c49ea8-74b9-45b2-a13b-55902612b2e5
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column '% comparativo entre teorico y real' = IF('SERV_NOW dmn_demand'[GRADO_AVANCE_LineasCandidatas] = "Candidata",'SERV_NOW dmn_demand'[% avance teorico] - ('SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_percent_complete]/100))
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: cc818af8-6b93-45f9-bb26-74e0f20e0753
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'EVOLUTIVOS_COMPLETO_start_date - SoloFecha'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 4dca4905-31c8-4e17-90c4-1cc834911697
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_start_date - SoloFecha
+
+		variation Variación
+			isDefault
+			relationship: 06a396fa-5824-4fd2-964a-9b9af3890851
+			defaultHierarchy: LocalDateTable_e198d24d-f8fa-41a1-8b0e-3bac9b0f70bf.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'EVOLUTIVOS_COMPLETO_end_date - SoloFecha'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: f0844021-d0f2-4e0b-8f3c-2b0a0b7f7b64
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_end_date - SoloFecha
+
+		variation Variación
+			isDefault
+			relationship: 90059b8b-cf96-40c8-a1eb-b8d1a1dfa49c
+			defaultHierarchy: LocalDateTable_0cd37825-1b68-4cbf-9be6-289947cf7ca8.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DEMANDA_NUMBER_FICTICIO
+		dataType: string
+		lineageTag: c4a875e8-7d50-4063-a1cc-a2980da9dec0
+		summarizeBy: none
+		sourceColumn: DEMANDA_NUMBER_FICTICIO
+
+		annotation SummarizationSetBy = Automatic
+
+	column _BackLOG_EVOL_DiaAbierto = 'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha]
+		formatString: Short Date
+		lineageTag: d8c3043b-de0a-4306-a20a-9fc9ae42d238
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 8fabb46c-4e12-4e93-b98b-15bf1d2e480e
+			defaultHierarchy: LocalDateTable_ca593358-77b8-483c-9061-3d513999afd4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _BackLOG_EVOL_MYMesAño-Abierto = FORMAT('SERV_NOW dmn_demand'[_BackLOG_EVOL_DiaAbierto],"YYYY MMM")
+		dataType: string
+		lineageTag: 5e37184b-7bc5-4c5f-a669-486b14d5ddef
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column _BackLOG_EVOL_EstadoGeneral = LOOKUPVALUE(ESTADO_Evolutivos[BackLOG_EstadoGeneral],ESTADO_Evolutivos[Estado_es], [EVOLUTIVOS_FINAL_dv_state])
+		lineageTag: 7209ed08-18d6-4563-85e0-b653ee208c95
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _BackLOG_EVOL_DiaCerrado = 'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_Fecha Cierre ConFormato]
+		formatString: Short Date
+		lineageTag: 92b9cf4c-3c15-4554-81ac-4e925da78a44
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: b8edbad1-a417-4450-b3e8-5e41b6ba9f93
+			defaultHierarchy: LocalDateTable_224b86cf-ebcd-4c3e-b45d-e3cfa6df5f41.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _BackLOG_EVOL_MYMesAño-Cerrado = FORMAT('SERV_NOW dmn_demand'[_BackLOG_EVOL_DiaCerrado],"YYYY MMM")
+		lineageTag: f4109719-4b35-4e7e-b4a5-47d796acde3a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _BackLOG_EVOL_UTIL = if ('SERV_NOW dmn_demand'[DMN-APLIC-ES-ENERGIA] = TRUE(), "Si", "No")
+		lineageTag: a44b5fb6-eb15-447c-8aa3-9f58f5537bd7
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6e09b241-538a-4061-93b8-c2c783d5891e
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha
+
+		variation Variación
+			isDefault
+			relationship: d5a23cbb-e078-454c-8f3b-ff27f4f350b2
+			defaultHierarchy: LocalDateTable_fd55a4ce-928a-47c6-9538-9d0f679f74b3.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column PortfolioAfectado_Energia
+		dataType: string
+		lineageTag: d796ff24-3079-43b1-82a5-f591d085b0ec
+		summarizeBy: none
+		sourceColumn: PortfolioAfectado_Energia
+
+		annotation SummarizationSetBy = Automatic
+
+	column PortfolioVisualizarEnergia
+		dataType: string
+		lineageTag: 0db6af40-014e-4244-aad3-ee5a0304907c
+		summarizeBy: none
+		sourceColumn: PortfolioVisualizarEnergia
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRJTASKs_Portfolio_Energia
+		dataType: string
+		lineageTag: 3925bcfe-c4cc-4a13-9916-7064b19681e2
+		summarizeBy: none
+		sourceColumn: PRJTASKs_Portfolio_Energia
+
+		annotation SummarizationSetBy = Automatic
+
+	column PortfolioVisualizarEnergia_Concatenado
+		dataType: string
+		lineageTag: e783bef6-eff4-4c3f-ba8f-2d513d574892
+		summarizeBy: none
+		sourceColumn: PortfolioVisualizarEnergia_Concatenado
+
+		annotation SummarizationSetBy = Automatic
+
+	column PortfolioVisualizarEnergia_FINAL
+		dataType: string
+		lineageTag: 5e4af1c9-709c-47bf-bec0-8ed93e7d2112
+		summarizeBy: none
+		sourceColumn: PortfolioVisualizarEnergia_FINAL
+
+		annotation SummarizationSetBy = Automatic
+
+	column EVOLUTIVOS_COMPLETO_PortfolioaMostrar
+		dataType: string
+		lineageTag: 7fa9ec06-0a8f-42a4-ba80-b2180bed4bf6
+		summarizeBy: none
+		sourceColumn: EVOLUTIVOS_COMPLETO_PortfolioaMostrar
+
+		annotation SummarizationSetBy = Automatic
+
+	column Aplicaciones_Energia_DEFINITIVAS =
+			IF (
+			'SERV_NOW dmn_demand'[EVOLUTIVOS_COMPLETO_PortfolioaMostrar] = "EN.Supply Chain", 'SERV_NOW dmn_demand'[DMNs_TASKs_AplicacionNegocio], "Aplicación Afectada")
+		lineageTag: a9143739-cd3d-4305-8687-73d74878c8d7
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Count DemandasRepetidas' =
+			
+			Var DemandaRepetida = [DEMANDA_NUMBER_FICTICIO]
+			RETURN
+			CALCULATE(
+			    COUNTROWS('SERV_NOW dmn_demand'),
+			    all('SERV_NOW dmn_demand'),
+			    'SERV_NOW dmn_demand'[DEMANDA_NUMBER_FICTICIO] = DemandaRepetida
+			)
+		formatString: 0
+		lineageTag: 663fea5f-3a49-43f6-a9e2-a4233d77c1c5
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column approved_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 06a3537f-f677-498f-89a2-7aa3521f9e64
+		summarizeBy: none
+		sourceColumn: approved_end_date
+
+		variation Variación
+			isDefault
+			relationship: 65adfad8-0ce5-4c99-9da6-441e1b2745d3
+			defaultHierarchy: LocalDateTable_3207e891-28e2-41af-b6ae-40a75d05f3cd.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column approved_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 225a64c6-6fd7-4684-915d-82fbfc244c23
+		summarizeBy: none
+		sourceColumn: approved_start_date
+
+		variation Variación
+			isDefault
+			relationship: 53a70553-d875-498e-b0aa-45a7acdfa185
+			defaultHierarchy: LocalDateTable_646ddc99-34cc-4275-8598-2ba3c896e805.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column calculation_type
+		dataType: string
+		lineageTag: 1ae6eca3-678e-4c72-9f36-767369dcabc9
+		summarizeBy: none
+		sourceColumn: calculation_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_calculation_type
+		dataType: string
+		lineageTag: bc163305-4582-42d8-92fe-373697f6e699
+		summarizeBy: none
+		sourceColumn: dv_calculation_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column contract
+		dataType: string
+		lineageTag: dd4dc212-1b64-47f2-832b-da6e1f72dd22
+		summarizeBy: none
+		sourceColumn: contract
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_contract
+		dataType: string
+		lineageTag: a9893785-b42e-4af1-9691-2f25744784a3
+		summarizeBy: none
+		sourceColumn: dv_contract
+
+		annotation SummarizationSetBy = Automatic
+
+	column model_id
+		dataType: string
+		lineageTag: d199aef4-ff8f-413d-998c-3061dab520ae
+		summarizeBy: none
+		sourceColumn: model_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_model_id
+		dataType: string
+		lineageTag: c2148ce7-6a9c-4473-b237-5ec17698eb38
+		summarizeBy: none
+		sourceColumn: dv_model_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column software_model
+		dataType: string
+		lineageTag: 778c5d44-974b-4192-a380-6252003dbd5f
+		summarizeBy: none
+		sourceColumn: software_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_software_model
+		dataType: string
+		lineageTag: b099603b-e2b7-40c0-b72f-be2f2fa19922
+		summarizeBy: none
+		sourceColumn: dv_software_model
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_commented
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: bd5803c4-3c1c-4bc9-8d98-0cb86e402c99
+		summarizeBy: none
+		sourceColumn: u_commented
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_deferred_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f829c045-33dd-4b80-9edc-19b82f9603d0
+		summarizeBy: none
+		sourceColumn: u_deferred_end_date
+
+		variation Variación
+			isDefault
+			relationship: d39e6962-2107-460a-9214-7b6f9c6633fc
+			defaultHierarchy: LocalDateTable_f8659342-58a0-4a4e-949a-1a3c0359c036.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_deferred_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: dfbe696f-2263-4da5-8f02-7f5ee74bab09
+		summarizeBy: none
+		sourceColumn: u_deferred_start_date
+
+		variation Variación
+			isDefault
+			relationship: d5fd23ad-8759-4c2a-a4fd-1e881fe9fc2f
+			defaultHierarchy: LocalDateTable_204440ff-6db7-4eab-b958-fcceeb03f2b0.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_digital_transformation
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 38b0a18f-a119-4ae5-8603-2796c76746d0
+		summarizeBy: none
+		sourceColumn: u_digital_transformation
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_fases_rfi
+		dataType: string
+		lineageTag: 1baaf11a-5aeb-433d-a0f6-094396d67b5c
+		summarizeBy: none
+		sourceColumn: u_fases_rfi
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_fases_rfi
+		dataType: string
+		lineageTag: 0ff02130-69a3-472e-825c-b0d23a4a76d2
+		summarizeBy: none
+		sourceColumn: dv_u_fases_rfi
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_operational_committee_comment
+		dataType: string
+		lineageTag: eaaf4957-f05c-4262-b39f-f77b497e3db7
+		summarizeBy: none
+		sourceColumn: u_operational_committee_comment
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_origin_country_of_the_demand
+		dataType: string
+		lineageTag: 43cda536-9442-4395-99cc-f9f2dd0a845e
+		summarizeBy: none
+		sourceColumn: u_origin_country_of_the_demand
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_payroll_area
+		dataType: string
+		lineageTag: 73798198-6e6d-40c9-be34-9cb272f9e9d9
+		summarizeBy: none
+		sourceColumn: u_payroll_area
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_payroll_area
+		dataType: string
+		lineageTag: f06e897b-2ea6-4e9c-a650-5f1523f68d4c
+		summarizeBy: none
+		sourceColumn: dv_u_payroll_area
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_planned_capital
+		dataType: double
+		lineageTag: 2b3bee24-4cfe-41b5-ba6f-04334ffe0988
+		summarizeBy: sum
+		sourceColumn: u_planned_capital
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_planned_operating
+		dataType: double
+		lineageTag: 97cb69d8-77e2-45aa-a9f6-e089e8a60dc0
+		summarizeBy: sum
+		sourceColumn: u_planned_operating
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_program_manager
+		dataType: string
+		lineageTag: d3d47e7d-6598-4e7a-8e41-5caeeb1027c3
+		summarizeBy: none
+		sourceColumn: u_program_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_program_manager
+		dataType: string
+		lineageTag: 0333f7a6-e679-4339-bc96-f0c264bdd14d
+		summarizeBy: none
+		sourceColumn: dv_u_program_manager
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_relevant_project_for_cio
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c2b8baf3-66d4-4055-9554-56323ab77f60
+		summarizeBy: none
+		sourceColumn: u_relevant_project_for_cio
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_rfi
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d1f5bff3-b761-4277-a6db-4213ddab5ab4
+		summarizeBy: none
+		sourceColumn: u_rfi
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_selected_suppliers
+		dataType: string
+		lineageTag: 519e74c1-68f9-496d-b805-fd5ac2118f31
+		summarizeBy: none
+		sourceColumn: u_selected_suppliers
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_targets
+		dataType: string
+		lineageTag: 55fa682b-7160-4c9c-8e4f-08238770da01
+		summarizeBy: none
+		sourceColumn: u_targets
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_total_planned_cost
+		dataType: double
+		lineageTag: b3cfa253-c407-4f0d-b8f4-0abfa19d63f3
+		summarizeBy: sum
+		sourceColumn: u_total_planned_cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'SERV_NOW dmn_demand-f7ef3148-1e85-4255-be0f-d0beca15ea7d' = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_dmn_demand = Origen{[Schema="SERV_NOW",Item="dmn_demand"]}[Data],
+				    #"Filas filtradas" = Table.SelectRows(SERV_NOW_dmn_demand, each ([dv_state] = "Approved" or [dv_state] = "Completed") and ([dv_u_subcategory] = "Small") and ([dv_type] = "Service Upgrade")),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas", {"sys_id"}, #"SERV_NOW pm_project - Multitarea", {"demand"}, "SERV_NOW pm_project", JoinKind.LeftOuter),
+				    #"Se expandió SERV_NOW pm_project" = Table.ExpandTableColumn(#"Consultas combinadas", "SERV_NOW pm_project", {"number", "closed_at", "end_date", "opened_at", "percent_complete", "phase", "dv_phase", "priority", "dv_priority", "start_date", "state", "dv_state", "dv_u_project_type", "dv_cmdb_ci_business_app", "short_description"}, {"SERV_NOW pm_project.number", "SERV_NOW pm_project.closed_at", "SERV_NOW pm_project.end_date", "SERV_NOW pm_project.opened_at", "SERV_NOW pm_project.percent_complete", "SERV_NOW pm_project.phase", "SERV_NOW pm_project.dv_phase", "SERV_NOW pm_project.priority", "SERV_NOW pm_project.dv_priority", "SERV_NOW pm_project.start_date", "SERV_NOW pm_project.state", "SERV_NOW pm_project.dv_state", "SERV_NOW pm_project.dv_u_project_type", "SERV_NOW pm_project.dv_cmdb_ci_business_app", "SERV_NOW pm_project.short_description"}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Se expandió SERV_NOW pm_project",{"activity_due", "additional_assignee_list", "apm_idea_action", "dv_apm_idea_action", "approval", "dv_approval", "approval_history", "approval_set", "assessment_required", "assigned_to", "dv_assigned_to", "assignment_group", "dv_assignment_group", "assumptions", "barriers", "business_capabilities", "business_case", "business_duration", "dv_business_duration", "business_service", "dv_business_service", "business_unit", "dv_business_unit", "calendar_duration", "dv_calendar_duration", "change", "dv_change", "close_notes", "cmdb_ci", "dv_cmdb_ci", "collaborators", "comments", "comments_and_work_notes", "company", "dv_company", "contact_type", "dv_contact_type", "correlation_display", "correlation_id", "defect", "dv_defect", "delivery_plan", "dv_delivery_plan", "delivery_task", "dv_delivery_task", "description", "escalation", "dv_escalation", "idea", "dv_idea", "in_scope", "investment_class", "dv_investment_class", "investment_type", "dv_investment_type", "knowledge", "labor_costs", "location", "dv_location", "made_sla", "out_of_scope", "dv_parent", "primary_program", "dv_primary_program", "project_manager", "dv_project_manager", "rate_model", "dv_rate_model", "reassignment_count", "rejection_goto", "dv_rejection_goto"}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas quitadas",{{"related_records", type text}}),
+				    #"Columnas quitadas1" = Table.RemoveColumns(#"Tipo cambiado",{"requested_by", "resource_allocated_cost", "resource_planned_cost", "risk_of_not_performing", "risk_of_performing", "route_reason", "dv_route_reason", "scrum_epic", "dv_scrum_epic", "scrum_story", "dv_scrum_story", "service_offering", "dv_service_offering", "skills", "sla_due", "strategic_objectives", "sys_class_name", "dv_sys_class_name", "sys_domain", "sys_domain_path", "sys_mod_count", "sys_tags", "task_for", "dv_task_for", "time_worked", "dv_time_worked", "u_acciona_priority", "u_architecture_analysis", "u_business_line", "dv_u_business_line", "u_catalog", "dv_u_catalog", "u_company", "dv_u_company", "u_concurrent_users", "dv_u_concurrent_users", "u_country", "dv_u_country", "u_criticality_level", "dv_u_criticality_level", "u_current_situation", "u_demand_type_description", "u_department", "dv_u_department", "u_dependencies", "u_external_vendor", "dv_u_external_vendor", "u_first_commettee_state", "dv_u_first_commettee_state", "u_first_committee_date", "dv_u_first_committee_date", "u_frecuency_of_use", "dv_u_frecuency_of_use", "u_impacted_companies", "u_impacted_countries", "u_impacted_groups", "follow_up", "goal", "dv_goal", "goals"}),
+				    #"Columnas quitadas2" = Table.RemoveColumns(#"Columnas quitadas1",{"close_demand", "dv_close_demand", "closed_by", "dv_closed_by", "demand_actual_effort", "dv_demand_actual_effort", "demand_manager", "dv_demand_manager", "department", "dv_department", "discount_rate", "due_date", "enablers", "expected_risk", "dv_expected_risk", "expected_roi", "expected_start", "group_list", "irr_value", "npv_value", "opened_by", "dv_opened_by", "order", "other_costs", "score", "score_cost", "score_risk", "dv_score_risk", "score_size", "score_strategic_allignment", "score_value", "dv_score_value", "stage", "submitter", "dv_submitter", "sys_created_by", "sys_updated_by", "u_ambito_global", "u_analysis_date", "u_approval_sent", "u_approver", "dv_u_approver", "u_due_date", "u_execution_type", "dv_u_execution_type", "u_phone", "u_pilot", "u_planned_demand", "dv_u_planned_demand", "u_previous_groups", "u_priority_justification", "u_reasons_for_delay", "dv_u_reasons_for_delay", "u_ref_country", "dv_u_ref_country", "u_reg_country", "dv_u_reg_country", "u_reg_department", "dv_u_reg_department", "u_reg_division", "dv_u_reg_division", "u_reg_user", "dv_u_reg_user", "u_second_commettee_state", "dv_u_second_commettee_state", "u_second_committee_date", "dv_u_second_committee_date", "u_idl", "u_id_plan"}),
+				    #"Consultas combinadas1" = Table.NestedJoin(#"Columnas quitadas2", {"enhancement"}, #"SERV_NOW rm_enhancement", {"sys_id"}, "SERV_NOW rm_enhancement", JoinKind.LeftOuter),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Consultas combinadas1",{{"SERV_NOW rm_enhancement", "DEMANDAS-MEJORAS"}}),
+				    #"Se expandió DEMNDAS-MEJORAS" = Table.ExpandTableColumn(#"Columnas con nombre cambiado", "DEMANDAS-MEJORAS", {"number","closed_at", "end_date", "opened_at", "percent_complete", "priority", "dv_priority", "start_date", "state", "dv_state","dv_u_business_application","short_description"}, {"DEMANDAS-MEJORAS.number","DEMANDAS-MEJORAS.closed_at", "DEMANDAS-MEJORAS.end_date", "DEMANDAS-MEJORAS.opened_at", "DEMANDAS-MEJORAS.percent_complete", "DEMANDAS-MEJORAS.priority", "DEMANDAS-MEJORAS.dv_priority", "DEMANDAS-MEJORAS.start_date", "DEMANDAS-MEJORAS.state", "DEMANDAS-MEJORAS.dv_state", "DEMANDAS-MEJORAS.dv_u_business_application", "DEMANDAS-MEJORAS.short_description"}),
+				    #"Consultas combinadas2" = Table.NestedJoin(#"Se expandió DEMNDAS-MEJORAS", {"sys_id"}, #"SERV_NOW TAREAS - ConDemanda", {"u_demand"}, "SERV_NOW pm_project_task", JoinKind.LeftOuter),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Consultas combinadas2",{{"SERV_NOW pm_project_task", "TAREAS-ASOCIADAS-DEMANDAS"}}),
+				    #"Se expandió TAREAS-ASOCIADAS-DEMANDAS" = Table.ExpandTableColumn(#"Columnas con nombre cambiado1", "TAREAS-ASOCIADAS-DEMANDAS", {"number"}, {"TAREAS-ASOCIADAS-DEMANDAS.number"}),
+				    #"Columnas combinadas" = Table.CombineColumns(#"Se expandió TAREAS-ASOCIADAS-DEMANDAS",{"SERV_NOW pm_project.dv_priority", "DEMANDAS-MEJORAS.dv_priority"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PJRs_ENHs_Prioridad"),
+				    #"Columnas combinadas1" = Table.CombineColumns(#"Columnas combinadas",{"SERV_NOW pm_project.number", "DEMANDAS-MEJORAS.number"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PRJs_ENHs-ID"),
+				    #"Columnas combinadas2" = Table.CombineColumns(Table.TransformColumnTypes(#"Columnas combinadas1", {{"SERV_NOW pm_project.closed_at", type text}, {"DEMANDAS-MEJORAS.closed_at", type text}}, "es-ES"),{"SERV_NOW pm_project.closed_at", "DEMANDAS-MEJORAS.closed_at"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PRJs_ENHs_closed_at"),
+				    #"Columnas combinadas3" = Table.CombineColumns(Table.TransformColumnTypes(#"Columnas combinadas2", {{"SERV_NOW pm_project.end_date", type text}, {"DEMANDAS-MEJORAS.end_date", type text}}, "es-ES"),{"SERV_NOW pm_project.end_date", "DEMANDAS-MEJORAS.end_date"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PRJs_ENHs_end_date"),
+				    #"Columnas combinadas4" = Table.CombineColumns(Table.TransformColumnTypes(#"Columnas combinadas3", {{"SERV_NOW pm_project.opened_at", type text}, {"DEMANDAS-MEJORAS.opened_at", type text}}, "es-ES"),{"SERV_NOW pm_project.opened_at", "DEMANDAS-MEJORAS.opened_at"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PRJs_ENHs_opened_at"),
+				    #"Columnas combinadas5" = Table.CombineColumns(Table.TransformColumnTypes(#"Columnas combinadas4", {{"SERV_NOW pm_project.percent_complete", type text}, {"DEMANDAS-MEJORAS.percent_complete", type text}}, "es-ES"),{"SERV_NOW pm_project.percent_complete", "DEMANDAS-MEJORAS.percent_complete"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PRJs_ENHs_percent_complete"),
+				    #"Columnas combinadas6" = Table.CombineColumns(Table.TransformColumnTypes(#"Columnas combinadas5", {{"SERV_NOW pm_project.start_date", type text}, {"DEMANDAS-MEJORAS.start_date", type text}}, "es-ES"),{"SERV_NOW pm_project.start_date", "DEMANDAS-MEJORAS.start_date"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PRJs_ENHs_start_date"),
+				    #"Columnas combinadas7" = Table.CombineColumns(#"Columnas combinadas6",{"SERV_NOW pm_project.dv_state", "DEMANDAS-MEJORAS.dv_state"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PRJs_ENHs_Estado"),
+				    #"Filas filtradas1" = Table.SelectRows(#"Columnas combinadas7", each true),
+				    #"Consulta anexada" = Table.Combine({#"Filas filtradas1", #"SERV_NOW TAREAS - SinDemanda"}),
+				    #"Columnas quitadas5" = Table.RemoveColumns(#"Consulta anexada",{"TAREAS-SINDEMANDA-active", "TAREAS-SINDEMANDA-assignment_group", "TAREAS-SINDEMANDA-dv_assignment_group", "TAREAS-SINDEMANDA-closed_at", "TAREAS-SINDEMANDA-end_date", "TAREAS-SINDEMANDA-milestone", "TAREAS-SINDEMANDA-opened_at", "TAREAS-SINDEMANDA-parent", "TAREAS-SINDEMANDA-dv_parent", "TAREAS-SINDEMANDA-percent_complete", "TAREAS-SINDEMANDA-priority", "TAREAS-SINDEMANDA-dv_priority", "TAREAS-SINDEMANDA-short_description", "TAREAS-SINDEMANDA-start_date", "TAREAS-SINDEMANDA-dv_state", "TAREAS-SINDEMANDA-sys_id", "TAREAS-SINDEMANDA-top_task", "TAREAS-SINDEMANDA-dv_top_task", "TAREAS-SINDEMANDA-u_demand", "TAREAS-SINDEMANDA-dv_u_demand"}),
+				    #"Columnas combinadas13" = Table.CombineColumns(#"Columnas quitadas5",{"dv_u_business_applications", "SERV_NOW pm_project - Mto.dv_cmdb_ci_business_app"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"DMNs_TASKs_AplicacionNegocio"),
+				    #"Columnas combinadas15" = Table.CombineColumns(#"Columnas combinadas13",{"SERV_NOW pm_project.dv_u_project_type", "SERV_NOW pm_project - Mto.dv_u_project_type"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"PRJs_TOPTASKs_dv_u_project_type"),
+				    #"Columna duplicada" = Table.DuplicateColumn(#"Columnas combinadas15", "PRJs_ENHs-ID", "PRJs_ENHs-ID - Copia"),
+				    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columna duplicada",{{"PRJs_ENHs-ID - Copia", "EVOLUTIVOS"}}),
+				    #"Columnas combinadas8" = Table.CombineColumns(#"Columnas con nombre cambiado2",{"TAREAS-SINDEMANDA-number", "EVOLUTIVOS"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS-ConTareasSinDemanda"),
+				    #"Columna duplicada1" = Table.DuplicateColumn(#"Columnas combinadas8", "EVOLUTIVOS-ConTareasSinDemanda", "EVOLUTIVOS-ConTareasSinDemanda - Copia"),
+				    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Columna duplicada1",{{"EVOLUTIVOS-ConTareasSinDemanda - Copia", "EVOLUTIVOS_COMPLETO_Number"}}),
+				    #"Columnas combinadas9" = Table.CombineColumns(#"Columnas con nombre cambiado3",{"EVOLUTIVOS_COMPLETO_Number", "TAREAS-ASOCIADAS-DEMANDAS.number"},Combiner.CombineTextByDelimiter(",", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_Number"),
+				    #"Dividir columna por delimitador2" = Table.ExpandListColumn(Table.TransformColumns(#"Columnas combinadas9", {{"EVOLUTIVOS_COMPLETO_Number", Splitter.SplitTextByEachDelimiter({","}, QuoteStyle.Csv, true), let itemType = (type nullable text) meta [Serialized.Text = true] in type {itemType}}}), "EVOLUTIVOS_COMPLETO_Number"),
+				    #"Filas filtradas3" = Table.SelectRows(#"Dividir columna por delimitador2", each ([EVOLUTIVOS_COMPLETO_Number] <> "")),
+				    #"Duplicados quitados" = Table.Distinct(#"Filas filtradas3", {"EVOLUTIVOS_COMPLETO_Number"}),
+				    #"Errores quitados" = Table.RemoveRowsWithErrors(#"Duplicados quitados", {"EVOLUTIVOS_COMPLETO_Number"}),
+				    #"Consultas combinadas4" = Table.NestedJoin(#"Errores quitados", {"EVOLUTIVOS_COMPLETO_Number"}, #"SERV_NOW TAREAS - ConDemanda", {"number"}, "SERV_NOW TAREAS - ConDemanda", JoinKind.LeftOuter),
+				    #"Se expandió SERV_NOW TAREAS - ConDemanda1" = Table.ExpandTableColumn(#"Consultas combinadas4", "SERV_NOW TAREAS - ConDemanda", {"closed_at", "end_date", "opened_at", "dv_parent", "percent_complete", "dv_priority", "short_description", "start_date", "dv_state", "dv_top_task", "Proyectos_Padre_Evo4&5.dv_phase"}, {"SERV_NOW TAREAS - ConDemanda.closed_at", "SERV_NOW TAREAS - ConDemanda.end_date", "SERV_NOW TAREAS - ConDemanda.opened_at", "SERV_NOW TAREAS - ConDemanda.dv_parent", "SERV_NOW TAREAS - ConDemanda.percent_complete", "SERV_NOW TAREAS - ConDemanda.dv_priority", "SERV_NOW TAREAS - ConDemanda.short_description", "SERV_NOW TAREAS - ConDemanda.start_date", "SERV_NOW TAREAS - ConDemanda.dv_state", "SERV_NOW TAREAS - ConDemanda.dv_top_task", "SERV_NOW TAREAS - ConDemandaProyectos_Padre_Evo4&5.dv_phase"}),
+				    #"Consultas combinadas5" = Table.NestedJoin(#"Se expandió SERV_NOW TAREAS - ConDemanda1", {"EVOLUTIVOS_COMPLETO_Number"}, #"SERV_NOW TAREAS - ConDemanda", {"number"}, "SERV_NOW TAREAS - ConDemanda", JoinKind.LeftOuter),
+				    #"Consultas combinadas6" = Table.NestedJoin(#"Consultas combinadas5", {"EVOLUTIVOS_COMPLETO_Number"}, #"SERV_NOW TAREAS - SinDemanda", {"TAREAS-SINDEMANDA-number"}, "SERV_NOW TAREAS - SinDemanda", JoinKind.LeftOuter),
+				    #"Se expandió SERV_NOW TAREAS - SinDemanda" = Table.ExpandTableColumn(#"Consultas combinadas6", "SERV_NOW TAREAS - SinDemanda", {"TAREAS-SINDEMANDA-closed_at", "TAREAS-SINDEMANDA-end_date", "TAREAS-SINDEMANDA-opened_at", "TAREAS-SINDEMANDA-dv_parent", "TAREAS-SINDEMANDA-percent_complete", "TAREAS-SINDEMANDA-dv_priority", "TAREAS-SINDEMANDA-short_description", "TAREAS-SINDEMANDA-start_date", "TAREAS-SINDEMANDA-dv_state", "TAREAS-SINDEMANDA-dv_top_task", "TAREAS-SINDEMANDA-Proyectos_Padre_Evo4&5.dv_phase"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-closed_at", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-end_date", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-opened_at", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-dv_parent", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-percent_complete", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-dv_priority", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-short_description", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-start_date", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-dv_state", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-dv_top_task", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-Proyectos_Padre_Evo4&5.dv_phase"}),
+				    #"Columnas con nombre cambiado13" = Table.RenameColumns(#"Se expandió SERV_NOW TAREAS - SinDemanda",{{"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-dv_top_task", "TAREAS-SINDEMANDA-dv_top_task"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-dv_state", "TAREAS-SINDEMANDA-dv_state"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-start_date", "TAREAS-SINDEMANDA-start_date"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-short_description", "TAREAS-SINDEMANDA-short_description"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-dv_priority", "TAREAS-SINDEMANDA-dv_priority"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-percent_complete", "TAREAS-SINDEMANDA-percent_complete"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-dv_parent", "TAREAS-SINDEMANDA-dv_parent"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-opened_at", "TAREAS-SINDEMANDA-opened_at"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-end_date", "TAREAS-SINDEMANDA-end_date"}, {"SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-closed_at", "TAREAS-SINDEMANDA-closed_at"}}),
+				    #"Consultas combinadas7" = Table.NestedJoin(#"Columnas con nombre cambiado13", {"EVOLUTIVOS_COMPLETO_Number"}, #"SERV_NOW PROYECTOS - Mto", {"number"}, "SERV_NOW PROYECTOS - Mto", JoinKind.LeftOuter),
+				    #"Se expandió SERV_NOW PROYECTOS - Mto" = Table.ExpandTableColumn(#"Consultas combinadas7", "SERV_NOW PROYECTOS - Mto", {"short_description", "closed_at","dv_cmdb_ci_business_app", "dv_demand", "number", "opened_at", "dv_parent", "percent_complete", "dv_phase", "dv_priority", "start_date", "end_date", "dv_state", "sys_id", "dv_top_task", "dv_u_project_phase", "dv_u_project_type", "dv_u_project_typology"}, {"SERV_NOW PROYECTOS - Mto.short_description", "SERV_NOW PROYECTOS - Mto.closed_at","SERV_NOW PROYECTOS - Mto.dv_cmdb_ci_business_app", "SERV_NOW PROYECTOS - Mto.dv_demand", "SERV_NOW PROYECTOS - Mto.number", "SERV_NOW PROYECTOS - Mto.opened_at", "SERV_NOW PROYECTOS - Mto.dv_parent", "SERV_NOW PROYECTOS - Mto.percent_complete", "SERV_NOW PROYECTOS - Mto.dv_phase", "SERV_NOW PROYECTOS - Mto.dv_priority", "SERV_NOW PROYECTOS - Mto.start_date", "SERV_NOW PROYECTOS - Mto.end_date", "SERV_NOW PROYECTOS - Mto.dv_state", "SERV_NOW PROYECTOS - Mto.sys_id", "SERV_NOW PROYECTOS - Mto.dv_top_task", "SERV_NOW PROYECTOS - Mto.dv_u_project_phase", "SERV_NOW PROYECTOS - Mto.dv_u_project_type", "SERV_NOW PROYECTOS - Mto.dv_u_project_typology"}),
+				    #"Consultas combinadas8" = Table.NestedJoin(#"Se expandió SERV_NOW PROYECTOS - Mto", {"EVOLUTIVOS_COMPLETO_Number"}, #"SERV_NOW pm_project - Multitarea", {"number"}, "SERV_NOW pm_project - Multitarea", JoinKind.LeftOuter),
+				    #"Se expandió SERV_NOW pm_project - Multitarea" = Table.ExpandTableColumn(#"Consultas combinadas8", "SERV_NOW pm_project - Multitarea", {"opened_at","closed_at", "start_date", "end_date", "dv_priority", "dv_state", "percent_complete", "short_description", "dv_phase", "dv_u_project_type"}, {"SERV_NOW pm_project - Multitarea.opened_at", "SERV_NOW pm_project - Multitarea.closed_at", "SERV_NOW pm_project - Multitarea.start_date", "SERV_NOW pm_project - Multitarea.end_date", "SERV_NOW pm_project - Multitarea.dv_priority", "SERV_NOW pm_project - Multitarea.dv_state", "SERV_NOW pm_project - Multitarea.percent_complete", "SERV_NOW pm_project - Multitarea.short_description", "SERV_NOW pm_project - Multitarea.dv_phase", "SERV_NOW pm_project - Multitarea.dv_u_project_type"}),
+				    #"Consultas combinadas9" = Table.NestedJoin(#"Se expandió SERV_NOW pm_project - Multitarea", {"EVOLUTIVOS_COMPLETO_Number"}, #"SERV_NOW rm_enhancement", {"number"}, "SERV_NOW rm_enhancement", JoinKind.LeftOuter),
+				    #"Se expandió SERV_NOW rm_enhancement" = Table.ExpandTableColumn(#"Consultas combinadas9", "SERV_NOW rm_enhancement", {"opened_at",  "closed_at", "start_date", "end_date", "dv_priority", "dv_state", "percent_complete", "short_description"}, {"SERV_NOW rm_enhancement.opened_at","SERV_NOW rm_enhancement.closed_at", "SERV_NOW rm_enhancement.start_date", "SERV_NOW rm_enhancement.end_date", "SERV_NOW rm_enhancement.dv_priority", "SERV_NOW rm_enhancement.dv_state", "SERV_NOW rm_enhancement.percent_complete", "SERV_NOW rm_enhancement.short_description"}),
+				    EVOLUTIVOS_COMPLETO_closed_at = Table.CombineColumns(Table.TransformColumnTypes(#"Se expandió SERV_NOW rm_enhancement", {{"SERV_NOW rm_enhancement.closed_at", type text}, {"SERV_NOW pm_project - Multitarea.closed_at", type text}, {"SERV_NOW PROYECTOS - Mto.closed_at", type text}, {"TAREAS-SINDEMANDA-closed_at", type text}, {"SERV_NOW TAREAS - ConDemanda.closed_at", type text}}, "es-ES"),{"SERV_NOW rm_enhancement.closed_at", "SERV_NOW pm_project - Multitarea.closed_at", "SERV_NOW PROYECTOS - Mto.closed_at", "TAREAS-SINDEMANDA-closed_at", "SERV_NOW TAREAS - ConDemanda.closed_at"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_closed_at"),
+				    EVOLUTIVOS_COMPLETO_opened_at = Table.CombineColumns(Table.TransformColumnTypes(EVOLUTIVOS_COMPLETO_closed_at, {{"SERV_NOW rm_enhancement.opened_at", type text}, {"SERV_NOW pm_project - Multitarea.opened_at", type text}, {"SERV_NOW PROYECTOS - Mto.opened_at", type text}, {"TAREAS-SINDEMANDA-opened_at", type text}, {"SERV_NOW TAREAS - ConDemanda.opened_at", type text}}, "es-ES"),{"SERV_NOW rm_enhancement.opened_at", "SERV_NOW pm_project - Multitarea.opened_at", "SERV_NOW PROYECTOS - Mto.opened_at", "TAREAS-SINDEMANDA-opened_at", "SERV_NOW TAREAS - ConDemanda.opened_at"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_opened_at"),
+				    EVOLUTIVOS_COMPLETO_start_date = Table.CombineColumns(Table.TransformColumnTypes(EVOLUTIVOS_COMPLETO_opened_at, {{"SERV_NOW rm_enhancement.start_date", type text}, {"SERV_NOW pm_project - Multitarea.start_date", type text}, {"SERV_NOW PROYECTOS - Mto.start_date", type text}, {"TAREAS-SINDEMANDA-start_date", type text}, {"SERV_NOW TAREAS - ConDemanda.start_date", type text}}, "es-ES"),{"SERV_NOW rm_enhancement.start_date", "SERV_NOW pm_project - Multitarea.start_date", "SERV_NOW PROYECTOS - Mto.start_date", "TAREAS-SINDEMANDA-start_date", "SERV_NOW TAREAS - ConDemanda.start_date"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_start_date"),
+				    EVOLUTIVOS_COMPLETO_end_date = Table.CombineColumns(Table.TransformColumnTypes(EVOLUTIVOS_COMPLETO_start_date, {{"SERV_NOW pm_project - Multitarea.end_date", type text}, {"SERV_NOW rm_enhancement.end_date", type text}, {"SERV_NOW PROYECTOS - Mto.end_date", type text}, {"TAREAS-SINDEMANDA-end_date", type text}, {"SERV_NOW TAREAS - ConDemanda.end_date", type text}}, "es-ES"),{"SERV_NOW pm_project - Multitarea.end_date", "SERV_NOW rm_enhancement.end_date", "SERV_NOW PROYECTOS - Mto.end_date", "TAREAS-SINDEMANDA-end_date", "SERV_NOW TAREAS - ConDemanda.end_date"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_end_date"),
+				    EVOLUTIVOS_COMPLETO_dv_priority = Table.CombineColumns(EVOLUTIVOS_COMPLETO_end_date,{"SERV_NOW rm_enhancement.dv_priority", "SERV_NOW pm_project - Multitarea.dv_priority", "SERV_NOW PROYECTOS - Mto.dv_priority", "TAREAS-SINDEMANDA-dv_priority", "SERV_NOW TAREAS - ConDemanda.dv_priority"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_dv_priority"),
+				    EVOLUTIVOS_COMPLETO_dv_state = Table.CombineColumns(EVOLUTIVOS_COMPLETO_dv_priority,{"SERV_NOW rm_enhancement.dv_state", "SERV_NOW pm_project - Multitarea.dv_state", "SERV_NOW PROYECTOS - Mto.dv_state", "TAREAS-SINDEMANDA-dv_state", "SERV_NOW TAREAS - ConDemanda.dv_state"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_dv_state"),
+				    EVOLUTIVOS_COMPLETO_percent_complete = Table.CombineColumns(Table.TransformColumnTypes(EVOLUTIVOS_COMPLETO_dv_state, {{"SERV_NOW rm_enhancement.percent_complete", type text}, {"SERV_NOW pm_project - Multitarea.percent_complete", type text}, {"SERV_NOW PROYECTOS - Mto.percent_complete", type text}, {"TAREAS-SINDEMANDA-percent_complete", type text}, {"SERV_NOW TAREAS - ConDemanda.percent_complete", type text}}, "es-ES"),{"SERV_NOW rm_enhancement.percent_complete", "SERV_NOW pm_project - Multitarea.percent_complete", "SERV_NOW PROYECTOS - Mto.percent_complete", "TAREAS-SINDEMANDA-percent_complete", "SERV_NOW TAREAS - ConDemanda.percent_complete"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_percent_complete"),
+				    EVOLUTIVOS_COMPLETO_short_description = Table.CombineColumns(Table.TransformColumnTypes(EVOLUTIVOS_COMPLETO_percent_complete, {{"SERV_NOW PROYECTOS - Mto.short_description", type text}}, "es-ES"),{"SERV_NOW rm_enhancement.short_description", "SERV_NOW pm_project - Multitarea.short_description", "SERV_NOW PROYECTOS - Mto.short_description", "TAREAS-SINDEMANDA-short_description", "SERV_NOW TAREAS - ConDemanda.short_description"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_COMPLETO_short_description"),
+				    #"Tipo cambiado4" = Table.TransformColumnTypes(EVOLUTIVOS_COMPLETO_short_description,{{"EVOLUTIVOS_COMPLETO_percent_complete", type number}}),
+				    EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase = Table.CombineColumns(#"Tipo cambiado4",{"SERV_NOW pm_project.dv_phase", "SERV_NOW TAREAS - SinDemanda.TAREAS-SINDEMANDA-Proyectos_Padre_Evo4&5.dv_phase", "SERV_NOW TAREAS - ConDemandaProyectos_Padre_Evo4&5.dv_phase"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase"),
+				    #"Columna duplicada2" = Table.DuplicateColumn(EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase, "dv_size", "dv_size - Copia"),
+				    #"Columnas con nombre cambiado4" = Table.RenameColumns(#"Columna duplicada2",{{"dv_size - Copia", "_dv_size - SoloLetra"}}),
+				    #"Dividir columna por delimitador1" = Table.SplitColumn(#"Columnas con nombre cambiado4", "_dv_size - SoloLetra", Splitter.SplitTextByDelimiter(":", QuoteStyle.Csv), {"_dv_size - SoloLetra.1", "_dv_size - SoloLetra.2"}),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Dividir columna por delimitador1",{{"_dv_size - SoloLetra.1", type text}, {"_dv_size - SoloLetra.2", type text}}),
+				    #"Columnas con nombre cambiado5" = Table.RenameColumns(#"Tipo cambiado1",{{"_dv_size - SoloLetra.2", "_dv_size - Texto"}, {"_dv_size - SoloLetra.1", "_dv_size - SoloLetra"}}),
+				    #"Columna duplicada3" = Table.DuplicateColumn(#"Columnas con nombre cambiado5", "EVOLUTIVOS_COMPLETO_opened_at", "EVOLUTIVOS_COMPLETO_opened_at - Copia"),
+				    #"Columnas con nombre cambiado6" = Table.RenameColumns(#"Columna duplicada3",{{"EVOLUTIVOS_COMPLETO_opened_at - Copia", "EVOLUTIVOS_COMPLETO_opened_at - Formato Fecha"}}),
+				    #"Columnas quitadas3" = Table.RemoveColumns(#"Columnas con nombre cambiado6",{"EVOLUTIVOS_COMPLETO_opened_at - Formato Fecha", "u_tic_unit", "dv_u_tic_unit", "u_time_to_manage_a_demand", "u_time_to_reach_analysis", "u_total_effort", "u_total_effort_req", "dv_u_total_effort_req", "u_volume_impacted_users", "universal_request", "dv_universal_request", "upon_approval", "dv_upon_approval", "upon_reject", "dv_upon_reject", "user_input", "variables", "visited_state", "watch_list", "wf_activity", "dv_wf_activity", "work_notes", "work_notes_list"}),
+				    #"Columnas quitadas4" = Table.RemoveColumns(#"Columnas quitadas3",{"u_duration_to_manage_a_demand", "dv_u_duration_to_manage_a_demand", "u_duration_to_reach_analysis", "dv_u_duration_to_reach_analysis", "u_parent_demand", "dv_u_parent_demand"}),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Columnas quitadas4", "EVOLUTIVOS_FINAL_dv_priority", each if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_priority], "1 - Critical") then "1 - Crítica" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_priority], "2 - High") then "2 - Alta" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_priority], "3 - Moderate") then "3 - Moderada" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_priority], "4 - Low") then "4 - Baja" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_priority], "5 - Very Low") then "5 - Muy Baja" else null),
+				    #"Columna condicional agregada1" = Table.AddColumn(#"Columna condicional agregada", "EVOLUTIVOS_FINAL_dv_state", each if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Open") then "Abierto" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Work in Progress") then "En curso" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Pendig") then "Pendiente" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Closed Complete") then "Cerrado completo" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Closed Incomplete") then "Cerrado incompleto" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Closed Skipped") then "Cerrado omitido" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Draft") then "Borrador" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "In Analysis") then "En Análisis" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "In Development") then "En proceso" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Testing/QA") then "En pruebas" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Deploy/Launch") then "Despliegue" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "On Hold") then "En espera" else if Text.StartsWith([EVOLUTIVOS_COMPLETO_dv_state], "Cancelled") then "Cancelado" else null),
+				    #"Columna duplicada6" = Table.DuplicateColumn(#"Columna condicional agregada1", "EVOLUTIVOS_COMPLETO_Number", "EVOLUTIVOS_COMPLETO_Number - Copia"),
+				    #"Columnas con nombre cambiado11" = Table.RenameColumns(#"Columna duplicada6",{{"EVOLUTIVOS_COMPLETO_Number - Copia", "EVOLUTIVOS_COMPLETO_Number - URL"}}),
+				    #"Columna condicional agregada2" = Table.AddColumn(#"Columnas con nombre cambiado11", "Personalizado", each if Text.StartsWith([#"EVOLUTIVOS_COMPLETO_Number - URL"], "PRJTASK") then "Tarea" else if Text.StartsWith([#"EVOLUTIVOS_COMPLETO_Number - URL"], "ENHC") then "Mejora" else if Text.StartsWith([#"EVOLUTIVOS_COMPLETO_Number - URL"], "PRJ0") then "Proyecto" else null),
+				    #"Columnas con nombre cambiado12" = Table.RenameColumns(#"Columna condicional agregada2",{{"Personalizado", "TABLA_SEGUN_ID"}}),
+				    #"Columna duplicada4" = Table.DuplicateColumn(#"Columnas con nombre cambiado12", "EVOLUTIVOS_COMPLETO_opened_at", "EVOLUTIVOS_COMPLETO_opened_at - Copia"),
+				    #"Columnas con nombre cambiado7" = Table.RenameColumns(#"Columna duplicada4",{{"EVOLUTIVOS_COMPLETO_opened_at - Copia", "EVOLUTIVOS_COMPLETO_Fecha Apertura"}}),
+				    #"Tipo cambiado2" = Table.TransformColumnTypes(#"Columnas con nombre cambiado7",{{"EVOLUTIVOS_COMPLETO_Fecha Apertura", type datetime}}),
+				    #"Columnas con nombre cambiado8" = Table.RenameColumns(#"Tipo cambiado2",{{"EVOLUTIVOS_COMPLETO_Fecha Apertura", "EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha"}}),
+				    #"Columna duplicada5" = Table.DuplicateColumn(#"Columnas con nombre cambiado8", "EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha", "EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha - Copia"),
+				    #"Columnas con nombre cambiado9" = Table.RenameColumns(#"Columna duplicada5",{{"EVOLUTIVOS_COMPLETO_Fecha Apertura ConFormatoFecha - Copia", "EVOLUTIVOS_COMPLETO_Fecha Apertura"}}),
+				    #"Fecha extraída" = Table.TransformColumns(#"Columnas con nombre cambiado9",{{"EVOLUTIVOS_COMPLETO_Fecha Apertura", DateTime.Date, type date}}),
+				    #"Columna duplicada7" = Table.DuplicateColumn(#"Fecha extraída", "EVOLUTIVOS_COMPLETO_closed_at", "EVOLUTIVOS_COMPLETO_closed_at - Copia"),
+				    #"Columnas con nombre cambiado10" = Table.RenameColumns(#"Columna duplicada7",{{"EVOLUTIVOS_COMPLETO_closed_at - Copia", "EVOLUTIVOS_COMPLETO_Fecha Cierre ConFormato"}}),
+				    #"Tipo cambiado3" = Table.TransformColumnTypes(#"Columnas con nombre cambiado10",{{"EVOLUTIVOS_COMPLETO_Fecha Cierre ConFormato", type datetime}}),
+				    #"Columna duplicada8" = Table.DuplicateColumn(#"Tipo cambiado3", "EVOLUTIVOS_COMPLETO_Fecha Cierre ConFormato", "EVOLUTIVOS_COMPLETO_Fecha Cierre ConFormato - Copia"),
+				    #"Columnas con nombre cambiado14" = Table.RenameColumns(#"Columna duplicada8",{{"EVOLUTIVOS_COMPLETO_Fecha Cierre ConFormato - Copia", "EVOLUTIVOS_COMPLETO_Fecha Cierre"}}),
+				    #"Fecha extraída1" = Table.TransformColumns(#"Columnas con nombre cambiado14",{{"EVOLUTIVOS_COMPLETO_Fecha Cierre", DateTime.Date, type date}}),
+				    #"Columna condicional agregada3" = Table.AddColumn(#"Fecha extraída1", "Personalizado", each if [dv_type] = "Service Upgrade" then "Evolución" else null),
+				    #"Columnas con nombre cambiado15" = Table.RenameColumns(#"Columna condicional agregada3",{{"Personalizado", "_dv_type - español"}}),
+				    #"Columna condicional agregada4" = Table.AddColumn(#"Columnas con nombre cambiado15", "Personalizado", each if [PRJs_TOPTASKs_dv_u_project_type] = "Multitask Enhancement" then "Evolutivo Multitarea" else if [PRJs_TOPTASKs_dv_u_project_type] = "Applications Maintenance" then "Mantenimiento de Aplicaciones" else null),
+				    #"Columnas con nombre cambiado16" = Table.RenameColumns(#"Columna condicional agregada4",{{"Personalizado", "PRJs_TOPTASKs_dv_u_project_type - español"}}),
+				    #"Columna condicional agregada5" = Table.AddColumn(#"Columnas con nombre cambiado16", "EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase-español", each if [EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase] = "Initiating" then "Iniciando" else if [EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase] = "Planning" then "Planificación" else if [EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase] = "Executing" then "Ejecución" else if [EVOLUTIVOS_PROYECTOS_PROYECTOSPADRE_dv_phase] = "Closing" then "Cierre" else null),
+				    #"Tipo cambiado5" = Table.TransformColumnTypes(#"Columna condicional agregada5",{{"EVOLUTIVOS_COMPLETO_start_date", type datetime}, {"EVOLUTIVOS_COMPLETO_end_date", type datetime}}),
+				    #"Columna duplicada9" = Table.DuplicateColumn(#"Tipo cambiado5", "EVOLUTIVOS_COMPLETO_start_date", "EVOLUTIVOS_COMPLETO_start_date - Copia"),
+				    #"Columna duplicada10" = Table.DuplicateColumn(#"Columna duplicada9", "EVOLUTIVOS_COMPLETO_end_date", "EVOLUTIVOS_COMPLETO_end_date - Copia"),
+				    #"Columnas con nombre cambiado17" = Table.RenameColumns(#"Columna duplicada10",{{"EVOLUTIVOS_COMPLETO_start_date - Copia", "EVOLUTIVOS_COMPLETO_start_date - SoloFecha"}}),
+				    #"Tipo cambiado6" = Table.TransformColumnTypes(#"Columnas con nombre cambiado17",{{"EVOLUTIVOS_COMPLETO_start_date - SoloFecha", type date}}),
+				    #"Columnas con nombre cambiado18" = Table.RenameColumns(#"Tipo cambiado6",{{"EVOLUTIVOS_COMPLETO_end_date - Copia", "EVOLUTIVOS_COMPLETO_end_date - SoloFecha"}}),
+				    #"Fecha extraída2" = Table.TransformColumns(#"Columnas con nombre cambiado18",{{"EVOLUTIVOS_COMPLETO_end_date - SoloFecha", DateTime.Date, type date}}),
+				    #"Columna condicional agregada6" = Table.AddColumn(#"Fecha extraída2", "DEMANDA_NUMBER_FICTICIO", each if [number] = null then [EVOLUTIVOS_COMPLETO_Number] else [number]),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columna condicional agregada6",null,"(En blanco)",Replacer.ReplaceValue,{"_dv_size - SoloLetra"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado",null,"(En blanco)",Replacer.ReplaceValue,{"_dv_size - Texto"}),
+				    #"Columna condicional agregada7" = Table.AddColumn(#"Valor reemplazado1", "PortfolioAfectado_Energia", each if Text.Contains([u_affected_portfolios], "8d71a38edb9580104f00366af496190a") then "SI" else "NO"),
+				    #"Errores reemplazados" = Table.ReplaceErrorValues(#"Columna condicional agregada7", {{"PortfolioAfectado_Energia", "NO"}}),
+				    #"Columna condicional agregada8" = Table.AddColumn(#"Errores reemplazados", "PortfolioVisualizarEnergia", each if [dv_portfolio] = "EN.Supply Chain" then "SI" else if [PortfolioAfectado_Energia] = "SI" then "SI" else if [dv_portfolio] = null then "QUIZAS" else "NO"),
+				    #"Columna condicional agregada9" = Table.AddColumn(#"Columna condicional agregada8", "PRJTASKs_Portfolio_Energia", each if [dv_top_portfolio] = "EN.Supply Chain" then "SI" else "NO"),
+				    #"Columna combinada insertada" = Table.AddColumn(#"Columna condicional agregada9", "PortfolioVisualizarEnergia_Concatenado", each Text.Combine({[PRJTASKs_Portfolio_Energia], [#"PortfolioVisualizarEnergia"]}, ","), type text),
+				    #"Columna duplicada11" = Table.DuplicateColumn(#"Columna combinada insertada", "PortfolioVisualizarEnergia_Concatenado", "PortfolioVisualizarEnergia_FINAL"),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Columna duplicada11","NO,NO","NO",Replacer.ReplaceText,{"PortfolioVisualizarEnergia_FINAL"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","NO,SI","SI",Replacer.ReplaceText,{"PortfolioVisualizarEnergia_FINAL"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","SI,QUIZAS","SI",Replacer.ReplaceText,{"PortfolioVisualizarEnergia_FINAL"}),
+				    #"Filas filtradas2" = Table.SelectRows(#"Valor reemplazado4", each ([PortfolioVisualizarEnergia_FINAL] = "SI")),
+				    #"Columna duplicada12" = Table.DuplicateColumn(#"Filas filtradas2", "dv_portfolio", "dv_portfolio - Copia"),
+				    #"Columna duplicada13" = Table.DuplicateColumn(#"Columna duplicada12", "dv_top_portfolio", "dv_top_portfolio - Copia"),
+				    #"Columnas combinadas10" = Table.CombineColumns(#"Columna duplicada13",{"dv_portfolio - Copia", "dv_top_portfolio - Copia"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"Combinada"),
+				    #"Columnas con nombre cambiado19" = Table.RenameColumns(#"Columnas combinadas10",{{"Combinada", "EVOLUTIVOS_COMPLETO_PortfolioaMostrar"}}),
+				    #"Filas filtradas4" = Table.SelectRows(#"Columnas con nombre cambiado19", each ([EVOLUTIVOS_FINAL_dv_state] <> null and [EVOLUTIVOS_FINAL_dv_state] <> ""))
+				in
+				    #"Filas filtradas4"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

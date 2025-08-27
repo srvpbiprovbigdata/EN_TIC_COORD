@@ -1,0 +1,339 @@
+table 'LB € y volumétrica'
+	lineageTag: 76299805-dcc3-48c4-9183-0313a692c71e
+
+	measure 'LB Comprometida € Medida' = SELECTEDVALUE('LB € y volumétrica'[LB Comprometida €])
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 85940b7c-5028-4c0b-a4a7-82c68595ec8b
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-ES"}
+
+	measure 'LB Comprometida Volumen Medida' = SELECTEDVALUE('LB € y volumétrica'[LB Comprometida Volumen])
+		lineageTag: 4668001c-dd43-467d-a94c-fe914bd96171
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'LB Comprometida +20% Medida' = SELECTEDVALUE('LB € y volumétrica'[LB +20% €])
+		lineageTag: e9afc74a-2c2c-43e7-b721-998929af7790
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'LB Comprometida -20% Medida' = SELECTEDVALUE('LB € y volumétrica'[LB -20% €])
+		lineageTag: 7660d153-b658-4d40-9edc-b89a8fb3eb5d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'LB Comprometida -20% Medida_vol' = SELECTEDVALUE('LB € y volumétrica'[LB -20% Volumen])
+		formatString: 0.00
+		lineageTag: 0eb613c5-7b25-4032-9014-07cc8b4237fb
+
+	measure 'LB Comprometida +20% Medida_vol' = SELECTEDVALUE('LB € y volumétrica'[LB +20% Volumen])
+		lineageTag: a0a6ccaf-390f-4e51-8468-582112ebc4b6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'LB Acumulado' = ```
+			
+			     CALCULATE(SUM('LB € y volumétrica'[LB Comprometida Volumen]), 
+			     FILTER(ALLSELECTED('LB € y volumétrica'),
+			     'LB € y volumétrica'[Período] <= MAX('LB € y volumétrica'[Período])))
+			```
+		lineageTag: 7f32d1a3-170d-4629-98ac-be86c5cfacdc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'LB Acumulado €' = ```
+			
+			     CALCULATE(SUM('LB € y volumétrica'[LB Comprometida €]), 
+			     FILTER(ALLSELECTED('LB € y volumétrica'),
+			     'LB € y volumétrica'[Período] <= MAX('LB € y volumétrica'[Período])))
+			```
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: c2b15d4d-8c9f-4f9d-a9af-55d882eaca4b
+
+	measure 'LB Real € _tabla' = ```
+			
+			     CALCULATE(SUM('LB € y volumétrica'[LB Real €]), 
+			     FILTER(ALLSELECTED('LB € y volumétrica'),
+			     'LB € y volumétrica'[Período] <= MAX('LB € y volumétrica'[Período])))
+			```
+		lineageTag: 8b924cb9-218d-4ff1-9688-ced5de513c68
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'LB Real volumen_tabla' = ```
+			
+			     CALCULATE(SUM('LB € y volumétrica'[LB Real Volumen]), 
+			     FILTER(ALLSELECTED('LB € y volumétrica'),
+			     'LB € y volumétrica'[Período] <= MAX('LB € y volumétrica'[Período])))
+			```
+		lineageTag: 5a643606-48b1-414e-b7f9-debfa4ac20f3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure LB_Actual = SELECTEDVALUE('LB € y volumétrica'[LB Objetivo 0 Volumen])
+		formatString: 0
+		lineageTag: 78552665-2112-4166-b3c3-ab277171141b
+
+	measure 'LB_Selected Value_2' = SELECTEDVALUE('LB € y volumétrica'[LB Objetivo Máximo Volumen])
+		lineageTag: 0b0b2c3d-73ff-4412-b69f-194e9cd087d0
+
+	measure 'LB_Selected Value_3' = SELECTEDVALUE('LB € y volumétrica'[LB Esperada Volumen])
+		lineageTag: bf68e6af-58b2-4259-b155-68c15fddebfb
+
+	measure LB_Actual_acumulado = ```
+			
+			     CALCULATE
+			     (SUM('LB € y volumétrica'[LB Objetivo 0 Volumen]), 
+			     FILTER(ALLSELECTED('LB € y volumétrica'),
+			     'LB € y volumétrica'[Período] <= MAX('LB € y volumétrica'[Período])))
+			```
+		lineageTag: 597ec5bc-d052-4234-9e59-45b357936eb5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure LB_Actual_acumulado2 = ```
+			
+			     CALCULATE
+			     (SUM('LB € y volumétrica'[LB Esperada Volumen]), 
+			     FILTER(ALLSELECTED('LB € y volumétrica'),
+			     'LB € y volumétrica'[Período] <= MAX('LB € y volumétrica'[Período])))
+			```
+		lineageTag: 20ba9ea8-b953-4d60-9092-fdc2a990ffbc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Servicio TIC'
+		dataType: string
+		lineageTag: a4b39c11-279c-4ad6-b113-c81ea9b5fee3
+		summarizeBy: none
+		sourceColumn: Servicio TIC
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ámbito del Servicio'
+		dataType: string
+		lineageTag: 4278a9b7-83c7-44d3-a474-533d85b90dd8
+		summarizeBy: none
+		sourceColumn: Ámbito del Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción Ámbito Servicio'
+		dataType: string
+		lineageTag: e688eb5f-07c5-4ca1-b98f-83d5fc520453
+		summarizeBy: none
+		sourceColumn: Descripción Ámbito Servicio
+		sortByColumn: 'Ámbito del Servicio'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LB Real €'
+		dataType: double
+		lineageTag: 7683990e-ddb7-460b-851b-ea4847ffeef8
+		summarizeBy: sum
+		sourceColumn: LB Real €
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB Real Volumen'
+		dataType: int64
+		lineageTag: 9ed7be1c-5de7-4cca-bff7-ed66b4f72a71
+		summarizeBy: sum
+		sourceColumn: LB Real Volumen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Período
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d4838af8-6b21-403b-b615-6de05bd81fdc
+		summarizeBy: none
+		sourceColumn: Período
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'LB Proyectado/Reservado €'
+		dataType: double
+		lineageTag: 536233fe-2d6e-43e8-97e4-6baac36ec4f3
+		summarizeBy: sum
+		sourceColumn: LB Proyectado/Reservado €
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB Proyectado/Reservado Volumen'
+		dataType: int64
+		lineageTag: 4314007b-ea4c-40e9-b22e-fb43d49197e7
+		summarizeBy: sum
+		sourceColumn: LB Proyectado/Reservado Volumen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB Comprometida €'
+		dataType: double
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 83b14881-f257-45a5-acd4-279b2f32951d
+		summarizeBy: sum
+		sourceColumn: LB Comprometida €
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LB -20% €'
+		dataType: double
+		lineageTag: 7930168f-808e-4944-9383-ecebfe95cbe9
+		summarizeBy: sum
+		sourceColumn: LB -20% €
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB -15% €'
+		dataType: double
+		lineageTag: 960dbfc9-3214-48fe-aff1-8aba91af3bd9
+		summarizeBy: sum
+		sourceColumn: LB -15% €
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB -10% €'
+		dataType: double
+		lineageTag: 72bf8918-8ac0-4b89-915c-f7ee85aaf20a
+		summarizeBy: sum
+		sourceColumn: LB -10% €
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB +10% €'
+		dataType: double
+		lineageTag: 0a45cd22-ce13-4a90-8ec4-f7ac6edcc749
+		summarizeBy: sum
+		sourceColumn: LB +10% €
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB +15% €'
+		dataType: double
+		lineageTag: 70924c17-6ddd-4a1f-9982-62ac0aa2cba8
+		summarizeBy: sum
+		sourceColumn: LB +15% €
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB +20% €'
+		dataType: double
+		lineageTag: f7f9e43d-6147-46c4-b50b-18df69e8b7b7
+		summarizeBy: sum
+		sourceColumn: LB +20% €
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB -20% Volumen'
+		dataType: double
+		lineageTag: 36b759ee-6fa3-47eb-bdbc-affaf92265f6
+		summarizeBy: sum
+		sourceColumn: LB -20% Volumen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB -15% Volumen'
+		dataType: double
+		lineageTag: 6bd0b229-2d69-49c8-ae5b-d3bf85d197e7
+		summarizeBy: sum
+		sourceColumn: LB -15% Volumen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB +20% Volumen'
+		dataType: int64
+		lineageTag: cb4bf7e6-05bd-4075-b7a2-1f1618e277e6
+		summarizeBy: sum
+		sourceColumn: LB +20% Volumen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB Esperada Volumen'
+		dataType: double
+		lineageTag: 02dcf5b6-9896-4b24-9d27-069c63253bbc
+		summarizeBy: sum
+		sourceColumn: LB Esperada Volumen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB Objetivo 0 Volumen'
+		dataType: double
+		lineageTag: 53b0a041-b7a2-4ee4-9bca-baeae0a3eebe
+		summarizeBy: sum
+		sourceColumn: LB Objetivo 0 Volumen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB Objetivo Máximo Volumen'
+		dataType: int64
+		lineageTag: 1d329831-a8a1-4f30-bc0b-8f2c1929f914
+		summarizeBy: sum
+		sourceColumn: LB Objetivo Máximo Volumen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LB Comprometida Volumen '
+		dataType: int64
+		lineageTag: f3a30bdb-e057-4a53-a443-f42923cb6cad
+		summarizeBy: sum
+		sourceColumn: "LB Comprometida Volumen "
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'LB € y volumétrica-7d047a29-fbb9-4517-8af5-9def0f548c86' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(sharepointSource & Entorno & lineaBase), null, true),
+				    LB_ENABLON_Sheet = Origen{[Item="LB_MERCADOS",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos1" = Table.PromoteHeaders(LB_ENABLON_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos1",{{"Servicio TIC", type text}, {"Ámbito del Servicio", type text}, {"Descripción Ámbito Servicio", type text}, {"LB -20% €", type number}, {"LB -15% €", type number}, {"LB -10% €", type number}, {"LB Comprometida €", type number}, {"LB +10% €", type number}, {"LB +15% €", type number}, {"LB +20% €", type number}, {"LB Real €", type number}, {"LB Proyectado/Reservado €", type number}, {"LB -20% Volumen", type number}, {"LB -15% Volumen", type number}, {"LB +20% Volumen", Int64.Type}, {"LB Real Volumen", Int64.Type}, {"LB Proyectado/Reservado Volumen", Int64.Type}, {"Período", type date}, {"LB Esperada Volumen", type number}, {"LB Objetivo 0 Volumen", type number}, {"LB Objetivo Máximo Volumen", Int64.Type}, {"LB Comprometida Volumen ", Int64.Type}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,137 @@
+table 'PRO - Alegaciones del Servicio KGI21'
+	lineageTag: 7657b1be-9e6e-4334-8f9b-2911dbc76f6e
+
+	column 'ID Alegación'
+		dataType: string
+		lineageTag: ce25b5bc-5f0d-4706-9beb-869557cbec36
+		summarizeBy: none
+		sourceColumn: ID Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: string
+		lineageTag: 4eaf1c3d-40b0-4de2-a64f-936b9746ea09
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sistema Afectado'
+		dataType: string
+		lineageTag: 0432ebf8-9dc7-409a-bce5-bfec05f88c10
+		summarizeBy: none
+		sourceColumn: Sistema Afectado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo de Medida del ANS alegado'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 22ef3fa7-53d6-4137-9483-d486a39cc2f2
+		summarizeBy: none
+		sourceColumn: Periodo de Medida del ANS alegado
+
+		variation Variation
+			isDefault
+			relationship: a22e977f-297b-44a9-a2bf-16401fcbb2c2
+			defaultHierarchy: LocalDateTable_c91b7005-0748-4b8c-a75a-8ec9a5e965b6.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Clasificación
+		dataType: string
+		lineageTag: 33392e69-308e-4468-b313-db62c88994f1
+		summarizeBy: none
+		sourceColumn: Clasificación
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANS
+		dataType: string
+		lineageTag: 2e916c7f-7787-4d6a-a5cf-6b70580afe0b
+		summarizeBy: none
+		sourceColumn: ANS
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 11ad72a3-fe61-4a21-ab3a-92011f7da2ed
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		variation Variation
+			isDefault
+			relationship: 7212ef96-c128-42af-9c8c-dfc17401ca1a
+			defaultHierarchy: LocalDateTable_2f396479-f108-486b-b87f-33730b40e83f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Estado
+		dataType: string
+		lineageTag: 88617e33-3263-4333-9b17-237e642a0f5b
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comentarios
+		dataType: string
+		lineageTag: ead6121d-7e54-46d3-8ea1-501808c56415
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column Solicitante
+		dataType: string
+		lineageTag: e6cc0d4b-deb5-4f7e-98a0-32e6274868a5
+		summarizeBy: none
+		sourceColumn: Solicitante
+
+		annotation SummarizationSetBy = Automatic
+
+	column Acción
+		dataType: string
+		lineageTag: cc13d69d-6be0-4f06-b549-4660084326c4
+		summarizeBy: none
+		sourceColumn: Acción
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Comentarios Acciona'
+		dataType: string
+		lineageTag: 6ffe3287-505d-4db7-bd4f-57b4d8b885ae
+		summarizeBy: none
+		sourceColumn: Comentarios Acciona
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Comentarios Proveedor'
+		dataType: string
+		lineageTag: dbce8f08-88b4-497d-89aa-f716f765e55b
+		summarizeBy: none
+		sourceColumn: Comentarios Proveedor
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Alegaciones del Servicio KGI21-1e1d6b40-30ae-4fbb-8557-d1673cc4c8a2' = m
+		mode: import
+		queryGroup: Alegaciones
+		source =
+				let
+				    Source = #"PRO - Alegaciones del Servicio",
+				    #"Filas filtradas" = Table.SelectRows(Source, each [ANS] = "KGI_21")
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,198 @@
+table 'Resumen KGI1-3-Final'
+	lineageTag: df86aab2-98a3-4ab8-a4c5-2314993c1e59
+
+	measure 'Tasa Máxima Permitida' = 0
+		formatString: 0
+		lineageTag: 6bfed195-952c-47ac-bf77-804b097c4d57
+
+	measure 'Peso Obtenido KGI13_M' =
+			IF(MAX(Fechas[SERVICE_P])=0,"N/A",
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,01,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,02,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,03,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,04,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,05,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,06,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,07,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,08,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,09,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,10,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,11,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2020,12,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,01,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,02,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,03,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,04,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,05,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,06,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,07,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,08,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,09,01), 1,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,10,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,11,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2021,12,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2022,01,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2022,02,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2022,03,01), 0,
+			IF(MAX(Fechas[Date_1er_día_mes]) = DATE(2022,04,01), 0,
+			1-SUM('Resumen KGI1-3-Final'[Peso_No_Obtenido]))))))))))))))))))))))))))))))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 2299f2e4-7ffd-477f-a89b-a13b081ef5a2
+
+	measure 'Puntos KGI13' = 10
+		formatString: 0
+		lineageTag: 779a4f4e-d626-4216-9d13-9572ad6b75af
+
+	measure 'Puntos_obtenidos KGI13' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[Peso Obtenido KGI13_M] * [Puntos KGI13])
+		formatString: 0
+		lineageTag: 8d46ec9c-31d8-4bd3-92c9-12449e2022cf
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Puntos Obtenidos KGI13_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([Puntos_obtenidos KGI13])
+			)
+		lineageTag: 2ae29aa2-8cd1-4e4d-bb9e-7f14a839d507
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Peso Obtenido KGI13_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreComp])),
+				CALCULATE([Peso Obtenido KGI13_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 25c3da44-416f-48b0-b457-58fe82ee9f7e
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c5323c37-23b0-4180-807c-c35251edeebf
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Prioridad
+		dataType: string
+		lineageTag: 12471bf6-93ad-4ba5-9c7c-68b9c6073c50
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: c2e65b0c-f9f2-4aae-93e0-7a0d632f1e6e
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Incidencias relacionadas'
+		dataType: double
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 39c7c1b4-5f25-4e7e-949d-e7945b6851e8
+		summarizeBy: sum
+		sourceColumn: Incidencias relacionadas
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total sin Incidencias'
+		dataType: string
+		lineageTag: ac447b40-e01b-4e02-9572-d2b3b1e338b0
+		summarizeBy: none
+		sourceColumn: Total sin Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Real %' = DIVIDE('Resumen KGI1-3-Final'[Incidencias relacionadas], 'Resumen KGI1-3-Final'[Recuento], 0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: eed4ad13-7ad7-44e2-8750-155c502175ae
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Máxima permitida_KGI13' = 0.05
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 1b86610b-aa9d-4199-8dc1-bb277553df41
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI1-3-Final'[Tasa Real %] >'Resumen KGI1-3-Final'[Tasa Máxima permitida_KGI13], "No", "Sí")
+		lineageTag: ce180c70-e0f8-4e27-ae01-3f8e6cf5b176
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parametros KGI1-3.Tasa de Desviación Máxima'
+		dataType: double
+		lineageTag: 24818ec0-dae2-43f8-a26e-6f7db929a162
+		summarizeBy: sum
+		sourceColumn: Parametros KGI1-3.Tasa de Desviación Máxima
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Parametros KGI1-3.Pesos %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 7fd2646c-740b-446e-9d41-685bc6c5a072
+		summarizeBy: sum
+		sourceColumn: Parametros KGI1-3.Pesos %
+
+		annotation SummarizationSetBy = Automatic
+
+	column Peso_No_Obtenido = IF('Resumen KGI1-3-Final'[¿Cumple?] = "No", 'Resumen KGI1-3-Final'[Parametros KGI1-3.Pesos %], 0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: d4e834f7-43c4-47e2-a396-93411bcc2914
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+	column Peso_Obtenido = 'Resumen KGI1-3-Final'[Parametros KGI1-3.Pesos %] - 'Resumen KGI1-3-Final'[Peso_No_Obtenido]
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: d3233ab4-9e1e-4b63-906d-ac9ea0331863
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+	column Incumplidas = 'Resumen KGI1-3-Final'[Recuento] - 'Resumen KGI1-3-Final'[Total sin Incidencias]
+		formatString: 0
+		lineageTag: 53925e5a-3b64-46c4-9e7b-724c21075acc
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	partition 'Resumen KGI1-3-Final-e916b2e7-3183-42ad-8b86-aacb8ec04d47' = m
+		mode: import
+		queryGroup: Resumen
+		source =
+				let
+				    Origen = #"PRO - Planificaciones PRJ y ENH con SLA",
+				    #"Filas agrupadas" = Table.Group(Origen, {"Fecha fin real - Copy", "Prioridad"}, {{"Recuento", each Table.RowCount(_), Int64.Type}}),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Filas agrupadas", {"Fecha fin real - Copy", "Prioridad"}, #"PRO - Incidencias con SLA (NY y MAD)-Relacionadas", {"PRO - Planificaciones PRJ y ENH con SLA.Fecha fin real - Copy", "Prioridad"}, "PRO - Incidencias con SLA (NY y MAD)-Relacionadas", JoinKind.LeftOuter),
+				    #"Se expandió PRO - Incidencias con SLA (NY y MAD)-Relacionadas" = Table.ExpandTableColumn(#"Consultas combinadas", "PRO - Incidencias con SLA (NY y MAD)-Relacionadas", {"Recuento"}, {"PRO - Incidencias con SLA (NY y MAD)-Relacionadas.Recuento"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Se expandió PRO - Incidencias con SLA (NY y MAD)-Relacionadas",null,0,Replacer.ReplaceValue,{"PRO - Incidencias con SLA (NY y MAD)-Relacionadas.Recuento"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Valor reemplazado",{{"PRO - Incidencias con SLA (NY y MAD)-Relacionadas.Recuento", "Incidencias relacionadas"}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Total sin Incidencias", each [Recuento] - [Incidencias relacionadas]),
+				    #"Consultas combinadas1" = Table.NestedJoin(#"Personalizada agregada", {"Prioridad"}, #"Parametros KGI1-3", {"Prioridad Hitos "}, "Parametros KGI1-3", JoinKind.LeftOuter),
+				    #"Se expandió Parametros KGI1-3" = Table.ExpandTableColumn(#"Consultas combinadas1", "Parametros KGI1-3", {"Tasa de Desviación Máxima", "Pesos %"}, {"Parametros KGI1-3.Tasa de Desviación Máxima", "Parametros KGI1-3.Pesos %"})
+				in
+				    #"Se expandió Parametros KGI1-3"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

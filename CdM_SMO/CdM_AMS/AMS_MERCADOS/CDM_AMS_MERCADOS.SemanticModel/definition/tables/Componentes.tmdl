@@ -1,0 +1,53 @@
+table Componentes
+	lineageTag: f90932ae-2113-482c-bdcf-7bfd011cf8c5
+
+	column MERCADOS
+		dataType: string
+		lineageTag: 1589cd89-0101-48f0-bfca-0fa6f943321b
+		summarizeBy: none
+		sourceColumn: MERCADOS
+
+		annotation SummarizationSetBy = Automatic
+
+	column EMS
+		dataType: string
+		lineageTag: b2aeb465-a43b-4c7d-8fd8-4178136e5641
+		summarizeBy: none
+		sourceColumn: EMS
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CRM Energia'
+		dataType: string
+		lineageTag: 1b41a6ad-c0fe-45c0-8048-cc01315b8d5f
+		summarizeBy: none
+		sourceColumn: CRM Energia
+
+		annotation SummarizationSetBy = Automatic
+
+	column LEGAL
+		dataType: string
+		lineageTag: 471531d7-15f5-4151-a5bd-f6f77ed99fac
+		summarizeBy: none
+		sourceColumn: LEGAL
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Componentes-52f57b4e-de8c-42d5-8f9a-5e7c1f7acde0 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(sharepointSource & Entorno & componentesPath & xlsx), null, true),
+				    Personalizado1 = Origen{[Name="Componentes Jira por Servicio"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Personalizado1, [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"ENABLON", type text}, {"MAXIMO", type text}, {"IAR", type text}, {"AMS CORE GFI", type text}, {"SERVICENOW", type text}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado1",{"MAXIMO", "IAR", "AMS CORE GFI", "SERVICENOW", "BI", "CRMSF", "GDOC", "LWAS", "RPA", "BESTINVER", "SAPHR", "BESTINVERAPP", "SAC", "SCS", "ENABLON"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each ([MERCADOS] = "EvoSAGO" or [MERCADOS] = "Gestión de Energía: Facturación Mercados Mayoristas" or [MERCADOS] = "Inge.COM: Inge.COM" or [MERCADOS] = "Inge.SOM: Inge.SOM"))
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

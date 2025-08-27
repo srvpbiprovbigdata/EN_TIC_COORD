@@ -1,0 +1,140 @@
+table 'PRO - Alegaciones del Servicio'
+	lineageTag: 47030e80-cddd-45ba-8833-b7ade23cad94
+
+	column ID
+		dataType: string
+		lineageTag: 00ffff45-96ea-4549-99ed-6d6f1e9218fd
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clasificación
+		dataType: string
+		lineageTag: 67fd81b0-95b6-49a6-a4eb-5d8ffd3252ec
+		summarizeBy: none
+		sourceColumn: Clasificación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 994216c8-2bdc-4373-9e53-c7131a525647
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sistema Afectado'
+		dataType: string
+		lineageTag: c6a0bd14-68f3-4b58-8643-01eb8319f67e
+		summarizeBy: none
+		sourceColumn: Sistema Afectado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID Alegación'
+		dataType: string
+		lineageTag: 84856a45-7126-4c47-89c4-f59638e5a48d
+		summarizeBy: none
+		sourceColumn: ID Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Solicitante
+		dataType: string
+		lineageTag: b3a0e775-b691-4afd-8de4-74be5b11dcad
+		summarizeBy: none
+		sourceColumn: Solicitante
+
+		annotation SummarizationSetBy = Automatic
+
+	column Acción
+		dataType: string
+		lineageTag: d30bfc34-d2f1-4055-8c9b-59a2e6a0ea76
+		summarizeBy: none
+		sourceColumn: Acción
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANS
+		dataType: string
+		lineageTag: aa586f7a-21d1-4dd7-838c-f4d3534862a4
+		summarizeBy: none
+		sourceColumn: ANS
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo de Medida del ANS alegado'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9c360444-a67b-4ac8-8858-c69b99f83c65
+		summarizeBy: none
+		sourceColumn: Periodo de Medida del ANS alegado
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Fecha
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 644db682-eb9e-4435-a40d-30d40af4d185
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		variation Variación
+			isDefault
+			relationship: abc7d950-052b-46ec-b01f-06be7ad8350f
+			defaultHierarchy: LocalDateTable_5e1e7668-4f05-4ecf-b611-3a74921714f1.'Jerarquía de fechas'
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Comentarios
+		dataType: string
+		lineageTag: 298cc534-8abb-499b-858b-abb924549ec8
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Comentarios Acciona'
+		dataType: string
+		lineageTag: 80ff6a08-d352-4d80-8063-5ac7283396d0
+		summarizeBy: none
+		sourceColumn: Comentarios Acciona
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Comentarios Proveedor'
+		dataType: string
+		lineageTag: 8eb7f897-8c28-48d2-8a4c-00e2cd23b2b1
+		summarizeBy: none
+		sourceColumn: Comentarios Proveedor
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Alegaciones del Servicio-2ec5af8e-5b9d-407a-9ea8-2cab49b78f37' = m
+		mode: import
+		queryGroup: Alegaciones
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(sharepointRoot2 & folderProvClien & alegaciones & xlsx), null, true),
+				    Tabla_CORE_Table = Source{[Item="Tabla_CORE",Kind="Table"]}[Data],
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(Tabla_CORE_Table,{{"ID Alegación", type text}, {"Solicitante", type text}, {"ID", type text},  {"Sistema Afectado", type text}, {"KGI", type text}, {"Acción", type text}, {"Periodo de Medida del ANS alegado*", type date}, {"Clasificación", type any}, {"Fecha de alegación", type any}, {"Estado", type text}, {"Descripción", type text}, {"Comentarios Acciona", type text}, {"Comentarios Proveedor", type text}}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Tipo cambiado1",{{"ID Alegación", type text}, {"Solicitante", type text}, {"ID", type text}, {"Sistema Afectado", type text}, {"Acción", type text}, {"KGI", type text}, {"Periodo de Medida del ANS alegado*", type date}, {"Clasificación", type any}, {"Fecha de alegación", type any}, {"Estado", type text}, {"Descripción", type text}, {"Comentarios Acciona", type text}, {"Comentarios Proveedor", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"KGI", "ANS"}, {"Periodo de Medida del ANS alegado*", "Periodo de Medida del ANS alegado"}, {"Fecha de alegación", "Fecha"}, {"Descripción", "Comentarios"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{{"ID", type text}, {"Periodo de Medida del ANS alegado", type date}, {"Clasificación", type text}, {"ANS", type text}, {"Fecha", type date}, {"Estado", type text}, {"Comentarios", type text}}),
+				    #"Filas filtradas" = Table.SelectRows(#"Changed Type", each true),
+				    #"Inicio del mes calculado" = Table.TransformColumns(#"Filas filtradas",{{"Periodo de Medida del ANS alegado", Date.StartOfMonth, type date}})
+				in
+				    #"Inicio del mes calculado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

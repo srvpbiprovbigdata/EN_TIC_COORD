@@ -1,0 +1,55 @@
+table Relación_Evolutivo-Incidencia
+	lineageTag: d6f7a630-7af9-4d1a-87ae-181388d64ac3
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0612253c-984a-45b5-82c4-7c9b6935e500
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		variation Variación
+			isDefault
+			relationship: 7e9d9db1-b481-44ed-b746-55b0d7c08548
+			defaultHierarchy: LocalDateTable_65dd4294-5c9f-44b3-be01-6642cb4cfbfc.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: 86679d79-0d65-45e2-aa8e-4945a49698e8
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PRO - Incidencias con SLA (NY y MAD).Prioridad'
+		dataType: string
+		lineageTag: ccfc87df-8e2d-459f-9861-3e1d56462e8d
+		summarizeBy: none
+		sourceColumn: PRO - Incidencias con SLA (NY y MAD).Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Relación_Evolutivo-Incidencia-9fb4330f-7155-42b1-887d-1f8c3a53969e = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = #"PRO - Planificaciones PRJ y ENH con SLA",
+				    #"Consultas combinadas" = Table.NestedJoin(Origen, {"Número"}, Incidencias_relacionadas, {"Tarea"}, "Incidencias_relacionadas", JoinKind.LeftOuter),
+				    #"Se expandió Incidencias_relacionadas" = Table.ExpandTableColumn(#"Consultas combinadas", "Incidencias_relacionadas", {"Incidente"}, {"Incidencias_relacionadas.Incidente"}),
+				    #"Consultas combinadas1" = Table.NestedJoin(#"Se expandió Incidencias_relacionadas", {"Incidencias_relacionadas.Incidente"}, #"PRO - Incidencias con SLA (NY y MAD)", {"Número"}, "PRO - Incidencias con SLA (NY y MAD)", JoinKind.LeftOuter),
+				    #"Se expandió PRO - Incidencias con SLA (NY y MAD)" = Table.ExpandTableColumn(#"Consultas combinadas1", "PRO - Incidencias con SLA (NY y MAD)", {"Prioridad"}, {"PRO - Incidencias con SLA (NY y MAD).Prioridad"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Se expandió PRO - Incidencias con SLA (NY y MAD)", each ([Incidencias_relacionadas.Incidente] <> null)),
+				    #"Filas agrupadas" = Table.Group(#"Filas filtradas", {"Fecha fin real - Copy", "PRO - Incidencias con SLA (NY y MAD).Prioridad"}, {{"Recuento", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Filas agrupadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

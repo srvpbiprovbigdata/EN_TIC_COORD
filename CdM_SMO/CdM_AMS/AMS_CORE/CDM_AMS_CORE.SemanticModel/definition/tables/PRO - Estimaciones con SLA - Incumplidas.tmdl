@@ -1,0 +1,63 @@
+table 'PRO - Estimaciones con SLA - Incumplidas'
+	lineageTag: 01f4f270-20a7-4050-855b-cf821484e8b6
+
+	column Prioridad
+		dataType: string
+		lineageTag: 676926fc-eda9-4f3e-88b0-cd93c2149b39
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Start of Month'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: bc7dd5b4-b812-4129-8bc6-b35475cf5dcb
+		summarizeBy: none
+		sourceColumn: Start of Month
+
+		variation Variation
+			isDefault
+			relationship: 87451345-92f6-4c8d-a7b8-271df16f1bd8
+			defaultHierarchy: LocalDateTable_06bbfd6b-4297-4d1e-8cb4-69dd1ed1e02a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Count
+		dataType: double
+		lineageTag: e511acd9-a19a-43cc-92a2-d7f49020628f
+		summarizeBy: sum
+		sourceColumn: Count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Infringido
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 3a1df8a5-2d13-47e4-9fbe-c3a86f7f693d
+		summarizeBy: none
+		sourceColumn: Infringido
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Estimaciones con SLA - Incumplidas-6a75a9ec-55fc-4960-996c-a1a002e84f96' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Source = #"PRO - Estimaciones con SLA",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Start of Month", "Infringido"}, {{"Count", each Table.RowCount(_), type number}}),
+				
+				    #"Filtered Rows" = Table.SelectRows(#"Grouped Rows", each ([Infringido] <> false))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

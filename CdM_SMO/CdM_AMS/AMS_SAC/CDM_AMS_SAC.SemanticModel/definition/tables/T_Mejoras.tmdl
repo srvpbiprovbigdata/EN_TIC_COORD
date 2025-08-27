@@ -1,0 +1,105 @@
+table T_Mejoras
+	lineageTag: 145c730d-a9d5-4430-9e47-1e49161844db
+
+	measure 'Cuenta de Numero' = COUNT(T_Mejoras[ID])
+		formatString: 0
+		lineageTag: c637e4fb-fc94-43b3-bbfa-1c925011028f
+
+	column Descripción
+		dataType: string
+		lineageTag: a418569a-2fa0-4ad6-8f65-3ec3d43420cf
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 386308f3-86b9-4da2-bbb5-5afbbd303eee
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Responsable
+		dataType: string
+		lineageTag: 7a764f1f-664d-45b5-bedb-2b2b2c5d02a2
+		summarizeBy: none
+		sourceColumn: Responsable
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: string
+		lineageTag: 94270f09-4cb8-47fc-89b7-6e97acec1c84
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nombre
+		dataType: string
+		lineageTag: decdb9ac-2dd2-456f-8320-63093b9462ac
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado de Aprobación'
+		dataType: string
+		lineageTag: 32162865-54e1-4871-a739-6baac4c75d54
+		summarizeBy: none
+		sourceColumn: Estado de Aprobación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Aprobación / Rechazo'
+		dataType: string
+		lineageTag: e89e33ae-8266-4021-8902-05fa660b89e6
+		summarizeBy: none
+		sourceColumn: Fecha de Aprobación / Rechazo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Cierre'
+		dataType: string
+		lineageTag: fc4aaee9-aba3-40e1-b4e5-8ba5c71d3da4
+		summarizeBy: none
+		sourceColumn: Fecha de Cierre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comentarios
+		dataType: string
+		lineageTag: 3e252885-5b0c-421d-b277-31006e4d4519
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Cierre - Copia'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b222d64f-5223-4f85-8a8b-9a71e0612bed
+		summarizeBy: none
+		sourceColumn: Fecha de Cierre - Copia
+
+		annotation SummarizationSetBy = Automatic
+
+	partition T_Mejoras-f4878d3d-acb8-4d77-b5ee-ededd9b30771 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = #"KGI_I_Mejoras propuestas (stagging)",
+				    #"Columna duplicada" = Table.DuplicateColumn(Origen, "Fecha de Cierre", "Fecha de Cierre - Copia"),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columna duplicada",{{"Fecha de Cierre - Copia", type datetime}}),
+				    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado", each ([#"Fecha de Cierre - Copia"] <> null)),
+				    #"Inicio del mes calculado" = Table.TransformColumns(#"Filas filtradas",{{"Fecha de Cierre - Copia", Date.StartOfMonth, type datetime}})
+				in
+				    #"Inicio del mes calculado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,142 @@
+table 'Resumen KGI2-3 Final'
+	lineageTag: 395a14bd-5c33-4b2a-bab4-e24780ef6fbb
+
+	measure 'Puntos de KGI23_M' =
+			
+			var _KGI23_V = MIN('Resumen KGI2-3 Final'[Puntos de KGI23])
+			return
+			IF(ISBLANK(_KGI23_V),5,_KGI23_V)
+		lineageTag: 6b67e076-106a-4882-9a62-71854395db63
+
+	measure 'Peso Obtenido KGI23_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",1-SUM('Resumen KGI2-3 Final'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 14798588-10d8-42d7-8277-f3e76de56b68
+
+	measure 'Puntos Obtenidos KGI23_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",IF([Total INCs cerradas del Periodo_M]=0,5,[Peso Obtenido KGI23_M]*[Puntos de KGI23_M]))
+		formatString: 0
+		lineageTag: bbd3a744-e924-429c-bc52-c42b1ba53150
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Peso Obtenido KGI23_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreComp])),
+				CALCULATE([Peso Obtenido KGI23_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 74e744ef-b14e-4371-af77-49ccf2cabddf
+
+	measure 'Puntos Obtenidos KGI23_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([Puntos Obtenidos KGI23_M])
+			)
+		formatString: 0.0
+		lineageTag: e4bff42a-ef49-4ded-979a-c3ec87c4c9b6
+
+	column 'Total Incidencias'
+		dataType: int64
+		lineageTag: 1a93df6c-7cd6-4b46-baba-05367bdbb6ff
+		summarizeBy: sum
+		sourceColumn: Total Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Tasa mínima objetivo %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 495103e4-fb5b-44e4-8574-ac699a36f580
+		summarizeBy: none
+		sourceColumn: Tasa mínima objetivo %
+
+		annotation SummarizationSetBy = User
+
+	column 'Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: d2b9e769-5d89-401a-a116-685d6dacc1b4
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI23'
+		dataType: string
+		lineageTag: 926478e6-e64e-4116-8047-04fc93d41cae
+		summarizeBy: none
+		sourceColumn: Puntos de KGI23
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF([KGI23 Tasa de Reducción de INCs_M]>='Resumen KGI2-3 Final'[Tasa mínima objetivo %],"Si","No")
+		lineageTag: 8b8434a9-74c8-41bb-a961-7238553b0267
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI2-3 Final'[¿Cumple?]="Si",'Resumen KGI2-3 Final'[Peso del KGI %],0)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 4b8f8fc3-8837-4133-9972-32fcd6c2ad6f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI2-3 Final'[¿Cumple?]="No",'Resumen KGI2-3 Final'[Peso del KGI %],0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: cf526288-7874-4a9c-be4d-b31769dc2a9a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 760395b1-1c3d-4225-a3dc-b6ea3fab86e3
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierto - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 55101911-5c6b-4b88-95c1-2a68adcdc6ad
+		summarizeBy: none
+		sourceColumn: Abierto - Copy
+
+		variation Variación
+			isDefault
+			relationship: 7b3cade1-6ba2-4121-a1a5-81e0a2fe4ed5
+			defaultHierarchy: LocalDateTable_74aeaca1-af93-43d5-8343-c0e4998ddf36.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'Resumen KGI2-3 Final-9a47107f-5dc1-4124-8dfd-ee68f140c375' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA (NY y MAD) - Abiertas",
+				
+				    //Total Incidencias Abiertas 
+				    #"Grouped Rows" = Table.Group(Source, {"Abierto - Copy"}, {{"Total Incidencias", each Table.RowCount(_), Int64.Type}}),
+				
+				    //Relacionar Valores constantes de Parámetros 
+				    #"Added Custom" = Table.AddColumn(#"Grouped Rows", "Tasa mínima objetivo %", each 0.05),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Peso del KGI %", each 1),
+				    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "Puntos de KGI23", each 5),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom2",{{"Peso del KGI %", Percentage.Type}, {"Tasa mínima objetivo %", Percentage.Type}}),
+				    #"Added Custom3" = Table.AddColumn(#"Changed Type", "KGI", each "KGI2-3")
+				in
+				    #"Added Custom3"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

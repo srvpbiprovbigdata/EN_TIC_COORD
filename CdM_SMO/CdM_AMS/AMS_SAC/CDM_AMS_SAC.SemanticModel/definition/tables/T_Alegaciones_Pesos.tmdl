@@ -1,0 +1,111 @@
+table T_Alegaciones_Pesos
+	lineageTag: dc722210-44f4-495f-8517-4129daefc41c
+
+	measure 'Recuento de Estado' = COUNT(T_Alegaciones_Pesos[Estado])
+		formatString: 0
+		lineageTag: 25344efd-0a0f-4ff1-940b-02e0147187f5
+
+	measure 'No. de Alegaciones' = COUNT(T_Alegaciones_Pesos[ID Alegación])
+		formatString: 0
+		lineageTag: 0cb3df11-a613-4108-8e23-58968920a22d
+
+	column 'ID Alegación'
+		dataType: int64
+		formatString: 0
+		lineageTag: 70b72dc9-8262-4def-a4d3-b15b3bbefc02
+		summarizeBy: sum
+		sourceColumn: ID Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Solicitante
+		dataType: string
+		lineageTag: ed286d8f-9f5d-4ac1-ad7a-fa5296b26a1e
+		summarizeBy: none
+		sourceColumn: Solicitante
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clasificación
+		dataType: string
+		lineageTag: 0f6d4ae9-98ae-4b79-825d-bbd5b05df1e2
+		summarizeBy: none
+		sourceColumn: Clasificación
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANS
+		dataType: string
+		lineageTag: 19649bb8-f055-4cd9-96c9-994b3d0c9273
+		summarizeBy: none
+		sourceColumn: ANS
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 9cfdd249-2dcf-4667-8c3a-dd5f8f7a86a0
+		summarizeBy: count
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = User
+
+	column Comentarios
+		dataType: string
+		lineageTag: 31c66dcb-33fa-403c-b4c5-0fa0a29e145d
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Comentarios Acciona'
+		dataType: string
+		lineageTag: 3098c783-5307-43b8-9f88-577d9236b2ad
+		summarizeBy: none
+		sourceColumn: Comentarios Acciona
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Valor Peso'
+		dataType: double
+		lineageTag: c7317ffb-ab0f-4094-8871-8c486938663a
+		summarizeBy: sum
+		sourceColumn: Valor Peso
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Alegacion_aceptada
+		dataType: string
+		lineageTag: fc05a325-5f28-4275-9008-311780a2a07b
+		summarizeBy: none
+		sourceColumn: Alegacion_aceptada
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Periodo de Medida del ANS alegado'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6517a461-e83a-4a8d-9851-cf622492019a
+		summarizeBy: none
+		sourceColumn: Periodo de Medida del ANS alegado
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition T_Alegaciones_Pesos = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = #"T_Alegaciones_Pesos (stagging)",
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Solicitante", type text}, {"ID Alegación", Int64.Type}, {"Periodo de Medida del ANS alegado", type date}, {"Comentarios", type text}, {"Valor Peso", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

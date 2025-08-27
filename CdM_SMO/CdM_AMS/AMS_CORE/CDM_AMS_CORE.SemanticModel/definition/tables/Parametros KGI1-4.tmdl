@@ -1,0 +1,48 @@
+table 'Parametros KGI1-4'
+	excludeFromModelRefresh
+	lineageTag: e8e9a8d8-1756-4191-b551-73ce069e9e36
+
+	column 'Tipo de incumplimiento'
+		dataType: string
+		lineageTag: 14825b63-b074-4915-ab86-a7cbb224a61e
+		summarizeBy: none
+		sourceColumn: Tipo de incumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de Desviación Máxima'
+		dataType: double
+		lineageTag: e65cc67c-d114-4cb0-98c3-eb1a9633b6b8
+		summarizeBy: sum
+		sourceColumn: Tasa de Desviación Máxima
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Pesos %'
+		dataType: double
+		lineageTag: 4d1f066f-5edd-4982-943c-62c6b7de2b41
+		summarizeBy: sum
+		sourceColumn: Pesos %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros KGI1-4-0ab7901c-098c-4ffb-997e-4c471fd5bac3' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(sharepointRoot2 & tablaParametros & xlsx), null, true),
+				    #"Parametros KGI1-4_Sheet" = Origen{[Item="Parametros KGI1-4",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Parametros KGI1-4_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Tipo de incumplimiento", type text}, {"Tasa de Desviación Máxima", type number}, {"Pesos %", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

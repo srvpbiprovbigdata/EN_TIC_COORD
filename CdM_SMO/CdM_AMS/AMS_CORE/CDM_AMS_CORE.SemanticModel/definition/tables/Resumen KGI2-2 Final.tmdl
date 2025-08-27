@@ -1,0 +1,169 @@
+table 'Resumen KGI2-2 Final'
+	lineageTag: 7ef61e09-acf9-420e-876a-d1581c07b175
+
+	measure 'Puntos de KGI22_M' =
+			
+			var _KGI22_V = MIN('Resumen KGI2-2 Final'[Puntos de KGI22])
+			return
+			IF(ISBLANK(_KGI22_V),5,_KGI22_V)
+		lineageTag: f7f0b430-be17-45c9-9930-4e4970a870a3
+
+	measure 'Peso Obtenido KGI22_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",1-SUM('Resumen KGI2-2 Final'[Peso No Obtenido %]))
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 0df3df61-34aa-4906-9e4c-df29e886b502
+
+	measure 'Puntos Obtenidos KGI22_M' = IF(MAX(Fechas[SERVICE_P])=0,"N/A",[Peso Obtenido KGI22_M]*[Puntos de KGI22_M])
+		formatString: 0
+		lineageTag: e9b2868a-61a6-4647-ae4f-8ff66e928583
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Peso Obtenido KGI22_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreComp])),
+				CALCULATE([Peso Obtenido KGI22_M])
+			)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 34a4e0e3-aaa0-4719-9f00-89275ec7df5e
+
+	measure 'Puntos Obtenidos KGI22_M average' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('Fechas'[MesNombreCorto])),
+				CALCULATE([Puntos Obtenidos KGI22_M])
+			)
+		formatString: 0.0
+		lineageTag: 5cd7db12-a2a4-4457-b9a9-6c79b262e44f
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 45f37787-ae70-455f-8eb1-e12dd00f4376
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Total INCs'
+		dataType: double
+		formatString: 0
+		lineageTag: 643372bc-d4d4-4236-be30-42ee1f603a93
+		summarizeBy: sum
+		sourceColumn: Total INCs
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Reabiertas'
+		dataType: double
+		formatString: 0
+		lineageTag: 76153412-1786-4a2c-ad4f-228fc596c3c7
+		summarizeBy: sum
+		sourceColumn: INCs Reabiertas
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cump. Objetivo %'
+		dataType: double
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: fe21277b-2bbb-4081-9f81-c6e6dd6cf463
+		summarizeBy: sum
+		sourceColumn: Cump. Objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: f169d9be-602a-440e-b75b-782101cda87a
+		summarizeBy: sum
+		sourceColumn: Peso %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Cumplidas' = ('Resumen KGI2-2 Final'[Total INCs]-'Resumen KGI2-2 Final'[INCs Reabiertas])
+		formatString: 0
+		lineageTag: 9d5fd3b9-f30d-453d-9eb4-acf1790fbd9e
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cump. Real %' = ('Resumen KGI2-2 Final'[INCs Reabiertas]/'Resumen KGI2-2 Final'[Total INCs])
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 9ca5fcba-7558-4900-b3d6-f8cd4c676fcf
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI2-2 Final'[Cump. Real %]<='Resumen KGI2-2 Final'[Cump. Objetivo %],"Si","No")
+		lineageTag: 1ef9a6a5-2d21-4658-b22c-da4701c32ba8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI2-2 Final'[¿Cumple?]="Si",'Resumen KGI2-2 Final'[Peso %],0)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 01c797d6-4b53-421d-896b-6db5a4d2d9e7
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI22'
+		dataType: string
+		lineageTag: 28380fe1-cf05-486b-b6de-f416e216c52a
+		summarizeBy: none
+		sourceColumn: Puntos de KGI22
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 9a37b5c5-57a0-48e2-992f-b60a7b1ee18f
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI2-2 Final'[¿Cumple?]="No",'Resumen KGI2-2 Final'[Peso %],0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: a9f71a37-5644-4cd2-ada7-53a3e2424f2e
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI2-2 Final-eb9da295-d46c-4818-af4b-24b8adeba48c' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA (NY y MAD) KGI22",
+				    
+				    //Total Incidencias
+				    #"Grouped Rows" = Table.Group(Source, {"Cerrado - Copy"}, {{"Total INCs", each Table.RowCount(_), type number}}),
+				
+				    #"Merged Queries" = Table.NestedJoin(#"Grouped Rows", {"Cerrado - Copy"}, #"PRO - Incidencias con SLA - Reabiertas", {"Cerrado - Copy"}, "PRO - Incidencias con SLA - Reabiertas v01", JoinKind.LeftOuter),
+				    #"Expanded PRO - Incidencias con SLA - Reabiertas v01" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Incidencias con SLA - Reabiertas v01", {"INCs Reabiertas"}, {"PRO - Incidencias con SLA - Reabiertas v01.INCs Reabiertas"}),
+				
+				    #"Filtered Rows2" = Table.SelectRows(#"Expanded PRO - Incidencias con SLA - Reabiertas v01", each ([#"Cerrado - Copy"] <> null)),
+				    
+				    #"Renamed Columns" = Table.RenameColumns(#"Filtered Rows2",{{"PRO - Incidencias con SLA - Reabiertas v01.INCs Reabiertas", "INCs Reabiertas"}}),
+				    
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Cump. Objetivo %", each "0,03"),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Peso %", each "1"),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom1",{{"Peso %", Percentage.Type}, {"Cump. Objetivo %", Percentage.Type}}),
+				
+				    #"Added Custom2" = Table.AddColumn(#"Changed Type", "Puntos de KGI22", each 5),
+				    #"Replaced Value" = Table.ReplaceValue(#"Added Custom2",null,0,Replacer.ReplaceValue,{"INCs Reabiertas"}),
+				    #"Added Custom3" = Table.AddColumn(#"Replaced Value", "KGI", each "KGI2-2")
+				in
+				    #"Added Custom3"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,207 @@
+table 'Registro de Cambios'
+	lineageTag: 5d807e54-b233-4a1f-a508-c55972bc1302
+
+	column 'Estado del Cambio'
+		dataType: string
+		lineageTag: 725cd19a-d01e-433e-9a2f-21784ee47f5b
+		summarizeBy: none
+		sourceColumn: Estado del Cambio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Servicio Afectado'
+		dataType: string
+		lineageTag: 14bad418-10d8-434b-81c7-9bc3753e6aa7
+		summarizeBy: none
+		sourceColumn: Servicio Afectado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción del impacto en el Servicio'
+		dataType: string
+		lineageTag: fd160b82-85c1-4253-acf6-197b1a1b0311
+		summarizeBy: none
+		sourceColumn: Descripción del impacto en el Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: 56ec0cff-602e-4aa6-b7e8-a3cb6226e9df
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 04211d51-f71c-4be7-bdba-6568016d6051
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		variation Variación
+			isDefault
+			relationship: 823bd979-8629-4e75-a9e5-8ecd7509099e
+			defaultHierarchy: LocalDateTable_44542df1-708a-4c77-9d79-1a418f1a5acf.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Ámbito afectado del Servicio'
+		dataType: string
+		lineageTag: 912320ba-553f-4328-84bf-3354c56b09d4
+		summarizeBy: none
+		sourceColumn: Ámbito afectado del Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de Cambio Solicitado'
+		dataType: string
+		lineageTag: 42dabb1a-9aff-4161-8dd3-499d7ea65f8a
+		summarizeBy: none
+		sourceColumn: Tipo de Cambio Solicitado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Urgencia
+		dataType: string
+		lineageTag: 81c5cd83-7f97-4930-8cfc-168b4262d80e
+		summarizeBy: none
+		sourceColumn: Urgencia
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Aprobación Comité Táctico'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 869da889-0280-4ab0-863a-52ec4bc4f088
+		summarizeBy: none
+		sourceColumn: Fecha Aprobación Comité Táctico
+
+		variation Variación
+			isDefault
+			relationship: 1110e82c-53de-4a46-9b63-ced20435d637
+			defaultHierarchy: LocalDateTable_b92b5836-44ab-4f70-bb21-c7dabffac2d4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Id Cambio'
+		dataType: string
+		lineageTag: 20734566-0d42-42a0-aa3f-95c4faa072ce
+		summarizeBy: none
+		sourceColumn: Id Cambio
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI =
+			
+			
+			var _inicio1 = FIND("KGI",'Registro de cambios'[Descripción], 1, 1)
+			var _extraenumber1 = MID('Registro de cambios'[Descripción], _inicio1, 7)
+			var _onlykginum1 = RIGHT(_extraenumber1, 3)
+			
+			var _isvalue = NOT(ISERROR(VALUE(RIGHT(_onlykginum1, 1))))
+			
+			var _inicio2 = FIND("KGI",'Registro de cambios'[Descripción del impacto en el Servicio], 1, 1)
+			var _extraenumber2 = MID('Registro de cambios'[Descripción del impacto en el Servicio], _inicio2, 7)
+			var _onlykginum2 = RIGHT(_extraenumber2, 3)
+			
+			var _isvalue2 = NOT(ISERROR(VALUE(RIGHT(_onlykginum2, 1))))
+			
+			var _kgidirty = if( _isvalue = TRUE(), _onlykginum1, if( _isvalue2 = TRUE(), _onlykginum2, BLANK()))
+			var _kgi = SUBSTITUTE(_kgidirty, ".", "-")
+			
+			RETURN
+			
+			IF(_kgi = BLANK(), "Sin KGI",
+			"KGI " & _kgi)
+		lineageTag: e6896f63-5c3f-4516-a67c-c9102cf9da8c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		dataType: string
+		lineageTag: 67f64ccf-77aa-47af-8230-f7880a5dc489
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abierto
+		dataType: string
+		lineageTag: 891e24c0-e853-488b-8a9e-dd35a87c83fc
+		summarizeBy: none
+		sourceColumn: Abierto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado
+		dataType: string
+		lineageTag: 1a96f961-ab90-465e-9e43-f2324825ea50
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Aprobación Comité Operativo'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4fb37196-b4ee-4e56-ad76-1d3ff2faaaa6
+		summarizeBy: none
+		sourceColumn: Fecha Aprobación Comité Operativo
+
+		variation Variación
+			isDefault
+			relationship: 87dea1b7-30a8-4d0b-95ae-551dc3fb3513
+			defaultHierarchy: LocalDateTable_fdcda48a-ab73-4b15-b49d-20df75aba1d5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Fecha Aprobación Comité Estratégico'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c2b8d804-80ec-463e-81ab-82d0d03580ff
+		summarizeBy: none
+		sourceColumn: Fecha Aprobación Comité Estratégico
+
+		variation Variación
+			isDefault
+			relationship: d5faaf9b-2fe7-4127-b8e1-1d059f965961
+			defaultHierarchy: LocalDateTable_b1f2aa36-508c-41a2-af5b-ca9ac217da57.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Abierto - Copia'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d2a0aa2e-28ac-49ea-a4cd-192ea4336d1b
+		summarizeBy: none
+		sourceColumn: Abierto - Copia
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'Registro de Cambios-4a2bc6d6-b8a0-4ebe-a84b-55802a479c58' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = #"Registro de Cambios (stagging)",
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Fecha", type date}, {"Id Cambio", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

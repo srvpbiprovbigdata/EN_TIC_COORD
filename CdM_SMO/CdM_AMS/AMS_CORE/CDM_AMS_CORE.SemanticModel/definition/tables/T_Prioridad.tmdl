@@ -1,0 +1,37 @@
+table T_Prioridad
+	excludeFromModelRefresh
+	lineageTag: fd363282-18f4-4b21-9bf9-cafe588054c5
+
+	column Criticidad
+		dataType: string
+		lineageTag: 5fbc5aef-71b7-420d-bfaf-d6283eb4fc8d
+		summarizeBy: none
+		sourceColumn: Criticidad
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		formatString: 0
+		lineageTag: 3536bc5b-1a08-4931-8bed-4907d645527f
+		summarizeBy: sum
+		sourceColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition T_Prioridad-40fe2b21-665d-45e1-96bf-248e3eee034e = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45Wci7KLMlMTlTSUTJUitWJVnLMKQFxjMAc39SUTBDPGMxzSswCcUyUYmMB", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Criticidad = _t, Orden = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Criticidad", type text}, {"Orden", Int64.Type}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Tipo cambiado","Critica","Crítica",Replacer.ReplaceText,{"Criticidad"})
+				in
+				    #"Replaced Value"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
