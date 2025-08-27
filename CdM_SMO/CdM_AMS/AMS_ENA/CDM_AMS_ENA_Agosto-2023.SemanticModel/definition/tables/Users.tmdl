@@ -1,0 +1,39 @@
+table Users
+	lineageTag: 130e72d1-2d7e-48e9-8cae-0e5818b0b168
+
+	measure NavigationAction = IF([Roles] = "Admin", SELECTEDVALUE(MenuCabeceras[Menu]), "Sin permiso")
+		lineageTag: eda41ac8-56f1-492e-8ef4-e37acc7ba140
+
+	measure Roles = LOOKUPVALUE(Users[Rol], Users[User], USERNAME())
+		lineageTag: fad5aaf7-38e4-4b69-b10b-b1c005706cd2
+
+	column User
+		dataType: string
+		lineageTag: 5cdebae9-c450-4f45-8b4a-ca6d40bff396
+		summarizeBy: none
+		sourceColumn: User
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rol
+		dataType: string
+		lineageTag: 9252f8dd-9ef1-4d79-a037-c81cefdf3c55
+		summarizeBy: none
+		sourceColumn: Rol
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Users-fe21d794-4e6e-4f26-ad76-de86d7278b02 = m
+		mode: import
+		queryGroup: 'Parámetros / Listas\Cabeceras Presupuestarias'
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("fZHRigMhDEX/xeci7B/sfsdQykVTJ0XNEHVY5usrtK/xNRzuPUm2zTU9H63II6LjFyGwVPggxd3cXyxc3f22OcXOETnJYSKxQZVHgnby9N9NMCDLQVc0gfTMoryQkTn3RZSq+NkXVuzou8/TjOCVTzS7dSSpFzJddlpRSoPUBl74+JxsZ0A66eKQ3/sg2y0yl5+m7cduObhCl394ocxfcd0XrvGk2odiGRS5trFA7m8=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [User = _t, Rol = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"User", type text}, {"Rol", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

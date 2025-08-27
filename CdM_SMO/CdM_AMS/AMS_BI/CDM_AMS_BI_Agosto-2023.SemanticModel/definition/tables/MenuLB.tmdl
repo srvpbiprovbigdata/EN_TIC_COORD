@@ -1,0 +1,33 @@
+table MenuLB
+	lineageTag: 56557da3-5b71-4d62-9569-e316cf6fb61a
+
+	column Menu
+		dataType: string
+		lineageTag: b096f92a-d22c-42d4-91e8-d26685372249
+		summarizeBy: none
+		sourceColumn: Menu
+
+		annotation SummarizationSetBy = Automatic
+
+	column Columna1
+		dataType: string
+		lineageTag: 8763f49d-243a-4b7a-bb22-e361a4b22007
+		summarizeBy: none
+		sourceColumn: Columna1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition MenuLB = m
+		mode: import
+		queryGroup: 'Parámetros / Listas\Param. Tablas'
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45W8jm8Ni81UcEpsThVIbSkWMG1LD+ntCSzLL9YSUdJKVYHU4VzflFRajJeJQGpJZnJmfl5qRAVsQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Menu = _t, Columna1 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Menu", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,64 @@
+table 'Parametros KGI14_P'
+	lineageTag: 0f70d229-100a-4f0d-995d-1fce64623bea
+
+	column 'Tipo de incumplimiento'
+		dataType: string
+		lineageTag: 87a66657-62df-4ed0-96a1-7abb26aefb55
+		summarizeBy: none
+		sourceColumn: Tipo de incumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de desviación máxima %'
+		dataType: double
+		lineageTag: 56f20058-4778-43a7-8c78-fe5e3cfb357e
+		summarizeBy: sum
+		sourceColumn: Tasa de desviación máxima %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Pesos %'
+		dataType: double
+		lineageTag: 6c0f40bd-9acf-4c6b-aeac-662fc13b46cc
+		summarizeBy: sum
+		sourceColumn: Pesos %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Puntos de KGI14'
+		dataType: int64
+		formatString: 0
+		lineageTag: 02cd4c5e-4ca4-43b5-8ff5-e444c8a08cfc
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI14
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: f79f6e46-64d8-4fc6-b419-4cfa44d45b3b
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI14_P-650b8960-a5e1-4254-a690-b55a0dddf415' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & kgi & xlsx), null, true),
+				    #"P_KGI14 PRO_Sheet" = Origen{[Item="P_KGI14 PRO",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"P_KGI14 PRO_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Tipo de incumplimiento", type text}, {"Tasa de desviación máxima %", type number}, {"Pesos %", type number}, {"Puntos de KGI14", Int64.Type}, {"KGI", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

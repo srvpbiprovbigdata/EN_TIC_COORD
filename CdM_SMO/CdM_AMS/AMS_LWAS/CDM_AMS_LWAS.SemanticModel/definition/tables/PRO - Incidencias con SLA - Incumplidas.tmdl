@@ -1,0 +1,67 @@
+table 'PRO - Incidencias con SLA - Incumplidas'
+	lineageTag: ce957e33-fcd2-4b21-a5a5-43123c586b6d
+
+	column Prioridad
+		dataType: string
+		lineageTag: 783bb8ce-b17e-4ed1-b1f4-a375ac193533
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado_1er_día_mes
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8f56b92a-c82c-4b92-ad95-69f5a8d65342
+		summarizeBy: none
+		sourceColumn: Cerrado_1er_día_mes
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Infringido
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2a355b8b-4897-4250-9a64-a9558e511b44
+		summarizeBy: none
+		sourceColumn: Infringido
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'INCs Incumplidas'
+		dataType: int64
+		lineageTag: fad9373c-3dc6-41f3-bbbd-98ab0ba3d532
+		summarizeBy: sum
+		sourceColumn: INCs Incumplidas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Lote_Aplicación_relación.Lote'
+		dataType: string
+		lineageTag: d21b4b9c-0745-455c-b723-80f76834a998
+		summarizeBy: none
+		sourceColumn: Lote_Aplicación_relación.Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Incidencias con SLA - Incumplidas-8aaac431-853f-45ba-8fae-3cf1017a131b' = m
+		mode: import
+		queryGroup: KGIs_II
+		source =
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A",
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Infringido", "Cerrado - Copy", "Lote_Aplicación_relación.Lote"}, {{"Count", each Table.RowCount(_), Int64.Type}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Grouped Rows", each ([Infringido] = true)),
+				    #"Renamed Columns" = Table.RenameColumns(#"Filtered Rows",{{"Cerrado - Copy", "Cerrado_1er_día_mes"}}),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Prioridad", "Cerrado_1er_día_mes", "Infringido", "Count"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Reordered Columns",{{"Count", "INCs Incumplidas"}})
+				in
+				    #"Renamed Columns1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

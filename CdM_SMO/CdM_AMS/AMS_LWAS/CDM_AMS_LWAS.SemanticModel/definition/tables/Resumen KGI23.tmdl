@@ -1,0 +1,122 @@
+table 'Resumen KGI23'
+	lineageTag: bc73c016-4f48-4063-9830-bf6bcfc7956c
+
+	measure 'Resumen KGI23 Tasa de Reducción de INCs_M' = ([KGI23 Media INCs Trim Anterior_M]- [Total INCs abiertas del Periodo_M])/[KGI23 Media INCs Trim Anterior_M]
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 98a92f7e-0b66-4c5d-adbd-ce8d329720e4
+
+	column 'Total Incidencias'
+		dataType: int64
+		formatString: 0
+		lineageTag: 851b8596-366a-4907-815a-e767230cf403
+		summarizeBy: sum
+		sourceColumn: Total Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa mínima objetivo %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 636f2530-8e45-4bec-a622-46bd4fadfff3
+		summarizeBy: sum
+		sourceColumn: Tasa mínima objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 4853fe6f-3ced-46dc-a2eb-28dad76e5677
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI23'
+		dataType: string
+		lineageTag: 450e025e-1bdf-4998-aa7c-1479095b962f
+		summarizeBy: none
+		sourceColumn: Puntos de KGI23
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF(([Resumen KGI23 Tasa de Reducción de INCs_M])>MAX('Resumen KGI23-Lote Movilidad'[Tasa mínima objetivo %]),"Si","No")
+		lineageTag: ed20b24b-91f1-42a9-92d8-c8f94a3261c7
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF([¿Cumple KGI23?]="Si",'Resumen KGI23'[Peso del KGI %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 7d72ad0e-27bc-4a40-806d-736833ac1ba2
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF([¿Cumple KGI23?]="No",'Resumen KGI23'[Peso del KGI %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 86db62f5-ed31-4e5c-ad10-4a1144e918c3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 184ccced-494a-441e-a302-78e86851ac09
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lote_Aplicación_relación.Lote'
+		dataType: string
+		lineageTag: b11ba204-894e-4932-98c1-77e2e8459a38
+		summarizeBy: none
+		sourceColumn: Lote_Aplicación_relación.Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'KGI23 Resumen Tasa de Reducción de INCs_M' = ([KGI23 Media INCs Trim Anterior_M]- [Total INCs abiertas del Periodo_M])/[KGI23 Media INCs Trim Anterior_M]
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: a387c2ce-e59d-4682-a6ff-9466d9b8ab12
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierta - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 39fae4ba-0b1d-4104-9763-47f4debacb22
+		summarizeBy: none
+		sourceColumn: Abierta - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'Resumen KGI23-9a47107f-5dc1-4124-8dfd-ee68f140c375' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A_Abiertas",
+				
+				    //Total Incidencias Abiertas 
+				    #"Grouped Rows" = Table.Group(Source, {"Abierta - Copy", "Lote_Aplicación_relación.Lote"}, {{"Total Incidencias", each Table.RowCount(_), Int64.Type}}),
+				
+				    //Relacionar Valores constantes de Parámetros 
+				    #"Added Custom" = Table.AddColumn(#"Grouped Rows", "Tasa mínima objetivo %", each 0.05),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Peso del KGI %", each 1),
+				    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "Puntos de KGI23", each 0),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom2",{{"Peso del KGI %", Percentage.Type}, {"Tasa mínima objetivo %", Percentage.Type}}),
+				    #"Added Custom3" = Table.AddColumn(#"Changed Type", "KGI", each "KGI2-3")
+				in
+				    #"Added Custom3"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

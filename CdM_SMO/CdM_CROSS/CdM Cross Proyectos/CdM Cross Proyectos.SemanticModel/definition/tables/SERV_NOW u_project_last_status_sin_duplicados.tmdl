@@ -1,0 +1,80 @@
+table 'SERV_NOW u_project_last_status_sin_duplicados'
+	lineageTag: 9e155059-57d7-4018-92c0-a242d59852a2
+
+	column prj_number
+		dataType: string
+		lineageTag: 2b3c73bf-7fb6-4752-a020-8dfbf72ecc63
+		summarizeBy: none
+		sourceColumn: prj_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column status_number
+		dataType: string
+		lineageTag: 05032741-81bd-4b93-b14d-0ecbec652f4f
+		summarizeBy: none
+		sourceColumn: status_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column status_u_executive_summary
+		dataType: string
+		lineageTag: 5905ccd3-17b5-4c03-8bc4-128cc39fe7dd
+		summarizeBy: none
+		sourceColumn: status_u_executive_summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column status_sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 466a52c3-0bcd-4bd0-bc6f-bc4fedf4455e
+		summarizeBy: none
+		sourceColumn: status_sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: 524f96be-eea1-4e44-8e03-f709b9bac621
+			defaultHierarchy: LocalDateTable_e46bb1d3-c0df-4967-8110-92bb79237236.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column status_sys_updated_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d9a542e6-551e-4e9a-9496-c12206e89055
+		summarizeBy: none
+		sourceColumn: status_sys_updated_on
+
+		variation Variación
+			isDefault
+			relationship: e5fb9e5b-5bf6-44e9-8039-329d0124f296
+			defaultHierarchy: LocalDateTable_59682e21-690d-46c2-9360-577968f23642.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ProyectosPadre.number'
+		dataType: string
+		lineageTag: 1c8fce7b-9425-43ca-b0b8-9b9572e400cb
+		summarizeBy: none
+		sourceColumn: ProyectosPadre.number
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SERV_NOW u_project_last_status_sin_duplicados-68453298-e367-4eff-a207-4022d1a48ac4' = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_u_project_last_status_sin_duplicados = Origen{[Schema="SERV_NOW",Item="u_project_last_status_sin_duplicados"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_u_project_last_status_sin_duplicados,{"prj_capex_cost", "dv_prj_cmdb_ci_business_app", "prj_cost", "dv_prj_demand", "dv_prj_department", "prj_description", "dv_prj_duration", "dv_prj_effort", "prj_end_date", "dv_prj_impact", "prj_opex_cost", "dv_prj_phase", "dv_prj_primary_portfolio", "dv_prj_primary_program", "dv_prj_priority", "dv_prj_project_manager", "dv_prj_remaining_effort", "dv_prj_risk", "prj_risk_cost", "prj_score", "dv_prj_score_value", "prj_short_description", "prj_start_date", "dv_prj_status", "prj_task", "dv_prj_task_for", "dv_prj_top_program", "prj_u_end_date_deviation", "prj_u_planned_resource_plan_effort", "prj_u_problems", "prj_u_project_impact", "dv_prj_u_project_phase", "dv_prj_u_project_type", "prj_u_relevant", "prj_u_risks_comments", "prj_u_state_date", "dv_prj_urgency", "dv_prj_work_effort", "dv_status_overall_health", "status_percent_complete", "status_u_last_week_s_achievements", "prj_percent_complete", "dv_status_cost", "status_planned_cost", "dv_status_resources", "dv_status_schedule", "dv_status_scope", "prj_u_tic_unit", "dv_prj_u_tic_unit", "status_sys_id"}),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Columnas quitadas", {"prj_number"}, ProyectosPadre, {"number"}, "ProyectosPadre", JoinKind.LeftOuter),
+				    #"Se expandió ProyectosPadre" = Table.ExpandTableColumn(#"Consultas combinadas", "ProyectosPadre", {"number"}, {"ProyectosPadre.number"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Se expandió ProyectosPadre", each [ProyectosPadre.number] <> null and [ProyectosPadre.number] <> "")
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

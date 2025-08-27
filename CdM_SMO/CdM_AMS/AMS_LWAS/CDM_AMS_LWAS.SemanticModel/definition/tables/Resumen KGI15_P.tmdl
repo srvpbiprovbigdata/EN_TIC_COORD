@@ -1,0 +1,144 @@
+table 'Resumen KGI15_P'
+	lineageTag: 6993f54e-f4f8-4bcf-b89e-646b599e4e6f
+
+	column Tipo
+		dataType: string
+		lineageTag: bb3b5aab-012a-4ec9-9a83-90b97b3d7332
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Pruebas UAT'
+		dataType: int64
+		lineageTag: 679852dd-cdae-46ea-b3b2-389629d39cdd
+		summarizeBy: sum
+		sourceColumn: Pruebas UAT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Defectos UAT'
+		dataType: double
+		lineageTag: 33270ae5-835a-400e-9d9f-845bea410ab4
+		summarizeBy: sum
+		sourceColumn: Defectos UAT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Tasa de desviación máxima %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 312a0194-388a-4930-a289-32197f208301
+		summarizeBy: sum
+		sourceColumn: Tasa de desviación máxima %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI %'
+		dataType: double
+		lineageTag: 2fa12d46-eaa7-4df0-82a3-bfd871cc78e1
+		summarizeBy: none
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Puntos de KGI15'
+		dataType: int64
+		formatString: 0
+		lineageTag: 443ba519-370a-4134-8dce-c386c7e276c6
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI15
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: cd13640e-f710-4c0b-970b-b04c3ad06392
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI15_P'[Tasa Real %]<='Resumen KGI15_P'[Tasa de desviación máxima %],"Si","No")
+		lineageTag: bd52ddff-d316-4e73-89ff-100af21f21b9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI15_P'[¿Cumple?]="No",'Resumen KGI15_P'[Peso del KGI %],0)
+		lineageTag: 1865b166-e0e6-48d5-8ea8-d072e11e81a0
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI15_P'[¿Cumple?]="Si",'Resumen KGI15_P'[Peso del KGI %],0)
+		lineageTag: f146a34d-33f7-44db-815a-c58f0817a490
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Real %' = ('Resumen KGI15_P'[Defectos UAT])/'Resumen KGI15_P'[Pruebas UAT]
+		lineageTag: 1d6ed6b2-c19b-4833-85ae-a9a0fc5bc2a5
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Resolved - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 62513aae-f77a-4917-9c98-511da2065b12
+		summarizeBy: none
+		sourceColumn: Resolved - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Lote
+		dataType: string
+		lineageTag: 412a128a-8b57-4135-9a12-bf9066e895f6
+		summarizeBy: none
+		sourceColumn: Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI15_P-5e317a1f-24df-48d8-a2f5-d30faafa7f38' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Jira - Pruebas con SLA",
+				    #"Filas filtradas" = Table.SelectRows(Source, each not Text.Contains([Tipo de Servicio], "Mtto")),
+				    //Filtro por tipo de Pruebas UAT
+				    #"Filtered Rows" = Table.SelectRows(#"Filas filtradas", each Text.Contains([Tipo de prueba], "UAT")),
+				
+				    //Agrupa por número de Pruebas UAT por Prioridad de la Pruebas
+				    #"Grouped Rows" = Table.Group(#"Filtered Rows", {"Resolved - Copia", "Priority", "Lote"}, {{"Pruebas UAT", each Table.RowCount(_), Int64.Type}}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Grouped Rows",{{"Resolved - Copia", type date}}),
+				
+				    //Une con tabla de defectos UAT
+				    #"Merged Queries" = Table.NestedJoin(#"Tipo cambiado", {"Resolved - Copia", "Lote"}, #"PRO - Jira - Defectos con SLA - UAT", {"PRO - Jira - Historias y Ejecuciones.Resolved - Copy", "Lote"}, "PRO - Jira - Defectos con SLA - UAT", JoinKind.LeftOuter),
+				    #"Expanded PRO - Jira - Defectos con SLA - UAT" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Jira - Defectos con SLA - UAT", {"Defectos UAT"}, {"PRO - Jira - Defectos con SLA - UAT.Defectos UAT"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded PRO - Jira - Defectos con SLA - UAT",{{"PRO - Jira - Defectos con SLA - UAT.Defectos UAT", "Defectos UAT"}}),
+				    
+				    //Une con tabla de Parámetros
+				    #"Merged Queries1" = Table.NestedJoin(#"Renamed Columns", {"Priority"}, #"Parametros KGI15_P", {"Prioridad"}, "Parametros KGI1-5", JoinKind.LeftOuter),
+				    #"Se expandió Parametros KGI1-5" = Table.ExpandTableColumn(#"Merged Queries1", "Parametros KGI1-5", {"Tasa de desviación máxima %", "Peso del KGI %", "Puntos de KGI15", "KGI"}, {"Parametros KGI1-5.Tasa de desviación máxima %", "Parametros KGI1-5.Peso del KGI %", "Parametros KGI1-5.Puntos de KGI15", "Parametros KGI1-5.KGI"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Se expandió Parametros KGI1-5",{{"Parametros KGI1-5.Tasa de desviación máxima %", "Tasa de desviación máxima %"}, {"Parametros KGI1-5.Peso del KGI %", "Peso del KGI %"}, {"Parametros KGI1-5.Puntos de KGI15", "Puntos de KGI15"}, {"Parametros KGI1-5.KGI", "KGI"}, {"Priority", "Tipo"}, {"Resolved - Copia", "Resolved - Copy"}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Renamed Columns1",null,0,Replacer.ReplaceValue,{"Defectos UAT"})
+				in
+				    #"Valor reemplazado"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

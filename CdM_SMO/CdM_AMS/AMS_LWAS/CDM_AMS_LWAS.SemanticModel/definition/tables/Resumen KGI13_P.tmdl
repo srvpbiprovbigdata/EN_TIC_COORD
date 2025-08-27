@@ -1,0 +1,133 @@
+table 'Resumen KGI13_P'
+	lineageTag: 62f84478-3706-4a30-9955-a63c8408f424
+
+	column Prioridad
+		dataType: string
+		lineageTag: 746c4980-07ad-4547-9485-2d0122867a62
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c1144267-df28-47bb-8c25-ff3d456885f4
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Lote
+		dataType: string
+		lineageTag: e7ed0950-6d13-4b9d-8390-b8c66211ec07
+		summarizeBy: none
+		sourceColumn: Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Planificaciones'
+		dataType: int64
+		formatString: 0
+		lineageTag: b2e716dc-ebd7-4eb6-87d3-978dbc4205e9
+		summarizeBy: sum
+		sourceColumn: Total Planificaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Incumplidas'
+		dataType: double
+		lineageTag: 443e08c3-cfa5-474a-b89e-63c445a487ed
+		summarizeBy: sum
+		sourceColumn: Total Incumplidas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total No Incumplidas'
+		dataType: string
+		lineageTag: 2a5546c2-08e6-4e2d-879b-32d48f1fbb67
+		summarizeBy: none
+		sourceColumn: Total No Incumplidas
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa máxima'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 5213c4cf-c8c9-41d4-8620-e848c48a91e7
+		summarizeBy: sum
+		sourceColumn: Tasa máxima
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 5aa060d9-a9d8-4515-b276-1b37df769580
+		summarizeBy: sum
+		sourceColumn: Peso del KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos del KGI'
+		dataType: int64
+		formatString: 0
+		lineageTag: 17778b42-a448-49f1-998c-2b248fd2f5d8
+		summarizeBy: sum
+		sourceColumn: Puntos del KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI13_P'[Tasa Real]>'Resumen KGI13_P'[Tasa máxima], "No", "Sí")
+		lineageTag: e2ea546e-c909-4853-8c06-bbb138a3d2a0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Real' = DIVIDE('Resumen KGI13_P'[Total Incumplidas], 'Resumen KGI13_P'[Total Planificaciones], 0)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 621f19aa-0664-4577-b0ad-b75856d57e9b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido' = IF('Resumen KGI13_P'[¿Cumple?] = "Sí", 'Resumen KGI13_P'[Peso del KGI], 0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 19455776-46fc-4c0e-ba5e-0b2dc57f985c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Peso_No_Obtenido = IF('Resumen KGI13_P'[¿Cumple?] = "No", 'Resumen KGI13_P'[Peso del KGI], 0)
+		formatString: 0
+		lineageTag: ed0254f8-71d9-473b-b538-b87789eaa7e3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI13_P-0ce00540-a1e5-470a-831a-6de8923ae0d4' = m
+		mode: import
+		queryGroup: Resumen
+		source =
+				let
+				    Origen = #"Resumen KGI12_P",
+				    #"Columnas quitadas" = Table.RemoveColumns(Origen,{"Planificaciones Incumplidas", "Cump. Objetivo %", "Peso %", "KGI", "Puntos de KGI12"}),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Columnas quitadas", {"Prioridad", "Fecha fin real - Copy", "Lote"}, #"Evolutivos-Incidencias-Proyectos", {"Prioridad", "Fecha fin real - Copy", "Lote"}, "Evolutivos-Incidencias-Proyectos", JoinKind.LeftOuter),
+				    #"Se expandió Evolutivos-Incidencias-Proyectos" = Table.ExpandTableColumn(#"Consultas combinadas", "Evolutivos-Incidencias-Proyectos", {"Recuento"}, {"Evolutivos-Incidencias-Proyectos.Recuento"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Se expandió Evolutivos-Incidencias-Proyectos",null,0,Replacer.ReplaceValue,{"Evolutivos-Incidencias-Proyectos.Recuento"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Valor reemplazado",{{"Evolutivos-Incidencias-Proyectos.Recuento", "Total Incumplidas"}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Total No Incumplidas", each [Total Planificaciones] - [Total Incumplidas]),
+				    #"Consultas combinadas1" = Table.NestedJoin(#"Personalizada agregada", {"Prioridad"}, #"Parametros KGI13_E", {"Prioridad "}, "Parametros KGI13_E", JoinKind.LeftOuter),
+				    #"Se expandió Parametros KGI13_E" = Table.ExpandTableColumn(#"Consultas combinadas1", "Parametros KGI13_E", {"Tasa máxima permitida %", "Peso del KGI %", "Puntos de KGI13"}, {"Parametros KGI13_E.Tasa máxima permitida %", "Parametros KGI13_E.Peso del KGI %", "Parametros KGI13_E.Puntos de KGI13"}),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Se expandió Parametros KGI13_E",{{"Parametros KGI13_E.Tasa máxima permitida %", "Tasa máxima"}, {"Parametros KGI13_E.Peso del KGI %", "Peso del KGI"}, {"Parametros KGI13_E.Puntos de KGI13", "Puntos del KGI"}})
+				in
+				    #"Columnas con nombre cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

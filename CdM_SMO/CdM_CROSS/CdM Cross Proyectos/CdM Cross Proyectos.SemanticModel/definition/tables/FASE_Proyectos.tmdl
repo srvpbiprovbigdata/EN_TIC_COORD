@@ -1,0 +1,56 @@
+table FASE_Proyectos
+	lineageTag: 1d9bdc96-88d3-45a6-b0b4-22e00e94e130
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: d8dadaa6-dffc-4a49-ba16-f1438cfa1524
+		summarizeBy: none
+		sourceColumn: Index
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fase_en
+		dataType: string
+		lineageTag: 0afd011b-0593-4e5e-834e-835eac5a8c9b
+		summarizeBy: none
+		sourceColumn: Fase_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fase_es
+		dataType: string
+		lineageTag: e710f317-c4f4-4635-9ad8-187b6ad5802e
+		summarizeBy: none
+		sourceColumn: Fase_es
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FASE_Proyectos-377a6a03-70bd-4636-89ec-b46968bf461b = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("ZcxNC8IwDIDhv1Jy3sXPuwwPnhzs4KHsoG0YYVtS0vr/DRaZ4qnJm4d6Dxto4JqQ7Tk9CLUIDI2Hre030ckRu05lVMzZ0pldeGquZmehQ47E42dCLvi+7a20s2SMrpUlzWjdCqreo7hQU/3msNILh39M/MOPK+8nSgnjl5WFCkWDwws=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t, Columna2 = _t, Columna3 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", Int64.Type}, {"Columna2", type text}, {"Columna3", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Columna1", "Index"}, {"Columna2", "Estado_en"}, {"Columna3", "Estado_es"}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas con nombre cambiado","Open","Initiating",Replacer.ReplaceText,{"Estado_en"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Work in Progress","Planning",Replacer.ReplaceText,{"Estado_en"}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","Pending","Executing",Replacer.ReplaceText,{"Estado_en"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Closed Complete","In Pause",Replacer.ReplaceText,{"Estado_en"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Closed Incomplete","Closing",Replacer.ReplaceText,{"Estado_en"}),
+				    #"Filas inferiores quitadas" = Table.RemoveLastN(#"Valor reemplazado4",1),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Filas inferiores quitadas","Abierto","Iniciando",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","En curso","Planificación",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","Pendiente","Ejecución",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado7","Cerrado completo","En Pausa",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado9" = Table.ReplaceValue(#"Valor reemplazado8","Cerrado incompleto","Cierre",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Valor reemplazado9",{{"Estado_en", "Fase_en"}, {"Estado_es", "Fase_es"}})
+				in
+				    #"Columnas con nombre cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

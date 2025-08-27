@@ -1,0 +1,144 @@
+table 'PRO - Jira - Historias'
+	lineageTag: 6262fead-f272-4a74-a642-b18da6023068
+
+	column Components
+		dataType: string
+		lineageTag: 67120f3f-b395-42ac-9928-fb71236b7b5b
+		summarizeBy: none
+		sourceColumn: Components
+
+		annotation SummarizationSetBy = Automatic
+
+	column Project
+		dataType: string
+		lineageTag: 5b48ee32-401f-4a21-b38b-ac5d706e1d5c
+		summarizeBy: none
+		sourceColumn: Project
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Type'
+		dataType: string
+		lineageTag: 578cc4da-dde8-4d29-82f9-aa4166a37f19
+		summarizeBy: none
+		sourceColumn: Issue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key
+		dataType: string
+		lineageTag: cd79e566-37dd-48b0-b07b-be789926c8a3
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: 1c712498-88a5-456a-b8d6-d5ee9c2292dd
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignee
+		dataType: string
+		lineageTag: e1ff3fdb-6d12-4566-a044-e84855215c32
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reporter
+		dataType: string
+		lineageTag: 9a2fe096-bb4d-4828-9990-e92aa9b55a6c
+		summarizeBy: none
+		sourceColumn: Reporter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: de573310-a397-4d4e-b712-b20496e5ff07
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 5f363ce6-6c2b-4c57-8275-5927bbf7eb6b
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 710b44c4-1d8a-45f5-beab-0d8522163d4c
+		summarizeBy: none
+		sourceColumn: Created
+
+		variation Variation
+			isDefault
+			relationship: 8431216c-b400-4b54-93d4-87289f7ebf98
+			defaultHierarchy: LocalDateTable_5b346fa8-0020-46db-a02b-29456f43359c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Linked Issues'
+		dataType: string
+		lineageTag: aa395eff-057d-490a-9629-e705c6720b7c
+		summarizeBy: none
+		sourceColumn: Linked Issues
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-tasks
+		dataType: string
+		lineageTag: 56fa8eff-581c-4814-841f-1418bbac8a15
+		summarizeBy: none
+		sourceColumn: Sub-tasks
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de prueba'
+		dataType: string
+		lineageTag: 875074aa-78e8-4fb9-b1a9-2e66a104b48b
+		summarizeBy: none
+		sourceColumn: Tipo de prueba
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resolved
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1b303a8a-7230-4e54-9dcb-a28480422ecd
+		summarizeBy: none
+		sourceColumn: Resolved
+
+		variation Variation
+			isDefault
+			relationship: 5a663a0c-1db2-4fee-aa05-6d8c95fb4e6f
+			defaultHierarchy: LocalDateTable_02358946-bcd1-421d-967b-a0ad14b50b3e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Jira - Historias-c7523024-d4f7-4501-9d3e-67879c622ea8' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & pruebas_defectos & xlsx), null, true),
+				    Stories_Sheet = Source{[Item="Stories",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Stories_Sheet, [PromoteAllScalars=true]),
+				
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Components", type text}, {"Project", type text}, {"Issue Type", type text}, {"Key", type text}, {"Summary", type text}, {"Assignee", type text}, {"Reporter", type text}, {"Priority", type text}, {"Status", type text}, {"Created", type datetime}, {"Linked Issues", type text}, {"Sub-tasks", type text}, {"Tipo de prueba", type text}, {"Resolved", type datetime}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,40 @@
+table Users
+	lineageTag: aad75ec2-d696-4e57-87cd-f2e152a8f93c
+
+	measure Roles = LOOKUPVALUE(Users[Rol], Users[User], USERNAME())
+		lineageTag: 63748340-9741-426c-bc11-f9e5dc937c12
+
+	measure NavigationAction = IF([Roles] = "Admin", SELECTEDVALUE(MenuLB[Menu]), "Without Permission")
+		lineageTag: a759021c-b947-4c7b-9033-c81c12ac7965
+
+	column User
+		dataType: string
+		lineageTag: 7941d8fd-14ec-408d-b12f-d4c9ca6ad3a0
+		summarizeBy: none
+		sourceColumn: User
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rol
+		dataType: string
+		lineageTag: 623601b8-5bb7-4c0d-9098-81b149a60636
+		summarizeBy: none
+		sourceColumn: Rol
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Users-32842990-d183-4478-8345-7720b105ac08 = m
+		mode: import
+		queryGroup: 'LB Energía'
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("fY5BCsMgFAXv4jp4hvYcSQgPvyS/1G94aujx67JdmPUMw8yzK7y2kvImqHggBM0GH3Jyk3tKUnPrNLtUlTjbL1+42J8jBaS2HazRx08dxohDBe89n0MFTDDJXg1d6JiMOt6LCQy57OP/s5d4e/VCj1S1Q8cVuaLVRtyGRK20G2X9Ag==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [User = _t, #"Rol#(lf)Admin#(lf)Admin#(lf)Admin#(lf)Admin#(lf)Admin#(lf)Admin#(lf)Rol" = _t]),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"Rol#(lf)Admin#(lf)Admin#(lf)Admin#(lf)Admin#(lf)Admin#(lf)Admin#(lf)Rol", "Rol"}}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{{"User", type text}, {"Rol", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

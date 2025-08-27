@@ -1,0 +1,132 @@
+table 'Resumen KGI13_E'
+	lineageTag: 4a5c179a-0af7-4af3-935c-7724eec75088
+
+	column Prioridad
+		dataType: string
+		lineageTag: 75c4e688-a15a-4e86-afbf-51a3ca479bea
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 05658844-646a-49ad-be00-8a6020681095
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Lote
+		dataType: string
+		lineageTag: ce64d72a-e882-469f-b027-a821485cc819
+		summarizeBy: none
+		sourceColumn: Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Planificaciones'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5816bd1f-06ee-4dea-9164-2576b2dd338a
+		summarizeBy: sum
+		sourceColumn: Total Planificaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Incumplidas'
+		dataType: double
+		lineageTag: ae596c57-b0ea-4c44-93a7-f66465b49b51
+		summarizeBy: sum
+		sourceColumn: Total Incumplidas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total No Incumplidas'
+		dataType: string
+		lineageTag: 2f779144-b4b5-472a-a796-6d2d905aa718
+		summarizeBy: none
+		sourceColumn: Total No Incumplidas
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parametros KGI13_E.Tasa máxima permitida %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: d58139e6-5575-48e1-97e7-620b60b25b3c
+		summarizeBy: sum
+		sourceColumn: Parametros KGI13_E.Tasa máxima permitida %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parametros KGI13_E.Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: ad7edf0d-504a-49e9-b69a-c73690cfc3ed
+		summarizeBy: sum
+		sourceColumn: Parametros KGI13_E.Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parametros KGI13_E.Puntos de KGI13'
+		dataType: int64
+		formatString: 0
+		lineageTag: 300f3850-f99d-44f2-815b-fc2abca75c46
+		summarizeBy: sum
+		sourceColumn: Parametros KGI13_E.Puntos de KGI13
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa Real' = DIVIDE('Resumen KGI13_E'[Total Incumplidas], 'Resumen KGI13_E'[Total Planificaciones], 0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 62e5a73d-52f0-4e22-bd3f-af65f795bb53
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF('Resumen KGI13_E'[Tasa Real]>'Resumen KGI13_E'[Parametros KGI13_E.Tasa máxima permitida %], "No", "Sí")
+		lineageTag: 91560b82-684c-49d4-b88c-f529715b15f9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido' = IF('Resumen KGI13_E'[¿Cumple?] = "Sí", 'Resumen KGI13_E'[Parametros KGI13_E.Peso del KGI %], 0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 670fe460-b72b-4967-8efc-55b76346d9d6
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Peso_No_Obtenido = IF('Resumen KGI13_E'[¿Cumple?] = "No", 'Resumen KGI13_E'[Parametros KGI13_E.Peso del KGI %], 0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 3b24c677-a7f0-49b0-82df-ed7735e2a7e5
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI13_E-b4c416bd-24fb-4147-96a7-73711a3b90ce' = m
+		mode: import
+		queryGroup: Resumen
+		source =
+				let
+				    Origen = #"Resumen KGI12_E",
+				    #"Columnas quitadas" = Table.RemoveColumns(Origen,{"Planificaciones Incumplidas", "Cump. Objetivo %", "Peso %", "KGI", "Puntos de KGI12"}),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Columnas quitadas", {"Fecha fin real - Copy", "Prioridad", "Lote"}, #"Evolutivos-Incidencias-Evolutivos", {"Fecha fin real - Copy", "Prioridad", "Lote"}, "Evolutivos-Incidencias-Evolutivos", JoinKind.LeftOuter),
+				    #"Se expandió Evolutivos-Incidencias-Evolutivos" = Table.ExpandTableColumn(#"Consultas combinadas", "Evolutivos-Incidencias-Evolutivos", {"Recuento"}, {"Evolutivos-Incidencias-Evolutivos.Recuento"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Se expandió Evolutivos-Incidencias-Evolutivos",null,0,Replacer.ReplaceValue,{"Evolutivos-Incidencias-Evolutivos.Recuento"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Valor reemplazado",{{"Evolutivos-Incidencias-Evolutivos.Recuento", "Total Incumplidas"}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado", "Total No Incumplidas", each [Total Planificaciones] - [Total Incumplidas]),
+				    #"Consultas combinadas1" = Table.NestedJoin(#"Personalizada agregada", {"Prioridad"}, #"Parametros KGI13_E", {"Prioridad "}, "Parametros KGI13_E", JoinKind.LeftOuter),
+				    #"Se expandió Parametros KGI13_E" = Table.ExpandTableColumn(#"Consultas combinadas1", "Parametros KGI13_E", {"Tasa máxima permitida %", "Peso del KGI %", "Puntos de KGI13"}, {"Parametros KGI13_E.Tasa máxima permitida %", "Parametros KGI13_E.Peso del KGI %", "Parametros KGI13_E.Puntos de KGI13"})
+				in
+				    #"Se expandió Parametros KGI13_E"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

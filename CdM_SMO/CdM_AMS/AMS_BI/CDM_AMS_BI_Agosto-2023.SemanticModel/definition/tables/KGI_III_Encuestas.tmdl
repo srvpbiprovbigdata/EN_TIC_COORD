@@ -1,0 +1,178 @@
+table KGI_III_Encuestas
+	lineageTag: a738b2f5-489e-47ca-92f4-d1721a825f6c
+
+	column Valoración
+		dataType: string
+		lineageTag: 483c2d2c-5e32-43b7-aa53-680137db1229
+		summarizeBy: none
+		sourceColumn: Valoración
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Creación encuesta mes'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 1d817309-bbc1-4bc4-8518-9fbbb9091dc5
+		summarizeBy: none
+		sourceColumn: Creación encuesta mes
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Instancia
+		dataType: string
+		lineageTag: bad33a69-e3a5-4c47-88aa-9fe3a87a3521
+		summarizeBy: none
+		sourceColumn: Instancia
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Valor real'
+		dataType: int64
+		formatString: 0
+		lineageTag: 775c6448-f084-45e6-b00f-2f5c3afb38a4
+		summarizeBy: sum
+		sourceColumn: Valor real
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Valor de cadena'
+		dataType: string
+		lineageTag: 5c39fa7e-6f22-4314-a443-d918e7ed3d03
+		summarizeBy: none
+		sourceColumn: Valor de cadena
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 83cf4dbf-46e9-4ed6-96fb-f16d978c1ec2
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		variation Variación
+			isDefault
+			relationship: 137d0c4b-4768-4efd-b806-e6533dfc3476
+			defaultHierarchy: LocalDateTable_3775d88e-0126-451c-85c9-9d0d28cf6c33.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Actualizado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ad2aafb6-0953-49f0-aa26-70c457ee4137
+		summarizeBy: none
+		sourceColumn: Actualizado
+
+		variation Variación
+			isDefault
+			relationship: a47102a4-47f2-42d3-8244-00e12acd3972
+			defaultHierarchy: LocalDateTable_a72f6707-25d4-437a-bcdc-4b46703eed5d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Número
+		dataType: string
+		lineageTag: 0dec1d11-21d0-4228-9fe4-db6f18aff043
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column Número_1
+		dataType: string
+		lineageTag: 355577b9-f1e4-4ec4-be32-0a87ccfa66b2
+		summarizeBy: none
+		sourceColumn: Número_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Elemento
+		dataType: string
+		lineageTag: fc0f5bb2-6c7c-4250-aead-80ce292b5168
+		summarizeBy: none
+		sourceColumn: Elemento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de asignación'
+		dataType: string
+		lineageTag: dbf07ad8-ed22-433a-8e03-76188aa808b0
+		summarizeBy: none
+		sourceColumn: Grupo de asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pregunta
+		dataType: string
+		lineageTag: 9d1a9df6-f87d-42ef-babe-fb29df61213e
+		summarizeBy: none
+		sourceColumn: Pregunta
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Elemento métrico'
+		dataType: string
+		lineageTag: 6b74abcf-6bcf-43f0-afb7-109a2651ac11
+		summarizeBy: none
+		sourceColumn: Elemento métrico
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierto por'
+		dataType: string
+		lineageTag: 24b5fc60-33cd-4b0c-942a-330304e5b5db
+		summarizeBy: none
+		sourceColumn: Abierto por
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID_KGI_3.4'
+		dataType: string
+		lineageTag: d7e1c048-854a-45a5-936d-c2f462d11ecc
+		summarizeBy: none
+		sourceColumn: ID_KGI_3.4
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID_KGI_3.4_bis'
+		dataType: string
+		lineageTag: bc055b5b-3936-468f-b9f5-45ec5739c008
+		summarizeBy: none
+		sourceColumn: ID_KGI_3.4_bis
+
+		annotation SummarizationSetBy = Automatic
+
+	partition KGI_III_Encuestas-6645394d-fb29-4409-beae-e16a114e7a93 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source = ```
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & encuestas & xlsx), null, true),
+				    #"Page 1_Sheet" = Origen{[Name="Page 1"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Cerrado", type date}, {"Actualizado", type date}}),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Tipo cambiado", "Valoración", each if [Valor real] = 1 then "Alta" else if [Valor real] = 2 then "Media" else if [Valor real] = 3 then "Baja" else null, type text),
+				    #"Inicio del mes insertado" = Table.AddColumn(#"Columna condicional agregada", "Creación encuesta mes", each Date.StartOfMonth([Cerrado]), type date),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Inicio del mes insertado",{{"Creación encuesta mes", type date}, {"Valor real", Int64.Type}, {"Cerrado", type date}, {"Actualizado", type datetime}}),
+				    ID_KGI_3.4 = Table.AddColumn(#"Tipo cambiado1", 
+				                 "ID_KGI_3.4", 
+				                 each if [Valor real] = 1 then "3-4-4-1" 
+				                      else if [Valor real] = 2 then "3-4-4-2" 
+				                      else if [Valor real] = 3 then "3-4-4-3" 
+				                      else null, 
+				                type text),
+				    #"ID_KGI_3.4 (bis)" = Table.AddColumn(ID_KGI_3.4, "ID_KGI_3.4_bis", each "3-4-4-1"),
+				    #"Filas filtradas" = Table.SelectRows(#"ID_KGI_3.4 (bis)", each ([Creación encuesta mes] <> #date(2022, 4, 1) and [Creación encuesta mes] <> #date(2022, 5, 1)))
+				in
+				    #"Filas filtradas"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

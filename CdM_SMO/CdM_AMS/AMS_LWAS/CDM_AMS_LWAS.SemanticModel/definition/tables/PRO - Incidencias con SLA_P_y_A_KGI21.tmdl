@@ -1,0 +1,340 @@
+table 'PRO - Incidencias con SLA_P_y_A_KGI21'
+	lineageTag: a2a2f5ad-d20a-4db7-a823-3ee5d8f0f073
+
+	column Número
+		dataType: string
+		lineageTag: 22df2dbd-bb11-4468-a335-446acee61e12
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Breve descripción'
+		dataType: string
+		lineageTag: 6d2241df-6191-4564-ae65-d53aaad70e04
+		summarizeBy: none
+		sourceColumn: Breve descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sistema
+		dataType: string
+		lineageTag: e73b9150-c2ba-477a-9444-6d0496daeeab
+		summarizeBy: none
+		sourceColumn: Sistema
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: 4c40d613-fcf2-4db0-9932-88a123fdbe7a
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7ccf9f79-315f-484b-8f40-18b04c9da279
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		variation Variación
+			isDefault
+			relationship: 1ec01b39-da8a-493e-84a6-1cba8e38daa4
+			defaultHierarchy: LocalDateTable_09eca8cc-6f4a-43be-9d8b-1c6cc86bd723.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Duración
+		dataType: int64
+		formatString: 0
+		lineageTag: 3cf5fd42-b915-429d-9b36-55103639efb9
+		summarizeBy: sum
+		sourceColumn: Duración
+
+		annotation SummarizationSetBy = Automatic
+
+	column Infringido
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 25acd81b-e6bf-4c63-ba89-9583032805a4
+		summarizeBy: none
+		sourceColumn: Infringido
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo original de incumplimiento'
+		dataType: string
+		lineageTag: 370be7e5-7475-434e-b7c2-0279638514f0
+		summarizeBy: none
+		sourceColumn: Tiempo original de incumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Porcentaje de negocio trascurrido'
+		dataType: double
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: db3824fd-6d6a-4e6f-94bc-429dfbbdffec
+		summarizeBy: none
+		sourceColumn: Porcentaje de negocio trascurrido
+
+		annotation SummarizationSetBy = User
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4b623ee3-8edd-4702-a064-aa15b4bf0f46
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ANS_Alegado
+		dataType: string
+		lineageTag: a5e916e1-4ee9-4829-a6cb-1d4265c67086
+		summarizeBy: none
+		sourceColumn: ANS_Alegado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Alegación
+		dataType: string
+		lineageTag: fca5dfbd-d0d5-4174-99c6-9624dca9ca80
+		summarizeBy: none
+		sourceColumn: Estado_Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Infringidos Numérico' = IF('PRO - Incidencias con SLA_P_y_A_KGI21'[Infringido] = TRUE(),1,0)
+		formatString: 0
+		lineageTag: a56e30d6-e19d-434a-8376-5ee7e1470535
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'No Infringidos Numerico' = IF('PRO - Incidencias con SLA_P_y_A_KGI21'[Infringido] = TRUE(),0,1)
+		formatString: 0
+		lineageTag: 4040a53d-d2e2-44b7-8c49-836648c7c2bc
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración D:HH:MM:SS' =
+			
+			VAR VDUR21_2 = 'PRO - Incidencias con SLA_P_y_A_KGI21'[Duración del negocio]
+			  RETURN INT
+			    (VDUR21_2/86400)&" Día(s) "&
+			    RIGHT("0" & INT(MOD(VDUR21_2/3600,24)),2)&":"&
+			    RIGHT("0" & INT(MOD(VDUR21_2/60,60)),2)&":"&
+			    RIGHT("0" & INT(MOD(VDUR21_2,60)),2)
+		lineageTag: 41794795-5724-46ef-9726-cea9d436f2e8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración_EX D:HH:MM:SS' =
+			
+			VAR VDUR21_EX_2 = 'PRO - Incidencias con SLA_P_y_A_KGI21'[Duración excedida]
+			  RETURN INT
+			    (VDUR21_EX_2/86400)&" Día(s) "&
+			    RIGHT("0" & INT(MOD(VDUR21_EX_2/3600,24)),2)&" HH"
+		lineageTag: ec8bb7d2-ef78-478d-843f-a717613c4d94
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resuelto
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bfe1b617-1151-4488-a4f0-29692eb20d9b
+		summarizeBy: none
+		sourceColumn: Resuelto
+
+		variation Variación
+			isDefault
+			relationship: c463e816-6d56-4949-9175-01f03d4668e0
+			defaultHierarchy: LocalDateTable_27325c97-574f-4951-9bec-4e60b14b9a25.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Código de resolución'
+		dataType: string
+		lineageTag: 08d84d8d-6a3f-463a-a68f-d5b286cc4d53
+		summarizeBy: none
+		sourceColumn: Código de resolución
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Volver a abrir recuento'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f49c0cc2-b7a0-41ce-8378-57754a207f40
+		summarizeBy: none
+		sourceColumn: Volver a abrir recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de Solución'
+		dataType: string
+		lineageTag: ba7127d9-d89f-479e-a675-24de90df8d53
+		summarizeBy: none
+		sourceColumn: Tipo de Solución
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID de correlación'
+		dataType: string
+		lineageTag: 63eade5b-87e9-4d3d-a92e-40b59f2a538b
+		summarizeBy: none
+		sourceColumn: ID de correlación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Principal
+		dataType: string
+		lineageTag: 2675209a-04fd-4d8a-9822-7c0a3ce56ee3
+		summarizeBy: none
+		sourceColumn: Principal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de asignación'
+		dataType: string
+		lineageTag: 63cd8e08-b369-476a-9d68-c82800c428a2
+		summarizeBy: none
+		sourceColumn: Grupo de asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración del negocio'
+		dataType: int64
+		formatString: 0
+		lineageTag: a0b383d6-e64c-4949-a497-9b2b6ceae914
+		summarizeBy: sum
+		sourceColumn: Duración del negocio
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado de la incidencia'
+		dataType: string
+		lineageTag: 3f498a13-0b09-49bb-9e11-630baf47a657
+		summarizeBy: none
+		sourceColumn: Estado de la incidencia
+
+		annotation SummarizationSetBy = Automatic
+
+	column Etapa
+		dataType: string
+		lineageTag: ebe38c09-647f-4f2a-907d-6980818522f5
+		summarizeBy: none
+		sourceColumn: Etapa
+
+		annotation SummarizationSetBy = Automatic
+
+	column Duración_1
+		dataType: string
+		lineageTag: ee103540-b686-43e4-a268-ded7e7fe1a42
+		summarizeBy: none
+		sourceColumn: Duración_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lote_Aplicación_relación.Lote'
+		dataType: string
+		lineageTag: 16e74464-00f5-4efa-a3d8-6d343fb2a1fe
+		summarizeBy: none
+		sourceColumn: Lote_Aplicación_relación.Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column Duracion_INCs_Previas = IF('PRO - Incidencias con SLA_P_y_A_KGI21'[Abierto] < DATE(2021,09,16), "N/A", 'PRO - Incidencias con SLA_P_y_A_KGI21'[Duración D:HH:MM:SS])
+		lineageTag: a8f84cec-6fca-4bd4-a370-96da67f027f7
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Porcentaje_trascurrido_INCs_Previas = 'PRO - Incidencias con SLA_P_y_A_KGI21'[Porcentaje de negocio trascurrido]
+		dataType: string
+		lineageTag: e10d6821-701c-449a-8184-7cb2ad12da45
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Porcentaje_trascurrido_INCS PREVIAS' = IF('PRO - Incidencias con SLA_P_y_A_KGI21'[Abierto] < DATE(2021,09,15), BLANK(), 'PRO - Incidencias con SLA_P_y_A_KGI21'[Porcentaje de negocio trascurrido])
+		dataType: double
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: d9194861-9054-4a1f-bb1b-2d14af0b0289
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+	column ServiceNow = CONCATENATE("https://acciona.service-now.com/task.do?sysparm_query=number%3d", 'PRO - Incidencias con SLA_P_y_A_KGI21'[Número])
+		lineageTag: 7c42c288-77ea-4df9-bc4b-c204c9fa89ef
+		dataCategory: WebUrl
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abierto
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6cff4e91-7116-46fc-b32f-cc4ed973a245
+		summarizeBy: none
+		sourceColumn: Abierto
+
+		variation Variación
+			isDefault
+			relationship: 1ed48406-25c0-4a3e-b216-5594edc1081a
+			defaultHierarchy: LocalDateTable_26773cf5-2939-46e2-a860-1a81cd0091bc.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo de trabajo'
+		dataType: string
+		lineageTag: 2fc684ff-82f0-4a42-b3d7-e7a4eed81f34
+		summarizeBy: none
+		sourceColumn: Tiempo de trabajo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado del incidente'
+		dataType: string
+		lineageTag: 1d0f2713-4fc2-4d8f-a180-b59ff959891f
+		summarizeBy: none
+		sourceColumn: Estado del incidente
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Incidencias con SLA_P_y_A_KGI21-fff1a7e5-2741-461f-885c-fd6d97bfabdc' = m
+		mode: import
+		queryGroup: KGIs_II
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A",
+				    #"Removed Columns" = Table.RemoveColumns(Source,{"ANS_Alegado", "Estado_Alegación"}),
+				    
+				    //Une con tabla de alegaciones
+				    #"Merged Queries" = Table.NestedJoin(#"Removed Columns", {"Número"}, #"PRO - Alegaciones del Servicio KGI21", {"ID"}, "PRO - Alegaciones del Servicio KGI21", JoinKind.LeftOuter),
+				    #"Expanded PRO - Alegaciones del Servicio KGI21" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Alegaciones del Servicio KGI21", {"ANS", "Estado"}, {"PRO - Alegaciones del Servicio KGI21.ANS", "PRO - Alegaciones del Servicio KGI21.Estado"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded PRO - Alegaciones del Servicio KGI21",{{"PRO - Alegaciones del Servicio KGI21.ANS", "ANS_Alegado"}, {"PRO - Alegaciones del Servicio KGI21.Estado", "Estado_Alegación"}}),
+				
+				    //Realiza la corrección sobre el cumplimiento de la columna "Infringido" si la alegación es aceptada
+				    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns1",each [Infringido],
+				        each if [Estado_Alegación] = "1 - Aprobada" and [ANS_Alegado] = "KGI 2-1" then "FALSE" else [Infringido],Replacer.ReplaceValue,{"Infringido"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Replaced Value",{{"Infringido", type logical}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation LinkedQueryName = PRO - Incidencias con SLA_P_y_A_KGI21
+
+	annotation PBI_NavigationStepName = Navigation
+

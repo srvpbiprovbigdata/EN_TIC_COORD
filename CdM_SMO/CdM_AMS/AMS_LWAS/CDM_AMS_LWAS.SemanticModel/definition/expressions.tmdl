@@ -1,0 +1,362 @@
+expression globalPath = sharepointsource & Entorno & sharepointsource2
+	lineageTag: da9dc894-1852-4119-9890-799909aba5fd
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression kgi = "AMS_LWAS_CDM_Parámetros KGIs" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 4f0408ee-ec22-42ab-995a-123f2fd7b1ad
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression xlsx = ".xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 289f514a-30ce-44c8-9572-98c65ec9aa27
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression estimaciones = "AMS_LWAS_CDM_S2_Estimaciones" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 65a01c8c-836d-4bf2-8c5d-c2a9f2fb78db
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression alegaciones = "AMS_LWAS_CDM_Control de alegaciones" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 0bb97afc-6a60-464a-a155-d8f561b48b05
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression incidencias = "AMS_LWAS_CDM_S4_Incidencias" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 5fd2acad-ce59-4237-9bb3-9567882a5701
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression incidencias_previas = "AMS_LWAS_CDM_S4_Incidencias_Previas" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: f96a9834-87ce-425f-9418-7544cf8c20e0
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression lotes = "AMS_LWAS_LOTE_APLICACION_RELACION" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 3a973b21-fdfe-41b7-be73-343246ddc701
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression incidencias_relacionadas = "AMS_LWAS_CDM_Incidencias_Relacionadas" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: a9c83da7-932c-4e01-9be7-53d602a3d89e
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression mejs = "AMS_LWAS_CDM_S2_Planificaciones de MEJs" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 6250e877-9d1c-4a5d-ae8b-9f64c01defc9
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression evos = "AMS_LWAS_CDM_S2_Planificaciones de EVOs" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: d856ad2c-7810-41eb-ae67-9e0847714d13
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression prjs = "AMS_LWAS_CDM_S1_Planificaciones de PRJs" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 80b93ca5-7082-4212-ac0f-02444e5483dc
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression pruebas_defectos = "AMS_LWAS_CDM_S1_S2_Entregables, Pruebas y Defectos" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: fe3d0eb0-8757-4363-bfe7-37b37452f888
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+expression mejoras = "AMS_LWAS_CDM_S1_Mejoras propuestas" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 31ddd7c8-1308-4f49-b5f1-9f0741816d0b
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+/// Ruta principal
+expression LBEnergia = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_PRE/Documentos compartidos/CdM_SMO/CdM_AMS/Archivos comunes/03. Línea Base Energía/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 46a173b9-7d04-41a3-b700-68ae9f72724b
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression FF = #date(2024, 12, 31) meta [IsParameterQuery=true, Type="Date", IsParameterQueryRequired=true]
+	lineageTag: 0e4db058-7a64-499a-8ed9-5248a95f467f
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Date
+
+/// Mes de comienzo del contrato.
+expression StartofFiscalYear = 4 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 3a53d87b-73c8-4344-bb3d-d3de4413f487
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_ResultType = Number
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 70a68523-38f4-435b-a0b6-d82e6f5d0287
+	queryGroup: 'Query Errors - 26/05/2025 17:50:32'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A_KGI21' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A_KGI21",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "Lote_Aplicación_relación.Lote", "ANS_Alegado", "Estado_Alegación"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "Lote_Aplicación_relación.Lote", "ANS_Alegado", "Estado_Alegación"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 81710918-dd2c-4b2a-bceb-d45857c8bb54
+	queryGroup: 'Query Errors - 26/05/2025 17:50:32'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A_KGI22' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A_KGI22",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "Lote_Aplicación_relación.Lote", "ANS_Alegado", "Estado_Alegación"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "Lote_Aplicación_relación.Lote", "ANS_Alegado", "Estado_Alegación"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 6eb9497b-afb5-45e0-93bf-c754939084ab
+	queryGroup: 'Query Errors - 26/05/2025 17:50:32'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A_Abiertas' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A_Abiertas",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Abierta - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Abierta - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 2b18ab6a-1bf5-4ae7-8f57-76914d92cfc4
+	queryGroup: 'Query Errors - 26/05/2025 17:50:32'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A_Abiertas_KGI13' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A_Abiertas_KGI13",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Abierta - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Abierta - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 9977a09d-a12d-44e9-af28-cae029b877ae
+	queryGroup: 'Query Errors - 26/05/2025 17:50:32'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression Entorno = "PRE" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 357565f8-2052-4249-bcc9-7d49b1f69fcc
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression sharepointsource = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: ef7f8aa7-c7de-4d6e-95c9-58ffc11b2fa9
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression sharepointsource2 = "/Documentos compartidos/CdM_SMO/CdM_AMS/AMS_LWAS/Ficheros Actuales del Servicio/" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 17fb8fb9-2f84-4103-a7ce-8f3c989aebd3
+	queryGroup: 'Parámetros globales'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A (2)' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 7e7ba9f6-986b-487b-bd80-3930eb5121a1
+	queryGroup: 'Query Errors - 12/06/2025 19:27:38'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A_KGI21 (2)' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A_KGI21",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "Lote_Aplicación_relación.Lote", "ANS_Alegado", "Estado_Alegación"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "Lote_Aplicación_relación.Lote", "ANS_Alegado", "Estado_Alegación"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 6b659484-1aea-49cd-8e34-20eb2a8a6814
+	queryGroup: 'Query Errors - 12/06/2025 19:27:38'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A_KGI22 (2)' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A_KGI22",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "Lote_Aplicación_relación.Lote", "ANS_Alegado", "Estado_Alegación"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Cerrado - Copy", "Lote_Aplicación_relación.Lote", "ANS_Alegado", "Estado_Alegación"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 6c3a0b30-1c6f-4558-8fa0-1e6f2d83282e
+	queryGroup: 'Query Errors - 12/06/2025 19:27:38'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A_Abiertas (2)' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A_Abiertas",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Abierta - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Abierta - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 2de01e83-31de-4e5a-be01-a6fd454037ac
+	queryGroup: 'Query Errors - 12/06/2025 19:27:38'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Errors in PRO - Incidencias con SLA_P_y_A_Abiertas_KGI13 (2)' =
+		let
+		Source = #"PRO - Incidencias con SLA_P_y_A_Abiertas_KGI13",
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Abierta - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "Número", "Breve descripción", "Sistema", "Prioridad", "Abierto", "Cerrado", "Resuelto", "Duración", "Duración del negocio", "Infringido", "Tiempo original de incumplimiento", "Estado de la incidencia", "Etapa", "Código de resolución", "Volver a abrir recuento", "Tipo de Solución", "Duración_1", "Porcentaje de negocio trascurrido", "ID de correlación", "Principal", "Grupo de asignación", "Estado del incidente", "Tiempo de trabajo", "Abierta - Copy", "ANS_Alegado", "Estado_Alegación", "Lote_Aplicación_relación.Lote"})
+		in
+		  #"Reordered Columns"
+	lineageTag: c86cf913-7ea7-43fc-957d-0d15f89246fd
+	queryGroup: 'Query Errors - 12/06/2025 19:27:38'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

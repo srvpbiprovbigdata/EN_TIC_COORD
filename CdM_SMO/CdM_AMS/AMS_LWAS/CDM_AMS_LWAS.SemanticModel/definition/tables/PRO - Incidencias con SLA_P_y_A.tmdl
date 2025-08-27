@@ -1,0 +1,395 @@
+table 'PRO - Incidencias con SLA_P_y_A'
+	lineageTag: ac4a1010-27c5-46d7-a457-fb0d10711430
+
+	column Número
+		dataType: string
+		lineageTag: d7067188-2654-45c7-9a62-a539e35e5f45
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Breve descripción'
+		dataType: string
+		lineageTag: 996cb9cc-f186-4daa-b124-c1a43a798d93
+		summarizeBy: none
+		sourceColumn: Breve descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sistema
+		dataType: string
+		lineageTag: 82e1fe47-f75d-45a1-b16f-4c936b425903
+		summarizeBy: none
+		sourceColumn: Sistema
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: 613ff6fb-8053-4fff-8ef1-47f80e434753
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerrado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d9391742-f4b7-4e39-a1e1-85a179e84d5a
+		summarizeBy: none
+		sourceColumn: Cerrado
+
+		variation Variación
+			isDefault
+			relationship: 5a2471d7-7ea4-4b25-947b-52b7fbedaad2
+			defaultHierarchy: LocalDateTable_209201f4-7449-48d3-bbcb-0f0bfc302049.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Duración
+		dataType: int64
+		formatString: 0
+		lineageTag: 31b61e7b-0aa3-4504-890e-75dce1e32bd5
+		summarizeBy: sum
+		sourceColumn: Duración
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado de la incidencia'
+		dataType: string
+		lineageTag: 24e61268-3945-4887-b18d-d9617c547cac
+		summarizeBy: none
+		sourceColumn: Estado de la incidencia
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Infringidos Numérico' = IF('PRO - Incidencias con SLA_P_y_A'[Infringido] = TRUE(),1,0)
+		formatString: 0
+		lineageTag: 2f988db0-99ba-449b-9fbe-e0e26528db56
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'No Infringidos Numerico' = IF('PRO - Incidencias con SLA_P_y_A'[Infringido] = TRUE(),0,1)
+		formatString: 0
+		lineageTag: 8605a705-0487-4eb3-9490-96c09d3675ca
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes = MONTH('PRO - Incidencias con SLA_P_y_A'[Cerrado])
+		formatString: 0
+		lineageTag: bfa96761-8aa2-424f-a3a3-c018edb665a9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año = YEAR('PRO - Incidencias con SLA_P_y_A'[Cerrado])
+		formatString: 0
+		lineageTag: f87a80b4-62a2-420c-8311-61e7e926872a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Reabierta Numérica' = IF('PRO - Incidencias con SLA_P_y_A'[Infringido] = TRUE(),1,0)
+		formatString: 0
+		lineageTag: 229b8b5d-2bc9-4ef8-9963-dd9b6dcbeac2
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column CerradoFecha = 'PRO - Incidencias con SLA_P_y_A'[Cerrado].[Date]
+		formatString: dd/mm/yyyy
+		lineageTag: 93117b34-d9fe-4ca0-bbb0-3d93a89f021e
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: ef839705-fc15-47a8-94b9-77ff93003e84
+			defaultHierarchy: LocalDateTable_706e46e7-8ab9-4e44-863c-dcae728d9101.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column AbiertoFecha = 'PRO - Incidencias con SLA_P_y_A'[Abierta].[Date]
+		lineageTag: 31931f4f-6630-4e96-9062-11466f88f93e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0469e55e-0a5c-4e80-953c-fb5c6922a126
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Duración D:HH:MM:SS' =
+			
+			VAR VDUR21 = 'PRO - Incidencias con SLA_P_y_A'[Duración real]
+			  RETURN INT
+			    (VDUR21/86400)&" Día(s) "&
+			    RIGHT("0" & INT(MOD(VDUR21/3600,24)),2)&":"&
+			    RIGHT("0" & INT(MOD(VDUR21/60,60)),2)&":"&
+			    RIGHT("0" & INT(MOD(VDUR21,60)),2)
+		lineageTag: 0ff30b2e-e443-4382-b3d0-5f84ba9fdaa8
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración_EX D:HH:MM:SS' =
+			
+			VAR VDUR21_EX = 'PRO - Incidencias con SLA_P_y_A'[Duración excedida]
+			  RETURN INT
+			    (VDUR21_EX/86400)&" Día(s) "&
+			    RIGHT("0" & INT(MOD(VDUR21_EX/3600,24)),2)&" HH"
+		lineageTag: 98985b62-51a6-432b-af99-2499c7a295b0
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANS_Alegado
+		dataType: string
+		lineageTag: f53ddb43-3f7e-4a94-84ef-759aee7cf2d8
+		summarizeBy: none
+		sourceColumn: ANS_Alegado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Alegación
+		dataType: string
+		lineageTag: fac5a9d6-59de-44f2-8a84-9df0f789ba22
+		summarizeBy: none
+		sourceColumn: Estado_Alegación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resuelto
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9601c9c5-08ab-4627-944f-320fe75ff3e1
+		summarizeBy: none
+		sourceColumn: Resuelto
+
+		variation Variación
+			isDefault
+			relationship: 89698544-97db-4ce6-b011-1a00fb468291
+			defaultHierarchy: LocalDateTable_4faac969-fe32-491b-afa0-2c93df88cdf5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Código de resolución'
+		dataType: string
+		lineageTag: 8c4d7a98-8b62-47c0-9d18-76f7b52ce077
+		summarizeBy: none
+		sourceColumn: Código de resolución
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Volver a abrir recuento'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 82ae2a28-428d-4b7b-b741-5ede8230b365
+		summarizeBy: none
+		sourceColumn: Volver a abrir recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo de Solución'
+		dataType: string
+		lineageTag: ea7bf360-e0db-44d9-bbc9-967e31d15ddf
+		summarizeBy: none
+		sourceColumn: Tipo de Solución
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID de correlación'
+		dataType: string
+		lineageTag: 0e643e10-5ba3-48e9-bce0-9756b1ad0e32
+		summarizeBy: none
+		sourceColumn: ID de correlación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Principal
+		dataType: string
+		lineageTag: 5ffa2cf2-004b-4446-87e1-7eddc79b9e5e
+		summarizeBy: none
+		sourceColumn: Principal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de asignación'
+		dataType: string
+		lineageTag: a71ee99a-95dc-49e5-967c-f298ed0e2f26
+		summarizeBy: none
+		sourceColumn: Grupo de asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lote_Aplicación_relación.Lote'
+		dataType: string
+		lineageTag: 4f274968-7965-4d2f-b57f-2eff978d786c
+		summarizeBy: none
+		sourceColumn: Lote_Aplicación_relación.Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración del negocio'
+		dataType: int64
+		formatString: 0
+		lineageTag: 654e1452-29d5-469c-82bc-e7eb46532d2c
+		summarizeBy: sum
+		sourceColumn: Duración del negocio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Infringido
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 76a2f720-d540-4dfa-83b9-fef8c2335057
+		summarizeBy: none
+		sourceColumn: Infringido
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo original de incumplimiento'
+		dataType: string
+		lineageTag: 5f280dc6-fb95-4604-95d0-db327d98d65a
+		summarizeBy: none
+		sourceColumn: Tiempo original de incumplimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column Etapa
+		dataType: string
+		lineageTag: 0931f02c-9fec-435c-b77e-763cc8768cda
+		summarizeBy: none
+		sourceColumn: Etapa
+
+		annotation SummarizationSetBy = Automatic
+
+	column Duración_1
+		dataType: string
+		lineageTag: ead23301-656b-437b-b14c-2a5714080009
+		summarizeBy: none
+		sourceColumn: Duración_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Porcentaje de negocio trascurrido'
+		dataType: double
+		lineageTag: 01a36218-4ad8-4321-b05a-f647fb012c33
+		summarizeBy: sum
+		sourceColumn: Porcentaje de negocio trascurrido
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ServiceNow = CONCATENATE("https://acciona.service-now.com/task.do?sysparm_query=number%3d", 'PRO - Incidencias con SLA_P_y_A'[Número])
+		lineageTag: 372fc238-699c-4c10-8c27-2ce87bb28a83
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abierto
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 16e3f356-9539-4bdd-bab4-ae7789bf8da5
+		summarizeBy: none
+		sourceColumn: Abierto
+
+		variation Variación
+			isDefault
+			relationship: c7e1d215-0bef-463b-bf86-7455b8002c4c
+			defaultHierarchy: LocalDateTable_c76db3ea-4ee5-48e8-aa5e-771167cbe2f1.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado del incidente'
+		dataType: string
+		lineageTag: 21627aa4-a85a-462a-9025-7abdc7f37418
+		summarizeBy: none
+		sourceColumn: Estado del incidente
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tiempo de trabajo'
+		dataType: string
+		lineageTag: 92d94c43-3b83-4b21-83ee-4fcaddf8b61c
+		summarizeBy: none
+		sourceColumn: Tiempo de trabajo
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Reabierta Jerarquía'
+		lineageTag: a0eb0eea-40a1-49a4-a1ec-03c707c5c5c8
+
+		level Sistema
+			lineageTag: b7824f7f-59dc-4b50-a589-14d1e1284441
+			column: Sistema
+
+	partition 'PRO - Incidencias con SLA_P_y_A-0372dffc-56a7-4dc5-b546-b758c41a1f06' = m
+		mode: import
+		queryGroup: KGIs_II
+		source = ```
+				let
+				URL = sharepointsource & Entorno & sharepointsource2 & incidencias_previas & xlsx,
+				    Origen = Excel.Workbook(Web.Contents(URL), null, true),
+				    #"Page 1_Sheet" = Origen{[Item="Page 1",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Page 1_Sheet", [PromoteAllScalars=true]),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Encabezados promovidos",{{"Usuarios interesados", "Duración del negocio"}, {"Causa probable", "Infringido"}, {"Lista de notas de trabajo", "Tiempo original de incumplimiento"}, {"Estado", "Estado de la incidencia"}, {"Entrada del usuario", "Etapa"}, {"Tiempo de trabajo", "Duración_1"}, {"Número de reasignación", "Porcentaje de negocio trascurrido"}}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{{"Número", type text}, {"Breve descripción", type text}, {"Subcategoría", type text}, {"Prioridad", type text}, {"Abierto", type datetime}, {"Cerrado", type datetime}, {"Resuelto", type datetime}, {"Duración del negocio", Int64.Type}, {"Infringido", type logical}, {"Estado de la incidencia", type text}, {"Etapa", type text}, {"Código de resolución", type text}, {"Volver a abrir recuento", type logical}, {"Tipo de Solución", type text}, {"Duración", Int64.Type}, {"Porcentaje de negocio trascurrido", Int64.Type}, {"ID de correlación", type text}, {"Principal", type text}}),
+				    #"Appended Query" = Table.Combine({#"Tipo cambiado", #"PRO - Incidencias con SLA_A"}),    
+				
+				      //Homologa las prioridades
+				    #"AllReplace" = [#"1 - Crítica" = "Crítica", #"2 - Alta" = "Alta", #"3 - Moderada" = "Media",#"3 - Media" = "Media",#"4 - Baja" = "Baja",#"5 - Muy Baja" = "Baja"],    
+				    #"Replaced Value" = Table.TransformColumns(#"Appended Query",{{"Prioridad",each Record.FieldOrDefault(AllReplace,_,_)}}),
+				     
+				    #"Filtered Rows3" = Table.SelectRows(#"Replaced Value", each ([Cerrado] <> null)),
+				
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Filtered Rows3", "Cerrado", "Cerrado - Copy"),
+				    #"Calculated Start of Month" = Table.TransformColumns(#"Duplicated Column",{{"Cerrado - Copy", Date.StartOfMonth, type datetime}}),
+				    #"Extracted Date" = Table.TransformColumns(#"Calculated Start of Month",{{"Cerrado - Copy", DateTime.Date, type date}}),
+				
+				    #"Renamed Columns" = Table.RenameColumns(#"Extracted Date",{{"Subcategoría", "Sistema"}}),
+				
+				    //Une con tabla de alegaciones
+				    #"Merged Queries" = Table.NestedJoin(#"Renamed Columns", {"Número"}, #"PRO - Alegaciones del Servicio KGI24", {"ID"}, "PRO - Alegaciones del Servicio", JoinKind.LeftOuter),
+				    #"Expanded PRO - Alegaciones del Servicio" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Alegaciones del Servicio", {"ANS", "Estado"}, {"PRO - Alegaciones del Servicio.ANS", "PRO - Alegaciones del Servicio.Estado"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded PRO - Alegaciones del Servicio",{{"PRO - Alegaciones del Servicio.ANS", "ANS_Alegado"}, {"PRO - Alegaciones del Servicio.Estado", "Estado_Alegación"}}),
+				
+				
+				    //Realiza la correcciones si la alegación es aceptada
+				    #"Replaced Value2" = Table.ReplaceValue(#"Renamed Columns1",each [Prioridad],
+				        each if [Estado_Alegación] = "1 - Aprobada" and [ANS_Alegado] = "KGI 2-4" then "Alta" else [Prioridad],Replacer.ReplaceValue,{"Prioridad"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Replaced Value2",{{"Prioridad", type text}}),
+				
+				    #"Divided Column" = Table.TransformColumns(#"Changed Type", {{"Porcentaje de negocio trascurrido", each _ / 100, Percentage.Type}}),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Divided Column", {"Grupo de asignación"}, Lote_Aplicacion_relacion, {"Grupo de Asignación"}, "Lote_Aplicación_relación", JoinKind.LeftOuter),
+				    #"Se expandió Lote_Aplicación_relación" = Table.ExpandTableColumn(#"Consultas combinadas", "Lote_Aplicación_relación", {"Lote"}, {"Lote_Aplicación_relación.Lote"}),
+				    #"Duplicados quitados" = Table.Distinct(#"Se expandió Lote_Aplicación_relación", {"Número"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Duplicados quitados",null,false,Replacer.ReplaceValue,{"Infringido"})
+				in
+				    #"Valor reemplazado"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation LinkedQueryName = PRO - Incidencias con SLA_P_y_A
+
+	annotation PBI_NavigationStepName = Navegación
+

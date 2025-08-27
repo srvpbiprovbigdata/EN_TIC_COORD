@@ -1,0 +1,608 @@
+table BI_Aplicación
+	lineageTag: 2aa0b0a5-d1cb-423f-a2ca-59454ac5dbdc
+
+	measure '€ Presupuesto Restante Global' = 'BI_Aplicación'[€_presupuesto restante] + [Linea Base Restante mes] + 'BI_Aplicación'[Linea Base Restante mes _C]
+		lineageTag: 092b77b6-70de-4eaa-ad83-fb30e7479341
+
+	measure '€ Proyectado_Correctivos' = AVERAGEX('BI_Aplicación', CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Correctivos", 'BI_Aplicación'[Atributo] = "Línea Base Real"))
+		lineageTag: 70bacf3e-e31f-4408-a8bc-102d37830daa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '€_Desviacion presupuesto' = ([Línea Base Real consumida €] / ( MONTH(TODAY())) * 12) - [€_por_mes]*12
+		lineageTag: 8c70669f-cf92-4a74-8271-6bacacda92f9
+
+	measure '€_Linea Base Real por Mes' =
+			
+			[Línea Base Real consumida €]/ [Meses_Restantes_Año_12_2]
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 11dfea22-200d-4d74-bbef-ac0471ddd610
+
+	measure '€_Linea Base Real por Mes_C' =
+			
+			var _meshoy = MONTH(TODAY())
+			
+			return
+			
+			[Línea Base Real consumida €_C] / _meshoy
+		lineageTag: 844b5db9-ea04-4faf-916d-0f090560709c
+
+	measure €_por_mes = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Atributo] = "Línea Base Objetivo", 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos") /12
+		lineageTag: 7f24a3f8-7f35-448d-b8e0-3b6347d5176a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure €_por_mes_C = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Atributo] = "Línea Base Objetivo", 'BI_Aplicación'[Descripción Ámbito] = "Correctivos") /12
+		lineageTag: edf5e8fa-38c3-4d76-8513-21d7c51f00fe
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '€_presupuesto restante' = [Presupuesto Real €] - [Línea Base Real consumida €]
+		lineageTag: 79dfdd4a-27db-427a-ac0c-a2b3af546b1a
+
+	measure '€_presupuesto restante_C' = [Linea_Base_esperada_total_C] - 'BI_Aplicación'[Línea Base Real consumida €_C]
+		lineageTag: 02be790e-6c79-4411-a2b1-35e0facfa442
+
+	measure Ahorro = [Coste Fijo] - [Gasto_Hipotetico_C]
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: ef588934-e977-4c64-97e4-d5e7da1f6234
+
+	measure Comparación_Consumo = IF([Línea Base Real consumida €] >= [Línea_Real_Consumida_SamePeriodLastYear], "#00B347", "#CD5C5C")
+		lineageTag: a32858b7-56a3-4412-a97d-dd577b70dc1c
+
+	measure Comparación_Consumo_% =
+			([Línea Base Real consumida €] - CALCULATE(SUM('BI_Aplicación'[Valor]),
+			 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos",
+			  'BI_Aplicación'[Atributo] = "Consumo Real",
+			   DATESBETWEEN(Fechas[Date], DATE(YEAR(TODAY()) -1,01,01), DATE(YEAR(TODAY())-1, MONTH(TODAY()), DAY(TODAY()))))) / CALCULATE(SUM('BI_Aplicación'[Valor]),
+			 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos",
+			  'BI_Aplicación'[Atributo] = "Consumo Real",
+			   DATESBETWEEN(Fechas[Date], DATE(YEAR(TODAY()) -1,01,01), DATE(YEAR(TODAY())-1, MONTH(TODAY()), DAY(TODAY()))))
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: dec1deac-1874-46f5-b801-bc823451d23e
+
+	measure Comparación_Euro_Hora = IF([Euro_Hora_Correctivo_C] >= [Euro_Hora_Estimado_C], "#0EB194", "#CD5C5C")
+		lineageTag: df6e1a24-c656-4684-9564-725272d3a17d
+
+	measure Consumido_PrecioHoraContratado = [Total_LB_Horas_Real_Aplicaciones_C] * [Precio_Hora_Contratado]
+		lineageTag: eff31546-cc1a-43d5-aaef-24bb15dd47dc
+
+	measure 'Coste Fijo' = [Total_LB_UTs_C] * [Euro_Hora_Estimado_C]
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 81342131-58c8-47fc-9bd7-68fc01eacbe6
+
+	measure 'Coste UT LB Objetivo' = [Linea_Base_esperada_total] / [UTS_totales_disponibles]
+		lineageTag: 5c05facb-73f4-428a-9bea-a07cc45419e0
+
+	measure Coste_FIjo_Horas_Incurridas = DIVIDE([Linea_Base_esperada_total_C], [Total_LB_Horas_Real_Aplicaciones_C], 0)
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: f3924ab9-5478-4602-b23a-314d005b6053
+
+	measure Desviacion-Proyectado = [Presupuesto Real €] - [Línea Base Real Consumida €]
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: ab580aa3-c664-414a-ba8c-9cbb164b0401
+
+	measure Diferencia_Consumo =
+			
+			[Línea Base Real consumida €] -
+			
+			CALCULATE([Línea Base real consumida €], PREVIOUSYEAR('BI_Aplicación'[Periodo]))
+		lineageTag: 419dd1f1-cedb-41dc-9f78-084b6c7039ea
+
+	measure Euro_hora_Correctivo_C = [Línea Base Real consumida €_C] / [Total_LB_Horas_Real_Aplicaciones_C]
+		lineageTag: d9609b39-0abc-4d22-92f8-8859868532a6
+
+	measure Euro_Hora_Estimado_C = [Linea_Base_esperada_total_C] / [Total_LB_UTs_C]
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 30e2fd8f-491c-44b7-9da8-d800879126b2
+
+	measure Gasto_Hipotetico_C = [Euro_Hora_Estimado_C] * [Total_LB_Horas_Real_Aplicaciones_C]
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 70b8b383-fc3e-4704-8ccc-96b5975a62f0
+
+	measure 'Grupos de asignacion de BI' = 8
+		formatString: 0
+		lineageTag: aaa491c0-a541-4361-9fed-716770f98a04
+
+	measure 'Línea Base Real consumida €' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] = "Consumo Real", MONTH('BI_Aplicación'[Periodo]<= MONTH(TODAY())))
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: d4b5805e-665b-4b8b-8688-42da87d933f5
+
+	measure 'Línea Base Real consumida €_C' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Correctivos", 'BI_Aplicación'[Atributo] = "Consumo Real")
+		lineageTag: 996e2b78-403d-437b-a8b9-e4a04016f143
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Linea Base Real Consumida Total' = CALCULATE('BI_Aplicación'[Línea Base Real consumida €], ALL(Fechas))
+		lineageTag: 4663bf1c-8e74-4a9f-9ceb-9bb240f524a5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Linea Base Real Consumida Total C' = CALCULATE('BI_Aplicación'[Línea Base Real consumida €_C], ALL(Fechas))
+		lineageTag: d9cda4d7-b5e7-4be7-9f88-7442af6e1727
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Linea Base Restante mes' = DIVIDE([€_presupuesto restante], [Meses_Restantes_Año_1], 0)
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 3220ee3d-87b5-432c-831e-a1eb1ae49821
+
+	measure 'Linea Base Restante mes _C' = DIVIDE('BI_Aplicación'[Linea_Base_esperada_total_C] - 'BI_Aplicación'[Línea Base Real consumida €_C], [Meses_Restantes_Año_1], 0)
+		lineageTag: 2783e2e9-1a2e-4c86-9148-20b26e574d0e
+
+	measure Linea_Base_esperada_restante = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Atributo]="Línea Base Objetivo", 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos") / 12
+		lineageTag: ff51a143-ce75-4d8e-8729-db5434bb00cc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Linea_Base_esperada_total = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Atributo]="Línea Base Objetivo", 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos")
+		lineageTag: 6db6d931-f648-456c-aa28-1dd50e187bc2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Linea_Base_esperada_total_C = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Atributo]="Línea Base Objetivo", 'BI_Aplicación'[Descripción Ámbito] = "Correctivos")
+		lineageTag: 73ffd6ab-b0b2-4a21-a4d0-5f6e2121f9f4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Linea_Base_esperada_total_mensual = CALCULATE(SUM('BI_Aplicación'[Valor])/12, 'BI_Aplicación'[Atributo]="Línea Base Objetivo", 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos")
+		lineageTag: 752064ca-1339-460f-93e5-5712e30e986b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Linea_Base_esperada_total_mensual_C = CALCULATE(SUM('BI_Aplicación'[Valor])/12, 'BI_Aplicación'[Atributo]="Línea Base Objetivo", 'BI_Aplicación'[Descripción Ámbito] = "Correctivos")
+		lineageTag: 44d2a747-eaba-4c8a-b621-a69b35cf68c2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Linea_Base_esperada_total_mes = DIVIDE('BI_Aplicación'[Linea_Base_esperada_total], [Meses restantes], 0)
+		lineageTag: eee47572-73ab-4964-9d62-cc628de14805
+
+	measure Linea_Base_esperada_total_mes_C = DIVIDE('BI_Aplicación'[Linea_Base_esperada_total_C], [Meses restantes], 0)
+		lineageTag: d0f4d37a-8b86-4223-a04a-31e1bf45d95c
+
+	measure Linea_Base_esperada_total_mes_C_2 = ([Linea_Base_esperada_total_mensual_C] * [Meses_Restantes_Año_12])
+		lineageTag: 7c5fe02b-0576-4d13-a880-6a39d63d9319
+
+	measure Línea_Real_Consumida_SamePeriodLastYear =
+			
+			[Línea Base Real consumida €] -
+			
+			CALCULATE(SUM('BI_Aplicación'[Valor]),
+			 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos",
+			  'BI_Aplicación'[Atributo] = "Consumo Real",
+			   DATESBETWEEN(Fechas[Date], DATE(YEAR(TODAY()) -1,01,01), DATE(YEAR(TODAY())-1, MONTH(TODAY()), DAY(TODAY()))))
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		lineageTag: d2b3539a-f147-484c-a4a9-7d54f2b8ffc4
+
+	measure Línea_Real_Consumida_Uts_SamePeriodLastYear = ```
+			[Total_LB_Uts_Real_Aplicaciones] - 
+			
+			CALCULATE(SUM('BI_Aplicación'[Valor]),
+			 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos",
+			  'BI_Aplicación'[Atributo] = "Consumo Real Uts",
+			   DATESBETWEEN(Fechas[Date], DATE(YEAR(TODAY()) -1,01,01), DATE(YEAR(TODAY())-1, MONTH(TODAY()), DAY(TODAY()))))
+			```
+		lineageTag: 606b9dd4-ca77-47d5-b6e9-fb3e63626e8d
+
+	measure Marcador_Ahorro = IF([Coste Fijo] > [Gasto_Hipotetico_C], "#0EB194", "#CD5C5C")
+		lineageTag: 51b39449-0588-4831-aaf5-1de0242eb6b7
+
+	measure 'Meses año actual' = MONTH(CALCULATE(MAX('BI_Aplicación'[Periodo]), 'BI_Aplicación'[Atributo] = "Consumo Real", 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos"))
+		formatString: 0
+		lineageTag: 6bfc3e19-4cb9-43a3-93af-677b01fdbabc
+
+	measure 'Meses restantes' = 12 - MONTH((CALCULATE(MAX('BI_Aplicación'[Periodo]), 'BI_Aplicación'[Atributo] = "Consumo Real", 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos")))
+		formatString: 0
+		lineageTag: 8d37474a-c281-41f8-8db4-fb812b045718
+
+	measure Meses_LB_Real_Total = CALCULATE((DATEDIFF(FIRSTDATE('BI_Aplicación'[Periodo]), LASTDATE('BI_Aplicación'[Periodo]), MONTH) +1),'BI_Aplicación'[Atributo] = "Consumo Real", ALLEXCEPT('BI_Aplicación','BI_Aplicación'[Área],'BI_Aplicación'[SubÁrea],'BI_Aplicación'[Aplicación]), ALL(Fechas))
+		formatString: 0
+		lineageTag: 1224ecb1-d78f-44b0-beba-7d179114375d
+
+	measure Meses_Restantes_2 = 12 - Month(MAX('BI_Aplicación'[Periodo]))
+		formatString: 0
+		lineageTag: 5705fe69-5b9c-49f2-82cb-d169d487b71b
+
+	measure Meses_Restantes_Año_0 =
+			IF(
+			    YEAR(TODAY()) > YEAR(MAX('BI_Aplicación'[Periodo])),
+			    0,
+			    12 - MONTH(TODAY())
+			)
+		formatString: 0
+		lineageTag: 2f236be8-aed6-411e-9498-5bdb989c784f
+
+	measure Meses_Restantes_Año_1 =
+			IF(
+			    YEAR(TODAY()) > YEAR(MAX('BI_Aplicación'[Periodo])),
+			    1,
+			    12 - MONTH(TODAY())
+			)
+		formatString: 0
+		lineageTag: a05306d0-10a4-4688-8b34-ed26743b37b6
+
+	measure Meses_Restantes_Año_12 =
+			IF(
+			    YEAR(TODAY()) > YEAR(MAX('BI_Aplicación'[Periodo])),
+			    12,
+			    12 - MONTH(TODAY()))
+		formatString: 0
+		lineageTag: 935f11a4-55c0-4f63-8ce9-da2988f8aee2
+
+	measure Meses_Restantes_Año_12_2 =
+			IF(
+			    YEAR(TODAY()) > YEAR(MAX('BI_Aplicación'[Periodo])),
+			    12,
+			    MONTH(TODAY()))
+		formatString: 0
+		lineageTag: 02191737-1457-4413-b1ad-fd8aec593993
+
+	measure Meses_Uts_Real_Total = CALCULATE((DATEDIFF(FIRSTDATE('BI_Aplicación'[Periodo]), LASTDATE('BI_Aplicación'[Periodo]), MONTH) +1),'BI_Aplicación'[Atributo] = "Consumo Real Uts", ALLEXCEPT('BI_Aplicación','BI_Aplicación'[Área],'BI_Aplicación'[SubÁrea],'BI_Aplicación'[Aplicación]), ALL(Fechas))
+		formatString: 0
+		lineageTag: 14bd391c-fcc9-4fd8-b905-e834582904fd
+
+	measure Ppto_Restante = 'BI_Aplicación'[Linea_Base_esperada_total] - 'BI_Aplicación'[Línea Base Real consumida €]
+		lineageTag: 18f025a6-e69c-4126-8333-2157c9722310
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Ppto_Restante_Año = [Presupuesto Real €] - [Línea Base Real consumida €]
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 2212c5fb-801a-48ad-a2fc-9055bbe7ade2
+
+	measure Precio_Hora_Contratado = [Linea_Base_esperada_total_C] / [UTS_totales_disponibles_ C]
+		lineageTag: bc28f14b-e65f-4442-954c-2b48b65fa652
+
+	measure 'Presupuesto Real €' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] ="Evolutivos", 'BI_Aplicación'[Atributo] = "Presupuesto")
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: d859a5a9-a301-477f-a544-99af137b34ca
+
+	measure 'Presupuesto Real Uts' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] ="Evolutivos", 'BI_Aplicación'[Atributo] = "Presupuesto Uts")
+		lineageTag: d0616d38-0631-40f3-8f87-b6ae4130971d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Presupuesto€_Mes = [Presupuesto Real €] / 12
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 18ca5413-c1b0-4913-94b4-573ad15af3f6
+
+	measure Tendencia_Color = IF([Total_LB_Horas_Real_Aplicaciones_C] > [Linea_Base_esperada_total_C], 0, 1)
+		lineageTag: 8b43702b-45f6-41da-a2c2-008e51919b0f
+
+	measure Tendencia_LB = DIVIDE('BI_Aplicación'[Linea Base Real Consumida Total], [Meses_LB_Real_Total], 0)
+		lineageTag: c4694767-1a54-49f5-9806-5a0273d9cc3e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Tendencia_LB_C_2 =
+			AVERAGEX(
+			    FILTER(
+			        'BI_Aplicación',
+			        'BI_Aplicación'[Periodo] <= TODAY()
+			            && YEAR('BI_Aplicación'[Periodo]) = YEAR(TODAY())
+			    ),
+			    [Línea Base Real consumida €_C]
+			)
+		lineageTag: 15e3da60-5e40-4657-8245-fccf38c03dbb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Tendencia_Uts = DIVIDE([Total_LB_Uts_Real_Total], [Meses_Uts_Real_Total], 0)
+		lineageTag: 5e421485-a359-4f15-aed2-8d508630b779
+
+	measure Tendencia_Uts_C = DIVIDE([Total_LB_Horas_Real_Aplicaciones_C], [Meses_Restantes_Año_12_2])
+		lineageTag: b538a21c-fc84-48fd-9885-1119b99589db
+
+	measure Total_LB_Horas_Real_Aplicaciones_C = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] ="Correctivos", 'BI_Aplicación'[Atributo] = "Consumo Real Uts")
+		lineageTag: e23327f6-42a9-4a69-85d4-0c6e1460d00c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_LB_UTs = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] = "Línea Base Objetivo Uts", MONTH('BI_Aplicación'[Periodo]) <= MONTH(TODAY()))
+		lineageTag: 27b4c546-2316-4821-a9fb-73fcc4808ec2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_LB_UTs_C =
+			CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Correctivos", 'BI_Aplicación'[Atributo] = "Línea Base Objetivo Uts", FILTER(ALL('BI_Aplicación'[Periodo]), IF(
+			    YEAR(TODAY()) > YEAR(MAX('BI_Aplicación'[Periodo])),
+			    12,
+			    MONTH('BI_Aplicación'[Periodo]) <= MONTH(TODAY()))
+			)
+			)
+		lineageTag: 2c265bfe-a42b-4bec-8246-335c94390c43
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_LB_Uts_Real = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] ="Evolutivos", 'BI_Aplicación'[Atributo] = "Línea Base Real Uts")
+		lineageTag: c28e44ee-d602-4fdb-a628-aae554545437
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_LB_Uts_Real_Aplicaciones = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] ="Evolutivos", 'BI_Aplicación'[Atributo] = "Consumo Real Uts")
+		formatString: 0.00
+		lineageTag: f3e665a3-baef-4e34-aedb-7064b897b495
+
+	measure Total_LB_Uts_Real_Aplicaciones_mes = [Total_LB_Uts_Real_Aplicaciones] / [Meses_Restantes_Año_12_2]
+		lineageTag: a6d08091-fdd5-4db5-9fa0-0a73807578bc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_LB_Uts_Real_C_Aplicaciones_mes = [Total_LB_Horas_Real_Aplicaciones_C] / MONTH(TODAY())
+		lineageTag: 7eebe19a-2fd1-40f3-aef7-ae9ebba70ec9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_LB_Uts_Real_Total = CALCULATE('BI_Aplicación'[Total_LB_Uts_Real_Aplicaciones], ALL(Fechas))
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 5289960d-3059-41f8-893e-f82a5a82381c
+
+	measure Total_LB_Uts_Real_Valor_C = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] ="Correctivos", 'BI_Aplicación'[Atributo] = "Consumo Real")
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: bf409eb0-57e7-4729-9c3e-5efeb1c77c84
+
+	measure 'Uts Disponibles por Aplicación' = ```
+			[UTS_disponibles por mes] 
+			```
+		lineageTag: 0b496893-9c7f-412a-a774-55855f239d9c
+
+	measure 'UTS_disponibles por mes' = [UTS_totales_disponibles] /12
+		lineageTag: 16d2bcd4-4a67-44af-abfc-79759d18f546
+
+	measure 'UTS_disponibles por mes_C' = [UTS_totales_disponibles_ C] /12
+		lineageTag: 921bea1d-51cc-4fc8-8c6e-8c32ab753a8e
+
+	measure UTS_Disponibles_Ppto = [Presupuesto Real Uts] - [Total_LB_Uts_Real_Aplicaciones]
+		lineageTag: 1bb2db01-1165-490c-8809-693864c91790
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'UTS_mes_disponibles restantes' = DIVIDE([UTS_restantes] , [Meses_Restantes_Año_1], 0)
+		lineageTag: 1276f61f-f6a4-47a2-bb4b-bbcffe419f88
+
+	measure 'UTS_mes_disponibles_C restantes' = DIVIDE([UTs_restantes_C_Aplicaciones], [Meses restantes], 0)
+		lineageTag: 347cdf0b-9157-4cf5-a4b0-d56f1ce07842
+
+	measure UTS_Rael_Mes_App = CALCULATE(SUM('BI_Aplicación'[Aplicación]), 'BI_Aplicación'[Atributo]="Línea Base Real Uts",'BI_Aplicación'[Descripción Ámbito]="Evolutivos", 'BI_Aplicación'[Periodo])
+		formatString: 0
+		lineageTag: 2756a470-f712-4687-b295-2cc1bcebdfe2
+
+	measure UTS_restantes = [Presupuesto Real Uts] - [Total_LB_Uts_Real_Aplicaciones]
+		lineageTag: f418a5ca-7e34-4b88-81ca-ab75d0bed27f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'UTS_restantes C' = [UTS_totales_disponibles_ C] - [Total_LB_Horas_Real_Aplicaciones_C]
+		lineageTag: 45ea2f40-f4f3-45ac-b97f-9d2b57f9b6b5
+
+	measure UTs_restantes_C_Aplicaciones = [UTS_totales_disponibles_ C] - [Total_LB_Horas_Real_Aplicaciones_C]
+		lineageTag: 3f841afd-8f86-40f0-bc88-5f05b29fb22a
+
+	measure UTS_restantes_mensual = [Presupuesto Real Uts] / 12
+		lineageTag: 3872c17c-e5f5-4686-b4bc-f1814a329ec3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure UTS_totales_disponibles = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Atributo] = "Línea Base Objetivo Uts", 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", ALL('BI_Aplicación'[Periodo]))
+		lineageTag: e3ea10f8-63c3-458a-8645-83a011a0f201
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'UTS_totales_disponibles_ C' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Atributo] = "Línea Base Objetivo Uts", 'BI_Aplicación'[Descripción Ámbito] = "Correctivos", ALL('BI_Aplicación'[Periodo]))
+		lineageTag: 13108be2-875b-4c20-8014-422df6841874
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure UTS_totales_disponibles_mensual = [UTS_totales_disponibles] / 12
+		lineageTag: 591478f7-9944-4c73-bf5d-df80a5ca59bc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure UTS_totales_disponibles_mes = DIVIDE([UTS_totales_disponibles], [Meses restantes], 0)
+		lineageTag: 9f5e9a21-f76f-4614-abcb-e3ba369fbeea
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_LB_Uts_Real_Valor = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] ="Evolutivos", 'BI_Aplicación'[Atributo] = "Consumo Real")
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 6f1285dc-4713-4429-b9f9-3b37ffbfda34
+
+	measure Tendencia_LB_C = DIVIDE('BI_Aplicación'[Linea Base Real Consumida Total], [Meses_LB_Real_Total], 0)
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 72f29f68-52f9-43f1-9188-f1342fe3a404
+
+	measure 'UTs Evolutivos' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] ="Consumo Real Uts")
+		lineageTag: 590c600a-66d3-4459-943d-565ab7fd1bd2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'UTs Peticiones' =
+			
+			
+			Var _Valor = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Peticiones", 'BI_Aplicación'[Atributo] ="Consumo Real Uts")
+			
+			return
+			
+			IF(ISBLANK(_Valor), 0,_Valor)
+		lineageTag: daeb36cc-fdba-4c14-b3cb-ee47155ed4b7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'UTs LB Actual' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] ="Línea Base Actual Uts")
+		formatString: 0
+		lineageTag: 5ee8e109-de22-4949-a480-0c9dfec04057
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'UTs LB Máxima' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] ="Línea Base Máxima Uts")
+		formatString: 0
+		lineageTag: f5acd4bf-ade7-49f7-8a9c-8b42df10b7a3
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'UTs LB Objetivo' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] ="Línea Base Objetivo Uts")
+		formatString: 0
+		lineageTag: 8754b62b-23b8-4e5e-9e33-e3e90376efe7
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure '€ Evolutivos' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] ="Consumo Real")
+		lineageTag: b3b10537-be89-42f5-82f4-6f3fbaa9b09a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '€ Peticiones' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Peticiones", 'BI_Aplicación'[Atributo] ="Consumo Real")
+		lineageTag: d1a135d9-21d5-410d-b4b3-ceff46fd787f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '€ LB Actual' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] ="Línea Base Actual")
+		lineageTag: 8c122d74-6db3-4086-b061-290e84384027
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '€ LB Objetivo' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] ="Línea Base Objetivo")
+		lineageTag: 7f802c84-2c4e-4ff2-a66c-b236d9dea58e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '€ LB Maxima' = CALCULATE(SUM('BI_Aplicación'[Valor]), 'BI_Aplicación'[Descripción Ámbito] = "Evolutivos", 'BI_Aplicación'[Atributo] ="Línea Base Máxima")
+		lineageTag: 36d175b9-17fd-4bff-bb45-3c101e7225c9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Servicio TIC'
+		dataType: string
+		lineageTag: c5f13d3c-4ff9-40ee-8b51-446d073f3bc8
+		summarizeBy: none
+		sourceColumn: Servicio TIC
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ámbito
+		dataType: string
+		lineageTag: 63f77414-6dd5-4a92-a155-8007ec45a7bf
+		summarizeBy: none
+		sourceColumn: Ámbito
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción Ámbito'
+		dataType: string
+		lineageTag: ac01ddd4-2585-4f13-b0b9-df6a159f1931
+		summarizeBy: none
+		sourceColumn: Descripción Ámbito
+
+		annotation SummarizationSetBy = Automatic
+
+	column Área
+		dataType: string
+		lineageTag: 5a165c91-f58d-47da-ad0e-8808ba6e5c48
+		summarizeBy: none
+		sourceColumn: Área
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubÁrea
+		dataType: string
+		lineageTag: 8153b65d-e36a-49f0-86f6-378edae7d7d0
+		summarizeBy: none
+		sourceColumn: SubÁrea
+
+		annotation SummarizationSetBy = Automatic
+
+	column Aplicación
+		dataType: string
+		lineageTag: 4427d94e-aec5-4976-8974-a863a004d475
+		summarizeBy: none
+		sourceColumn: Aplicación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Periodo
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: da5cb2be-4366-445c-94e3-195fd8256d2c
+		summarizeBy: none
+		sourceColumn: Periodo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Atributo
+		dataType: string
+		lineageTag: eac06537-78fd-4a79-9721-c4d152b84d63
+		summarizeBy: none
+		sourceColumn: Atributo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Valor
+		dataType: double
+		lineageTag: 8302b523-605a-4088-bd3a-b8347092f2f3
+		summarizeBy: sum
+		sourceColumn: Valor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Atributo - Leyenda'
+		dataType: string
+		lineageTag: 3170687e-1d40-48df-a158-29bb3b4fda0a
+		summarizeBy: none
+		sourceColumn: Atributo - Leyenda
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden_Leyenda
+		dataType: double
+		lineageTag: 801948ff-c437-47ff-822b-94682d325f9e
+		summarizeBy: sum
+		sourceColumn: Orden_Leyenda
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Mes = MONTH('BI_Aplicación'[Periodo])
+		formatString: 0
+		lineageTag: f0e7653b-54dc-401e-8968-54c1c3a38a7a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition BI_Aplicación = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(#"LBEnergia (3)" & "Líneas Base Energía v0.2 - Nuevos Presupuestos.xlsx"), null, true),
+				    BI_Aplicación_Sheet = Origen{[Item="BI_Aplicación",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(BI_Aplicación_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Servicio TIC", type text}, {"Ámbito", type text}, {"Descripción Ámbito", type text}, {"Área", type text}, {"SubÁrea", type text}, {"Aplicación", type text}, {"Línea Base Real", type number}, {"Línea Base Proyectada", type number}, {"Línea Base Real Uts", type number}, {"Línea Base Proyectada Uts", type number}, {"Periodo", type date}, {"Tarifa", Int64.Type}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado",{"Tarifa"}),
+				    #"Tipo cambiado3" = Table.TransformColumnTypes(#"Columnas quitadas",{{"Línea Base Real", type number}, {"Línea Base Proyectada", type number}, {"Presupuesto", type number}}),
+				    #"Valor reemplazado6" = Table.ReplaceValue(#"Tipo cambiado3",null,0,Replacer.ReplaceValue,{"Línea Base Objetivo"}),
+				    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6",null,0,Replacer.ReplaceValue,{"Línea Base Actual"}),
+				    #"Columna de anulación de dinamización" = Table.UnpivotOtherColumns(#"Valor reemplazado7", {"Servicio TIC", "Ámbito", "Descripción Ámbito", "Área", "SubÁrea", "Aplicación", "Periodo"}, "Atributo", "Valor"),
+				    #"Tipo cambiado2" = Table.TransformColumnTypes(#"Columna de anulación de dinamización",{{"Valor", type number}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado2","Línea Base Real Uts","Consumo Real Uts",Replacer.ReplaceText,{"Atributo"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Línea Base Real","Consumo Real",Replacer.ReplaceText,{"Atributo"}),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Valor reemplazado1",{{"Valor", type number}}),
+				    #"Columna duplicada" = Table.DuplicateColumn(#"Tipo cambiado1", "Atributo", "Atributo - Copia"),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columna duplicada",{{"Atributo - Copia", "Atributo - Leyenda"}}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Columnas con nombre cambiado","Línea Base Objetivo Uts","Fijo Correctivo Horas",Replacer.ReplaceText,{"Atributo - Leyenda"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado2","Línea Base Objetivo","Fijo Correctivo",Replacer.ReplaceText,{"Atributo - Leyenda"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado4","Consumo Real Uts","Gasto Correctivo Hipotético Horas",Replacer.ReplaceText,{"Atributo - Leyenda"}),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado3","Consumo Real","Gasto Correctivo Hipotético",Replacer.ReplaceText,{"Atributo - Leyenda"}),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Valor reemplazado5", "Orden_Leyenda", each if [Atributo] = "Línea Base Objetivo" then 1 else if [Atributo] = "Línea Base Actual" then 2 else if [Atributo] = "Línea Base Máxima" then 3 else if [Atributo] = "Consumo Real" then 4 else if [Atributo] = "Línea Base Objetivo Uts" then 5 else if [Atributo] = "Línea Base Actual Uts" then 6 else if [Atributo] = "Línea Base Máxima Uts" then 7 else if [Atributo] = "Consumo Real Uts" then 8 else if [Atributo] = "Presupuesto" then 9 else null, type number)
+				in
+				    #"Columna condicional agregada"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

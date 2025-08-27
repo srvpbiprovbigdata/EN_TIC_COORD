@@ -1,0 +1,75 @@
+table 'Parametros KGI13_E'
+	excludeFromModelRefresh
+	lineageTag: 3379dcdf-d68c-4b82-935a-4ad47c9de1ac
+
+	column 'Prioridad '
+		dataType: string
+		lineageTag: 40716808-90d1-427a-a86b-8f2f65f594fa
+		summarizeBy: none
+		sourceColumn: "Prioridad "
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI13'
+		dataType: int64
+		formatString: 0
+		lineageTag: 52d42bbd-fe7c-491a-a416-22ebdc1ed1e4
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI13
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 837b3345-7554-407a-a745-2c51faedde98
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cumplimiento Objetivo %'
+		dataType: double
+		lineageTag: 95055b9e-e988-4aea-a8b3-477b7fec1ea2
+		summarizeBy: sum
+		sourceColumn: Cumplimiento Objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Tasa máxima permitida %'
+		dataType: double
+		lineageTag: 078fd96a-3e8d-4f13-8c91-19d929ef8ebd
+		summarizeBy: sum
+		sourceColumn: Tasa máxima permitida %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Peso del KGI %'
+		dataType: double
+		lineageTag: 3e2669cc-155c-40d2-9dfe-45001427f9ef
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Parametros KGI13_E-527c0736-f334-49f9-95fb-a3a2c4ab5dde' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & kgi & xlsx), null, true),
+				    #"P_KGI13_Sheet" = Source{[Item="P_KGI13",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"P_KGI13_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Prioridad ", type text}, {"Tasa máxima permitida %", type number}, {"Cumplimiento Objetivo %", type number}, {"Peso del KGI %", type number}, {"Puntos de KGI13", Int64.Type}, {"KGI", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,25 @@
+table MenuLB
+	lineageTag: 75b6d84e-d266-4a6d-ae6f-cd6a21512f1a
+
+	column Menu
+		dataType: string
+		lineageTag: 0691ee51-adee-4533-83df-2f46670f7bbd
+		summarizeBy: none
+		sourceColumn: Menu
+
+		annotation SummarizationSetBy = Automatic
+
+	partition MenuLB-aac218da-d4e4-482c-82f5-08f823536119 = m
+		mode: import
+		queryGroup: 'LB Energía'
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45W8jm8Ni81UcEpsThVIbSkWMG1LD+ntCSzLL9YKVYHU9o5v6goNRkqHwsA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Menu = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Menu", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

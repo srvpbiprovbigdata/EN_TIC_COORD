@@ -1,0 +1,59 @@
+table Lote_Aplicacion_relacion
+	lineageTag: c66edb7c-6d3a-4faa-aabb-347c0b8b0c65
+
+	column 'Aplicación de negocio'
+		dataType: string
+		lineageTag: a68cea5b-861f-4109-a77d-a4a0a8d8b1ef
+		summarizeBy: none
+		sourceColumn: Aplicación de negocio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Lote
+		dataType: string
+		lineageTag: d9fc8ceb-072d-4c19-85e4-af58a9733e2b
+		summarizeBy: none
+		sourceColumn: Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de Asignación'
+		dataType: string
+		lineageTag: 7115ef56-47c3-4a12-a752-05c8e432195c
+		summarizeBy: none
+		sourceColumn: Grupo de Asignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lote Nombre Pequeño'
+		dataType: string
+		lineageTag: cf412dd3-fa96-4f45-be9c-dcd9a7215194
+		summarizeBy: none
+		sourceColumn: Lote Nombre Pequeño
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo Asignación Estimaciones'
+		dataType: string
+		lineageTag: 86f6bdc9-72dc-4da5-ae56-2789ac9be0f1
+		summarizeBy: none
+		sourceColumn: Grupo Asignación Estimaciones
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Lote_Aplicacion_relacion-257de8cc-36cf-4551-9b8d-6ff6bc24c8a5 = m
+		mode: import
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & lotes & xlsx), null, true),
+				    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data],
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Hoja1_Sheet,{{"Column1", type text}, {"Column2", type text}}),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Tipo cambiado", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Aplicación de negocio", type text}, {"Lote", type text}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

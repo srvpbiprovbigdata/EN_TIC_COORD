@@ -1,0 +1,51 @@
+table 'PRO - Jira - Entregables con SLA - Incumplidos Sin Lote'
+	lineageTag: dec84aa2-ba80-4dab-b699-5ae5d27358d8
+
+	column 'Resolved - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a290eedc-909c-4234-a92c-7f068f03bc8d
+		summarizeBy: none
+		sourceColumn: Resolved - Copy
+
+		variation Variación
+			isDefault
+			relationship: 874fc981-0b96-41ca-8076-a839e1ba6020
+			defaultHierarchy: LocalDateTable_23b39fbf-81c3-4e05-8f0c-46e63e07db7d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Tipo
+		dataType: string
+		lineageTag: 764dd381-4521-425d-b8b0-75618059dbb6
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Rechazados'
+		dataType: int64
+		formatString: 0
+		lineageTag: d0bd8a2d-377c-4d5d-b99e-c4c1a663a7a6
+		summarizeBy: sum
+		sourceColumn: Total Rechazados
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Jira - Entregables con SLA - Incumplidos Sin Lote-4e2be397-959b-48dd-8ac8-22709df3f103' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Origen = #"PRO - Jira - Entregables con SLA",
+				    #"Filas filtradas" = Table.SelectRows(Origen, each [Rechazado] = true),
+				    #"Filas agrupadas" = Table.Group(#"Filas filtradas", {"Resolved - Copy", "Tipo"}, {{"Total Rechazados", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Filas agrupadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,86 @@
+table 'Línea Base BI'
+	lineageTag: 39371e16-bf53-48c3-8bcf-0554be820df5
+
+	column 'Servicio TIC'
+		dataType: string
+		lineageTag: 31706621-c102-4f66-92a0-d7695ee393aa
+		summarizeBy: none
+		sourceColumn: Servicio TIC
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ámbito
+		dataType: string
+		lineageTag: fc757bb5-752e-4968-b083-f8a402f09471
+		summarizeBy: none
+		sourceColumn: Ámbito
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Descripción Ámbito'
+		dataType: string
+		lineageTag: 61f31429-2973-43c9-a9a6-2a79db952f5e
+		summarizeBy: none
+		sourceColumn: Descripción Ámbito
+
+		annotation SummarizationSetBy = Automatic
+
+	column Periodo
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 766a54e0-93d3-4247-8ba1-53c26842a0e8
+		summarizeBy: none
+		sourceColumn: Periodo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Atributo
+		dataType: string
+		lineageTag: 03212419-4d82-44f3-a3f4-52e99c8933b5
+		summarizeBy: none
+		sourceColumn: Atributo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Valor
+		dataType: double
+		lineageTag: ebf0b76c-99ad-4a18-b3f9-0388c3a6d809
+		summarizeBy: sum
+		sourceColumn: Valor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column UTs/Euros
+		dataType: string
+		lineageTag: 8cabc373-2d88-4992-b50e-ddbfa329998b
+		summarizeBy: none
+		sourceColumn: UTs/Euros
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Línea Base BI' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(#"LBEnergia (2)" & "Líneas Base Energía v0.2.xlsx"), null, true),
+				    BI_Sheet = Origen{[Item="BI",Kind="Sheet"]}[Data],
+				    #"Columnas quitadas1" = Table.RemoveColumns(BI_Sheet,{"Column16", "Column17"}),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Columnas quitadas1", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Servicio TIC", type text}, {"Ámbito", type text}, {"Descripción Ámbito", type text}, {"Línea Base Objetivo", type any}, {"Línea Base Actual", type any}, {"Línea Base Máxima", type any}, {"Línea Base Real", type any}, {"Línea Base Proyectada", type any}, {"Línea Base Objetivo Uts", Int64.Type}, {"Línea Base Actual Uts", Int64.Type}, {"Línea Base Máxima Uts", Int64.Type}, {"Línea Base Real Uts", type any}, {"Línea Base Proyectada Uts", type any}, {"Periodo", type date}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado",{"Tarifa"}),
+				    #"Columna de anulación de dinamización" = Table.UnpivotOtherColumns(#"Columnas quitadas", {"Servicio TIC", "Ámbito", "Descripción Ámbito", "Periodo"}, "Atributo", "Valor"),
+				    #"Columna condicional agregada" = Table.AddColumn(#"Columna de anulación de dinamización", "UTs/Euros", each if Text.Contains([Atributo], "Uts") then "Linea BaseUTs" else "Linea Base Financiera"),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Columna condicional agregada",{{"Valor", type number}}),
+				    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado1", each ([Descripción Ámbito] = "Correctivos") and ([Atributo] = "Línea Base Real"))
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

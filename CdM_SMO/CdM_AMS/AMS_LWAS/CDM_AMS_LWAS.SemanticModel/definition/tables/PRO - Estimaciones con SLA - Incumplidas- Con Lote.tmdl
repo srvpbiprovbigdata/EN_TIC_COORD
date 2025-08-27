@@ -1,0 +1,70 @@
+table 'PRO - Estimaciones con SLA - Incumplidas- Con Lote'
+	lineageTag: ca9ddb0d-bcae-4dd0-aad1-ef6552b56f9f
+
+	column Prioridad
+		dataType: string
+		lineageTag: c4664f18-e904-4760-bb38-7f9577009180
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Start of Month'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 1f81b7a8-5fb8-41a5-9ca2-ee552abe31b1
+		summarizeBy: none
+		sourceColumn: Start of Month
+
+		variation Variation
+			isDefault
+			relationship: f17eae2f-8964-4045-9588-52255c5fad8c
+			defaultHierarchy: LocalDateTable_6b2e9b59-6630-4ec4-8cb0-2dc994965a42.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Infringido
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 481758dc-fb46-4d91-b48c-9cb071c293dc
+		summarizeBy: none
+		sourceColumn: Infringido
+
+		annotation SummarizationSetBy = Automatic
+
+	column Count
+		dataType: int64
+		lineageTag: 6071eb8f-0e7b-4f3a-aada-8807bf7a5ff5
+		summarizeBy: sum
+		sourceColumn: Count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Lote
+		dataType: string
+		lineageTag: df3c6fe6-336f-43f9-9672-71d996e060f6
+		summarizeBy: none
+		sourceColumn: Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Estimaciones con SLA - Incumplidas- Con Lote-75432853-b8a0-4e25-8f03-2fac6963c72f' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Source = #"PRO - Estimaciones con SLA",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Start of Month", "Infringido", "Lote"}, {{"Count", each Table.RowCount(_), Int64.Type}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Grouped Rows", each ([Infringido] <> false))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

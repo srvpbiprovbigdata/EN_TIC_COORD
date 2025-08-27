@@ -1,0 +1,73 @@
+table Fechas
+	lineageTag: 14656ba7-994f-456e-8953-47e40f08b098
+
+	column Date
+		formatString: dd/mm/yyyy
+		lineageTag: 4f2d7551-7db0-451d-a9b6-e440cbf6e01a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variación
+			isDefault
+			relationship: 91e000e9-5ef3-450d-8343-2a7c1786f30b
+			defaultHierarchy: LocalDateTable_d5c25d21-96d4-493e-9076-32f6ddb73cc4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column MesNombreCorto = REPLACE(LEFT(Fechas[Date].[Mes],3),1,1,UPPER(LEFT(Fechas[Date].[Mes],1)))
+		lineageTag: 4902b088-a821-42aa-995b-fe7a2f13be6c
+		summarizeBy: none
+		sortByColumn: MesNumero
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNumero = Fechas[Date].[NroMes]
+		formatString: 0
+		lineageTag: 786570ea-b9d0-491d-b929-d8194a62f9af
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_1er_día_mes = STARTOFMONTH(Fechas[Date])
+		formatString: General Date
+		lineageTag: 7bc9961e-bdb0-42d0-a1b7-33f7cacae162
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNombreComp = UPPER(LEFT(FORMAT(Fechas[Date],"MMMM"),10))
+		lineageTag: e3865bf6-74b3-4cdf-950c-8711e9e43dbd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Actual = IF( Fechas[Date]<TODAY(),1)
+		formatString: 0
+		lineageTag: b33aa740-b0e4-4b21-ab00-7355ebe44400
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Service_P = IF(Fechas[Date]>=DATE(2021,06,01) && Fechas[Date]<TODAY(),1,0)
+		formatString: 0
+		lineageTag: 56bf3d63-f5f8-463d-ba5b-ee0c20f98d1a
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año = YEAR([Date_1er_día_mes])
+		formatString: 0
+		lineageTag: ac80035b-f821-410d-b2d7-3831521eeeb5
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fechas-4d255649-a49d-4b3d-844c-89f20bea1cd2 = calculated
+		mode: import
+		source = CALENDAR(DATE(2020,01,01),MAX('PRO - Incidencias con SLA_P_y_A_Abiertas'[Cerrado]))
+

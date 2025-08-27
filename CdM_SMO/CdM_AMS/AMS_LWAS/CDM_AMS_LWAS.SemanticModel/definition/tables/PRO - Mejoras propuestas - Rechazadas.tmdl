@@ -1,0 +1,52 @@
+table 'PRO - Mejoras propuestas - Rechazadas'
+	lineageTag: a27a5041-0a19-448b-9778-b257ce6aee4a
+
+	column 'Estado de Aprobación'
+		dataType: string
+		lineageTag: e63f2f88-4b97-498f-b61e-dfca8ce63046
+		summarizeBy: none
+		sourceColumn: Estado de Aprobación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Propuestas rechazadas'
+		dataType: double
+		lineageTag: 333678a2-1771-4ad0-8204-7aac1045bb56
+		summarizeBy: sum
+		sourceColumn: Propuestas rechazadas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Fecha de Medición KGI'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 017e8cfb-d349-41ad-b32f-4f82db1f1bb5
+		summarizeBy: none
+		sourceColumn: Fecha de Medición KGI
+
+		variation Variation
+			isDefault
+			relationship: 892c2d1e-1bdc-41b0-a7cd-4caa1b803a98
+			defaultHierarchy: LocalDateTable_45f702e7-e398-4748-88f3-5dce52068dec.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'PRO - Mejoras propuestas - Rechazadas-e5512418-ee21-44c0-8f11-b9c58103eb52' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Source = #"PRO - Mejoras propuestas",
+				    #"Grouped Rows" = Table.Group(Source, {"Fecha de Medición KGI", "Estado de Aprobación"}, {{"Propuestas rechazadas", each Table.RowCount(_), type number}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Grouped Rows", each ([Estado de Aprobación] = "2 - Rechazada"))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

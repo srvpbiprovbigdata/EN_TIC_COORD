@@ -1,0 +1,141 @@
+table 'KGI_I_Mejoras propuestas'
+	lineageTag: dcc356e9-a098-4828-ac8c-66ff764e515a
+
+	column Demanda
+		dataType: string
+		lineageTag: 653c167f-467c-45c2-b608-82672e68d9dc
+		summarizeBy: none
+		sourceColumn: Demanda
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nombre
+		dataType: string
+		lineageTag: 3cba6583-4724-4052-828e-caffedb3442b
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: 148ac829-cc6b-43dd-96cc-8222a0a3dd81
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		annotation SummarizationSetBy = Automatic
+
+	column Responsable
+		dataType: string
+		lineageTag: 7cfab318-914b-42d2-9f18-b02f9e0e8aa1
+		summarizeBy: none
+		sourceColumn: Responsable
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado de Aprobación'
+		dataType: string
+		lineageTag: cf84e034-9168-4302-8adf-7db007c06507
+		summarizeBy: none
+		sourceColumn: Estado de Aprobación
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Medición KGI'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 85a5cb37-bfb0-400c-afcd-784e6fbc1889
+		summarizeBy: none
+		sourceColumn: Fecha de Medición KGI
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Fecha de Aprobación / Rechazo'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 40135fa6-73d7-449b-86ac-d8c991462536
+		summarizeBy: none
+		sourceColumn: Fecha de Aprobación / Rechazo
+
+		variation Variación
+			isDefault
+			relationship: 59bb332a-d4d5-49be-ad4e-337beec93979
+			defaultHierarchy: LocalDateTable_ff060343-e9eb-40fc-9ca4-22c5bb732972.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Comentarios
+		dataType: string
+		lineageTag: 95802708-d250-40ed-a486-5e776b596e60
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trimestre
+		dataType: string
+		lineageTag: 0f2889f4-4416-4b7d-8910-b31174193184
+		summarizeBy: none
+		sourceColumn: Trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: b9f1c854-54ad-40bb-a34f-b198777280c2
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'T_Alegaciones.Alegacion_aceptada'
+		dataType: string
+		lineageTag: 2384e21a-f870-4c7b-9755-11d5c866c2f5
+		summarizeBy: none
+		sourceColumn: T_Alegaciones.Alegacion_aceptada
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID_KGI_1.6'
+		dataType: string
+		lineageTag: 2954bd20-7db9-443d-8890-daadbbb4864c
+		summarizeBy: none
+		sourceColumn: ID_KGI_1.6
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'KGI_I_Mejoras propuestas-9cd5f897-ff6f-4848-80ff-b73206f7159f' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source = ```
+				let
+				    Origen = #"KGI_I_Mejoras propuestas (stagging)",
+				     #"Consulta anexada" = Table.Combine({Origen, T_Mejoras}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Consulta anexada",{{"ID", type text}, {"Nombre", type text}, {"Descripción", type text}, {"Responsable", type text}, {"Estado de Aprobación", type text}, {"Fecha de Aprobación / Rechazo", type date}, {"Estado", type text}, {"Fecha de Cierre", type date}, {"Comentarios", type text}}),
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Changed Type", "Fecha de Aprobación / Rechazo", "Fecha de Aprobación / Rechazo - Copy"),
+				    #"Calculated End of Quarter" = Table.TransformColumns(#"Duplicated Column",{{"Fecha de Aprobación / Rechazo - Copy", Date.EndOfQuarter, type date}}),
+				
+				    #"Renamed Columns" = Table.RenameColumns(#"Calculated End of Quarter",{{"Fecha de Aprobación / Rechazo - Copy", "Fecha de Aprobacion / Rechazo - Copy"}}),
+				    
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Fecha de Medición KGI", each Date.AddDays([#"Fecha de Aprobacion / Rechazo - Copy"],1)),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Fecha de Medición KGI", type date}}),
+				    #"Removed Blank Rows" = Table.SelectRows(#"Changed Type1", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+				    #"Otras columnas quitadas" = Table.SelectColumns(#"Removed Blank Rows",{"Estado de Aprobación", "Fecha de Medición KGI", "ID", "Nombre", "Descripción", "Responsable", "Fecha de Aprobación / Rechazo", "Comentarios", "Estado"}),
+				    #"Columnas reordenadas" = Table.ReorderColumns(#"Otras columnas quitadas",{"ID", "Nombre", "Descripción", "Responsable", "Estado de Aprobación", "Fecha de Medición KGI", "Fecha de Aprobación / Rechazo", "Comentarios"}),
+				    #"Added Quarter" = Table.AddColumn(#"Columnas reordenadas", "Trimestre", each Date.QuarterOfYear([#"Fecha de Aprobación / Rechazo"])),
+				    #"Personalizada agregada" = Table.AddColumn(#"Added Quarter", "ID_KGI_1.6", each "1-6-0-0"),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Personalizada agregada", {"ID"}, T_Alegaciones_Resumen, {"ID"}, "T_Alegaciones", JoinKind.LeftOuter),
+				    #"Se expandió T_Alegaciones" = Table.ExpandTableColumn(#"Consultas combinadas", "T_Alegaciones", {"Alegacion_aceptada"}, {"T_Alegaciones.Alegacion_aceptada"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió T_Alegaciones",{{"ID", "Demanda"}})
+				in
+				    #"Columnas con nombre cambiado"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

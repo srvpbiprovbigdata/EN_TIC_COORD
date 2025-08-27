@@ -1,0 +1,59 @@
+table Evolutivos-Incidencias-Evolutivos
+	lineageTag: 6e83e330-cd69-448b-887a-f870d7a78122
+
+	column Prioridad
+		dataType: string
+		lineageTag: d21c04a6-02d6-4700-9e58-ab95464f54a6
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 34ad8e38-3a2a-4022-8b74-db935f233218
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		variation Variación
+			isDefault
+			relationship: fce07ebf-9a08-440c-978a-dc50cf39c6a2
+			defaultHierarchy: LocalDateTable_c1743bdd-ceab-44c4-9406-347e075f91f8.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Lote
+		dataType: string
+		lineageTag: b99ed99e-9ca1-4fa4-81cf-42af643c1111
+		summarizeBy: none
+		sourceColumn: Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: a2740103-ea7b-420d-a7e1-981aff7be2fe
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Evolutivos-Incidencias-Evolutivos-721810c8-e089-4383-a415-4b88b392f550 = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Origen = #"PRO - Planificaciones PRJ y ENH con SLA_M - Relación Incidencias",
+				    #"Filas filtradas" = Table.SelectRows(Origen, each Text.StartsWith([Tipo de Servicio], "Mtto")),
+				    #"Filas agrupadas" = Table.Group(#"Filas filtradas", {"Prioridad", "Fecha fin real - Copy", "Lote"}, {{"Recuento", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Filas agrupadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

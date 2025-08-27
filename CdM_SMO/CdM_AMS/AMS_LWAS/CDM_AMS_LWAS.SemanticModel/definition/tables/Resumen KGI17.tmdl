@@ -1,0 +1,132 @@
+table 'Resumen KGI17'
+	lineageTag: b5d5a4bb-3b9c-4616-8b16-e887c8b5f7b6
+
+	column 'Total Propuestas'
+		dataType: double
+		formatString: 0
+		lineageTag: 574fc5b7-c0a8-4613-808e-8fa7527b9d39
+		summarizeBy: sum
+		sourceColumn: Total Propuestas
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: d7b418a6-3d1e-4597-aae1-fe16749119f9
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Propuestas rechazadas'
+		dataType: double
+		formatString: 0
+		lineageTag: ed11418b-e7d1-48a2-ac1e-403369c25ec0
+		summarizeBy: sum
+		sourceColumn: Propuestas rechazadas
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa real %' = ('Resumen KGI17'[Total Propuestas]-'Resumen KGI17'[Propuestas rechazadas])/'Resumen KGI17'[Total Propuestas]
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: a54819d8-2360-4a02-a534-95c6f31ee302
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha de Medición KGI'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 605570cd-99f2-4100-938b-37fd41c4c6f0
+		summarizeBy: none
+		sourceColumn: Fecha de Medición KGI
+
+		variation Variation
+			isDefault
+			relationship: 8818f00d-a545-437e-b0d0-04f7c8b2eae9
+			defaultHierarchy: LocalDateTable_160de622-d32f-4e8e-8612-4a91b7285907.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ¿Cumple? = IF('Resumen KGI17'[Total Propuestas]>3,IF('Resumen KGI17'[Tasa real %]>='Resumen KGI17'[Tasa de aprobación objetivo %],"Sí","No"),"No")
+		lineageTag: 05fe8b48-f740-4c68-9c65-feb09c50d25b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de aprobación objetivo %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 965ef1ab-a8c3-4fac-a7a6-c012358bae87
+		summarizeBy: sum
+		sourceColumn: Tasa de aprobación objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mínimo de propuestas por trimestre'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6dfa2bcd-08d6-40d9-9bdc-21477f95e7b8
+		summarizeBy: sum
+		sourceColumn: Mínimo de propuestas por trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 79227c42-fe10-41b9-b99f-6cb9401e707a
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI17'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0295ae06-e5d6-4fe5-8a3f-334059f4ef6d
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI17
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso Obtenido %' = IF('Resumen KGI17'[¿Cumple?]="Sí",'Resumen KGI17'[Peso del KGI %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: e1e3f8cf-6355-4112-b2bf-70b387de3bb7
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso No Obtenido %' = IF('Resumen KGI17'[¿Cumple?]="No",'Resumen KGI17'[Peso del KGI %],0)
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: aa94ee86-de89-4b21-917c-6034e86ba985
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Resumen KGI17-9b1210f8-1db9-4268-934b-6cbbe3e16d76' = m
+		mode: import
+		queryGroup: Resumen
+		source =
+				let
+				    Source = #"PRO - Mejoras propuestas",
+				    #"Grouped Rows" = Table.Group(Source, {"Fecha de Medición KGI"}, {{"Total Propuestas", each Table.RowCount(_), type number}}),
+				
+				    #"Merged Queries" = Table.NestedJoin(#"Grouped Rows", {"Fecha de Medición KGI"}, #"PRO - Mejoras propuestas - Rechazadas", {"Fecha de Medición KGI"}, "PRO - Mejoras propuestas - Rechazadas", JoinKind.LeftOuter),
+				    #"Expanded PRO - Mejoras propuestas - Rechazadas" = Table.ExpandTableColumn(#"Merged Queries", "PRO - Mejoras propuestas - Rechazadas", {"Propuestas rechazadas"}, {"Propuestas rechazadas"}),
+				
+				    //Crear Columna para relacionar tabla de parámetros
+				    #"Added Custom" = Table.AddColumn(#"Expanded PRO - Mejoras propuestas - Rechazadas", "KGI", each "KGI1-7"),
+				
+				    #"Merged Queries1" = Table.NestedJoin(#"Added Custom", {"KGI"}, #"Parametros KGI17_E", {"KGI"}, "Parametros KGI17", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI17" = Table.ExpandTableColumn(#"Merged Queries1", "Parametros KGI17", {"Tasa de aprobación objetivo %", "No. Mínimo de propuestas por trimestre", "Peso del KGI %", "Puntos de KGI17"}, {"Tasa de aprobación objetivo %", "Mínimo de propuestas por trimestre", "Peso del KGI %", "Puntos de KGI17"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Expanded Parametros KGI17",null,#date(2100, 1, 1),Replacer.ReplaceValue,{"Fecha de Medición KGI"})
+				in
+				    #"Valor reemplazado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

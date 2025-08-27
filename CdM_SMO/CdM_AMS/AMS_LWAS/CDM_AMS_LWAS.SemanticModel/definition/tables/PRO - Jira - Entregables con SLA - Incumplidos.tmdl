@@ -1,0 +1,67 @@
+table 'PRO - Jira - Entregables con SLA - Incumplidos'
+	lineageTag: da644a5a-76ef-4542-b0ef-6e7c7118af6b
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f0f9c07f-e579-45fa-b241-99b38678b99e
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		variation Variation
+			isDefault
+			relationship: dc9228cc-d374-4326-aac4-07cb9d63999f
+			defaultHierarchy: LocalDateTable_f6d77335-acaf-468e-b12d-d59934b39afe.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Tipo
+		dataType: string
+		lineageTag: b6875a37-1d9a-4658-b135-1ea56fea88bd
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Rechazados'
+		dataType: int64
+		lineageTag: 7a8fd7c2-5923-4c99-b79f-51477ab3816b
+		summarizeBy: sum
+		sourceColumn: Total Rechazados
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Lote
+		dataType: string
+		lineageTag: 81f54d1c-7504-4f69-850d-5109766f7a1b
+		summarizeBy: none
+		sourceColumn: Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Jira - Entregables con SLA - Incumplidos-7403e0b2-ead3-4737-a9d2-0edf4a4c269e' = m
+		mode: import
+		queryGroup: KGIs_I
+		source = ```
+				let
+				    Source = #"PRO - Jira - Entregables con SLA",
+				
+				    #"Renamed Columns" = Table.RenameColumns(Source,{{"Resolved - Copy", "Cerrado - Copy"}}),
+				   
+				    //Filtra solamente por los entregables que han sido rechazados
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Rechazado] = true)),
+				
+				    //Agrupa el total de entregables rechazados por mes y tipo de gravedad
+				    #"Grouped Rows" = Table.Group(#"Filtered Rows", {"Cerrado - Copy", "Tipo", "Lote"}, {{"Total Rechazados", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Grouped Rows"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

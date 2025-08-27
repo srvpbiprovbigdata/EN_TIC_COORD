@@ -1,0 +1,118 @@
+table 'Resumen KGI13_1_Críticas/Altas'
+	lineageTag: 0ff42d64-1ed6-4f89-9ba5-e2b196536c75
+
+	measure 'Puntos de KGI13_M_A' =
+			
+			var _KGI13_V = MIN('Resumen KGI13_1_Críticas/Altas'[Puntos de KGI13])
+			return
+			IF(ISBLANK(_KGI13_V),15,_KGI13_V)
+		formatString: 0
+		lineageTag: a3633f8f-6d3d-4e14-a298-15192fc86039
+
+	column Prioridad
+		dataType: string
+		lineageTag: ba2da6a7-90f2-4baa-99ca-e51210a2fbd8
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Incidencias'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6329849a-d910-4e48-99eb-1cd4fdec07b0
+		summarizeBy: none
+		sourceColumn: Total Incidencias
+
+		annotation SummarizationSetBy = User
+
+	column 'Tasa máxima permitida %'
+		dataType: double
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: a6b66c08-101a-42a9-a0ab-bfff40495c60
+		summarizeBy: sum
+		sourceColumn: Tasa máxima permitida %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 999d7abe-e59c-419b-b84e-068598900e11
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI13'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2db4a10b-05df-46af-9da2-0edca00ab65d
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI13
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: a2d1e3b3-44ff-4f98-9036-ac9719fb3664
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = [KGI13_P1 ¿Cumple?_M]
+		lineageTag: 4c5f2239-0465-44d2-a168-6f6c0f270ea6
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lote_Aplicación_relación.Lote'
+		dataType: string
+		lineageTag: ee072459-2a66-44ee-aa6b-b5d65b666ea9
+		summarizeBy: none
+		sourceColumn: Lote_Aplicación_relación.Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierta - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 19f5e89c-cc09-4617-8609-c865da488c21
+		summarizeBy: none
+		sourceColumn: Abierta - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'Resumen KGI13_1_Críticas/Altas-ab21f325-a94e-4538-a98a-fdbe6a03b45b' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A_Abiertas",
+				
+				    //Total Incidencias Abiertas por Prioridad
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Abierta - Copy", "Lote_Aplicación_relación.Lote"}, {{"Total Incidencias", each Table.RowCount(_), Int64.Type}}),
+				
+				      //Homologa las prioridades
+				    #"AllReplace" = [#"1 - Crítica" = "Alta", #"2 - Alta" = "Alta", #"3 - Moderada" = "Media",#"4 - Baja" = "Baja",#"5 - Muy Baja" = "Baja",#"Crítica" = "Alta"],    
+				    #"Replaced Value" = Table.TransformColumns(#"Grouped Rows",{{"Prioridad",each Record.FieldOrDefault(AllReplace,_,_)}}),
+				
+				    //Unir Tabla de Parámetros
+				    #"Merged Queries" = Table.NestedJoin( #"Replaced Value", {"Prioridad"}, #"Parametros KGI13_E", {"Prioridad "}, "Parametros KGI1-3 (2)", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI1-3" = Table.ExpandTableColumn(#"Merged Queries", "Parametros KGI1-3 (2)", {"Tasa máxima permitida %", "Peso del KGI %", "Puntos de KGI13", "KGI"}, {"Parametros KGI1-3 (2).Tasa máxima permitida %", "Parametros KGI1-3 (2).Peso del KGI %", "Parametros KGI1-3 (2).Puntos de KGI13", "Parametros KGI1-3 (2).KGI"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded Parametros KGI1-3",{{"Parametros KGI1-3 (2).Tasa máxima permitida %", "Tasa máxima permitida %"}, {"Parametros KGI1-3 (2).Peso del KGI %", "Peso del KGI %"}, {"Parametros KGI1-3 (2).Puntos de KGI13", "Puntos de KGI13"}, {"Parametros KGI1-3 (2).KGI", "KGI"}}),
+				
+				    //Filtro por "Altas"
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Prioridad] = "Alta")),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows",{{"Tasa máxima permitida %", Percentage.Type}, {"Peso del KGI %", Percentage.Type}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

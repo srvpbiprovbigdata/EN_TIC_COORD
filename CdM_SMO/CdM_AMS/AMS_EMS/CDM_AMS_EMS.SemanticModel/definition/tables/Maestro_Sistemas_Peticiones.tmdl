@@ -1,0 +1,27 @@
+table Maestro_Sistemas_Peticiones
+	lineageTag: 054c9641-d953-4e3f-9341-70cc71e54cb7
+
+	column Column1
+		dataType: string
+		lineageTag: 9cf7cf5e-3a90-4e32-b297-4fd8cbbdb08c
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Maestro_Sistemas_Peticiones-6a800269-4a84-41d9-a3ad-1b5d0adeaf43 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = KGI_III_Peticiones_Actuales_Histórico,
+				    Nombre1 = Origen[Nombre],
+				    #"Duplicados quitados" = List.Distinct(Nombre1),
+				    #"Convertida en tabla" = Table.FromList(#"Duplicados quitados", Splitter.SplitByNothing(), null, null, ExtraValues.Error)
+				in
+				    #"Convertida en tabla"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

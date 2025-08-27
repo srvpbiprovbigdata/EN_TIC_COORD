@@ -1,0 +1,51 @@
+table 'PRO - Estimaciones con SLA - Incumplidas- Sin Lote'
+	lineageTag: e902dd17-4c14-4c54-91cd-bda90e9f7f8b
+
+	column 'Start of Month'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fd597f90-8101-445c-bf47-a909fd966d90
+		summarizeBy: none
+		sourceColumn: Start of Month
+
+		variation Variación
+			isDefault
+			relationship: 01b2ba74-f8a8-493b-b581-83b35948b832
+			defaultHierarchy: LocalDateTable_e0ce99c2-11d8-4245-a921-9c08cb741456.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Prioridad
+		dataType: string
+		lineageTag: 092969af-6e1c-495c-b85c-4d00e7d6b8b8
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: 28a6f304-9688-4125-bd7b-8e4aaa2a7857
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Estimaciones con SLA - Incumplidas- Sin Lote-5f7aa124-bce5-4043-a703-c908f45a5845' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Origen = #"PRO - Estimaciones con SLA",
+				    #"Filas filtradas" = Table.SelectRows(Origen, each ([Infringido] = true)),
+				    #"Filas agrupadas" = Table.Group(#"Filas filtradas", {"Start of Month", "Prioridad"}, {{"Recuento", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Filas agrupadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

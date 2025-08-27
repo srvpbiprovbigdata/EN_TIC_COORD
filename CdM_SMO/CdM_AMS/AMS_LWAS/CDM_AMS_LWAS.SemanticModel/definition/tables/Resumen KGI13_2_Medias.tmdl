@@ -1,0 +1,110 @@
+table 'Resumen KGI13_2_Medias'
+	lineageTag: a3d26df1-496a-4873-9814-d6f1f6088d7c
+
+	column Prioridad
+		dataType: string
+		lineageTag: 8bab5728-ea76-44bc-affa-52c9b4bf835f
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Incidencias'
+		dataType: int64
+		formatString: 0
+		lineageTag: a56bf96a-f4a8-4035-81b2-949a086ca90a
+		summarizeBy: sum
+		sourceColumn: Total Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa máxima permitida %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 753c61dd-acc1-4688-92de-a0554f94fd89
+		summarizeBy: sum
+		sourceColumn: Tasa máxima permitida %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del KGI %'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 6f0f58e9-3fe9-4939-af8e-e788e817429e
+		summarizeBy: sum
+		sourceColumn: Peso del KGI %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI13'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e125fa8-c3d3-44a8-a27f-2e37c3dd4d45
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI13
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 3382fa76-fbd1-43be-9f67-b9c4ca3934d6
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column ¿Cumple? = IF(0.08<='Resumen KGI13_2_Medias'[Tasa máxima permitida %],"Si","No")
+		lineageTag: 95da229d-7492-4ab4-8adf-292747f2ab08
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lote_Aplicación_relación.Lote'
+		dataType: string
+		lineageTag: 9d0b8ff7-42ed-4006-b25b-2e7b7df2e613
+		summarizeBy: none
+		sourceColumn: Lote_Aplicación_relación.Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierta - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e82b4154-aa53-47ad-997d-3fb9e0979398
+		summarizeBy: none
+		sourceColumn: Abierta - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'Resumen KGI13_2_Medias-8126b32c-4cab-4ebe-bb13-af46cb7636ac' = m
+		mode: import
+		queryGroup: Resumen
+		source = ```
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A_Abiertas",
+				    
+				    //Total Incidencias Abiertas por Prioridad
+				    #"Grouped Rows" = Table.Group(Source, {"Prioridad", "Abierta - Copy", "Lote_Aplicación_relación.Lote"}, {{"Total Incidencias", each Table.RowCount(_), Int64.Type}}),
+				
+				  //Homologa las prioridades
+				    #"AllReplace" = [#"1 - Crítica" = "Alta", #"2 - Alta" = "Alta", #"3 - Moderada" = "Media",#"4 - Baja" = "Baja",#"5 - Muy Baja" = "Baja",#"Crítica" = "Alta"],    
+				    #"Replaced Value" = Table.TransformColumns( #"Grouped Rows",{{"Prioridad",each Record.FieldOrDefault(AllReplace,_,_)}}),
+				  
+				    //Unir Tabla de Parámetros
+				    #"Merged Queries" = Table.NestedJoin(#"Replaced Value", {"Prioridad"}, #"Parametros KGI13_E", {"Prioridad "}, "Parametros KGI1-3 (2)", JoinKind.LeftOuter),
+				    #"Expanded Parametros KGI1-3" = Table.ExpandTableColumn(#"Merged Queries", "Parametros KGI1-3 (2)", {"Tasa máxima permitida %", "Peso del KGI %", "Puntos de KGI13", "KGI"}, {"Parametros KGI1-3 (2).Tasa máxima permitida %", "Parametros KGI1-3 (2).Peso del KGI %", "Parametros KGI1-3 (2).Puntos de KGI13", "Parametros KGI1-3 (2).KGI"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded Parametros KGI1-3",{{"Parametros KGI1-3 (2).Tasa máxima permitida %", "Tasa máxima permitida %"}, {"Parametros KGI1-3 (2).Peso del KGI %", "Peso del KGI %"}, {"Parametros KGI1-3 (2).Puntos de KGI13", "Puntos de KGI13"}, {"Parametros KGI1-3 (2).KGI", "KGI"}}),
+				
+				    //Filtro por "Medias"
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Prioridad] = "Media")),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows",{{"Peso del KGI %", Percentage.Type}, {"Tasa máxima permitida %", Percentage.Type}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

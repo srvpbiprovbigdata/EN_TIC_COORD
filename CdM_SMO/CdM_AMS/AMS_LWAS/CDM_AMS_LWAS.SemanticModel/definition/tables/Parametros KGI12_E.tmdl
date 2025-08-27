@@ -1,0 +1,74 @@
+table 'Parametros KGI12_E'
+	excludeFromModelRefresh
+	lineageTag: 96c506e9-2ef5-418f-b480-b3325b9db963
+
+	column 'Prioridad Hitos Evolutivos'
+		dataType: string
+		lineageTag: c311b1dd-7c92-4ed8-b5ff-47724016e289
+		summarizeBy: none
+		sourceColumn: Prioridad Hitos Evolutivos
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tasa de Desviación Máxima'
+		dataType: double
+		lineageTag: b1748f7c-5a3c-4fb4-bbaa-9300e2f2308d
+		summarizeBy: sum
+		sourceColumn: Tasa de Desviación Máxima
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column '% cumplimiento Objetivo'
+		dataType: double
+		lineageTag: c4e0e41d-9e77-4264-8578-5865aa18c92f
+		summarizeBy: sum
+		sourceColumn: % cumplimiento Objetivo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Pesos %'
+		dataType: double
+		lineageTag: 4b07fe65-bbed-484b-b3d5-04f0f3c7354c
+		summarizeBy: sum
+		sourceColumn: Pesos %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Puntos de KGI12'
+		dataType: string
+		lineageTag: 99b77c53-0dcf-4575-aa1a-017c5d72fd1c
+		summarizeBy: none
+		sourceColumn: Puntos de KGI12
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 8416f6de-4041-4801-a729-34925c225d87
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI12_E-ec248a53-f3ac-4b15-b71a-8aa57e95b632' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & kgi & xlsx), null, true),
+				    #"P_KGI12_Sheet" = Origen{[Item="P_KGI12",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"P_KGI12_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Prioridad Hitos Evolutivos", type text}, {"Tasa de Desviación Máxima", type number}, {"% cumplimiento Objetivo", type number}, {"Pesos %", type number}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

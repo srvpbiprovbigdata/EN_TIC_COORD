@@ -1,0 +1,171 @@
+table 'Parámetros - Pesos'
+	lineageTag: 50e6623c-b2ff-4642-9797-c022567fa1bd
+
+	column ID
+		dataType: string
+		lineageTag: 9680a294-5ffd-4d9e-9041-62b9d8707bbd
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_KGI
+		dataType: string
+		lineageTag: 3cfedbca-8cd6-4edf-be1f-75cbb9a6e906
+		summarizeBy: none
+		sourceColumn: ID_KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI_texto
+		dataType: string
+		lineageTag: 6d788fa8-4bfd-49b1-be4a-9364519561f2
+		summarizeBy: none
+		sourceColumn: KGI_texto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Periodicidad
+		dataType: string
+		lineageTag: f35772db-13c9-413b-8708-7fccbae3ca0d
+		summarizeBy: none
+		sourceColumn: Periodicidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Id_Servicio
+		dataType: int64
+		formatString: 0
+		lineageTag: a44f28eb-7e6c-4693-a694-15500176e449
+		summarizeBy: sum
+		sourceColumn: Id_Servicio
+
+		annotation SummarizationSetBy = Automatic
+
+	column Servicio_texto
+		dataType: string
+		lineageTag: 457c93f7-b244-4ea7-88ff-e4553bfde7cc
+		summarizeBy: none
+		sourceColumn: Servicio_texto
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Categ. Definición'
+		dataType: string
+		lineageTag: 28fa6b6a-0236-487f-a863-251746b1ada8
+		summarizeBy: none
+		sourceColumn: Categ. Definición
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ID_Categoria '
+		dataType: int64
+		formatString: 0
+		lineageTag: 98da4ebf-1320-4a21-ba4e-c7a2f8b789cf
+		summarizeBy: sum
+		sourceColumn: "ID_Categoria "
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categorización
+		dataType: string
+		lineageTag: 87182eb1-0e0f-4f5e-99d7-59cd676e74cb
+		summarizeBy: none
+		sourceColumn: Categorización
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Criterio medición'
+		dataType: string
+		lineageTag: 287f75f5-ef58-41cb-a9d6-5d8119816152
+		summarizeBy: none
+		sourceColumn: Criterio medición
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Umbral medición'
+		dataType: double
+		lineageTag: 8e07d1ab-e72b-4b92-9b80-eccbce3504b8
+		summarizeBy: sum
+		sourceColumn: Umbral medición
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Cumplimiento Objetivo %'
+		dataType: double
+		lineageTag: d6d04b3b-584b-4f0b-8d52-0d957b6db2c2
+		summarizeBy: sum
+		sourceColumn: Cumplimiento Objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Peso dentro de KGI (%)'
+		dataType: double
+		lineageTag: 276334c6-759a-475f-b31b-75914b322e52
+		summarizeBy: sum
+		sourceColumn: Peso dentro de KGI (%)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Peso del KGI dentro del servicio (%)'
+		dataType: double
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 491702a2-1a56-4112-991a-69ea7ca092ba
+		summarizeBy: sum
+		sourceColumn: Peso del KGI dentro del servicio (%)
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso del servicio en el CdM (%)'
+		dataType: double
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 383ce2d7-d632-4d56-bd62-56e416972eb8
+		summarizeBy: sum
+		sourceColumn: Peso del servicio en el CdM (%)
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso CdM (%)'
+		dataType: double
+		lineageTag: cc32896e-6f64-41f4-832d-622f13619819
+		summarizeBy: sum
+		sourceColumn: Peso CdM (%)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Orden CdM'
+		dataType: string
+		lineageTag: d92f8860-01bc-4dd6-b5eb-be14d3ffafd6
+		summarizeBy: none
+		sourceColumn: Orden CdM
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parámetros - Pesos-b4f257d2-3f68-40a4-a23f-9f7930d4c0e6' = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(globalPath & "Parámetros_KGIs" & xlsx), null, true),
+				    #"Parámetros - Pesos_Sheet" = Origen{[Item="Parámetros - Pesos",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Parámetros - Pesos_Sheet", [PromoteAllScalars=true]),
+				    #"Otras columnas quitadas" = Table.SelectColumns(#"Encabezados promovidos",{"ID", "ID_KGI", "KGI_texto", "Periodicidad", "Id_Servicio", "Servicio_texto", "Categ. Definición", "ID_Categoria ", "Categorización", "Criterio medición", "Umbral medición", "Cumplimiento Objetivo %", "Peso dentro de KGI (%)", "Peso del KGI dentro del servicio (%)", "Peso del servicio en el CdM (%)", "Peso CdM (%)","Orden CdM"}),
+				    #"Filas en blanco eliminadas" = Table.SelectRows(#"Otras columnas quitadas", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Filas en blanco eliminadas",{{"Id_Servicio", Int64.Type}, {"Periodicidad", type text}, {"KGI_texto", type text}, {"ID_KGI", type text}, {"ID", type text}, {"Servicio_texto", type text}, {"Categ. Definición", type text}, {"ID_Categoria ", Int64.Type}, {"Categorización", type text}, {"Criterio medición", type text}, {"Umbral medición", type number}, {"Cumplimiento Objetivo %", Percentage.Type}, {"Peso dentro de KGI (%)", Percentage.Type}, {"Peso del KGI dentro del servicio (%)", Percentage.Type}, {"Peso del servicio en el CdM (%)", Percentage.Type}, {"Peso CdM (%)", Percentage.Type}}),
+				    #"Errores reemplazados" = Table.ReplaceErrorValues(#"Tipo cambiado", {{"Umbral medición", null}, {"Peso dentro de KGI (%)", null}, {"Peso del KGI dentro del servicio (%)", null}, {"Peso del servicio en el CdM (%)", null}, {"Peso CdM (%)", null}}),
+				    #"Filas filtradas" = Table.SelectRows(#"Errores reemplazados", each ([ID] <> null))
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

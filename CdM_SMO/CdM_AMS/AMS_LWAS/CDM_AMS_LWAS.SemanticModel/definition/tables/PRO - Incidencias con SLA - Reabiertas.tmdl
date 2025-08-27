@@ -1,0 +1,65 @@
+table 'PRO - Incidencias con SLA - Reabiertas'
+	lineageTag: 5b554a75-c442-4dc7-98c2-b535a5a1db55
+
+	column 'Cerrado - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 959b907b-8162-4f9c-8ee5-545c9e9b946d
+		summarizeBy: none
+		sourceColumn: Cerrado - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'INCs Reabiertas'
+		dataType: int64
+		lineageTag: 2bf2c540-4692-4f88-b383-832228298469
+		summarizeBy: sum
+		sourceColumn: INCs Reabiertas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Volver a abrir recuento'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a6b15c5e-0713-413a-a8ba-5cc2a866554b
+		summarizeBy: none
+		sourceColumn: Volver a abrir recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lote_Aplicación_relación.Lote'
+		dataType: string
+		lineageTag: 81742bee-d355-441f-ab6b-4f19dea81960
+		summarizeBy: none
+		sourceColumn: Lote_Aplicación_relación.Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	column Número
+		dataType: string
+		lineageTag: 6df239d7-6074-4fc3-b0f6-ae25574fe9e8
+		summarizeBy: none
+		sourceColumn: Número
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Incidencias con SLA - Reabiertas-c7aaf3f5-587a-428e-acb3-1c83def8b4c3' = m
+		mode: import
+		queryGroup: KGIs_II
+		source =
+				let
+				    Source = #"PRO - Incidencias con SLA_P_y_A",
+				
+				    #"Grouped Rows" = Table.Group(Source, {"Cerrado - Copy", "Volver a abrir recuento", "Lote_Aplicación_relación.Lote", "Número"}, {{"INCs Reabiertas", each Table.RowCount(_), Int64.Type}}),
+				    #"Filas filtradas" = Table.SelectRows(#"Grouped Rows", each ([Volver a abrir recuento] = true))
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

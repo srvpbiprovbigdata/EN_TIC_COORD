@@ -1,0 +1,61 @@
+table Componentes
+	lineageTag: f90932ae-2113-482c-bdcf-7bfd011cf8c5
+
+	column ENABLON
+		dataType: string
+		lineageTag: 7c6442a1-0cf4-4625-ae2f-16d0261001dc
+		summarizeBy: none
+		sourceColumn: ENABLON
+
+		annotation SummarizationSetBy = Automatic
+
+	column MERCADOS
+		dataType: string
+		lineageTag: a5dad267-aba2-45b4-89ae-325df6ab883c
+		summarizeBy: none
+		sourceColumn: MERCADOS
+
+		annotation SummarizationSetBy = Automatic
+
+	column EMS
+		dataType: string
+		lineageTag: 775d292e-8cf7-4922-be5d-86991a5da8e9
+		summarizeBy: none
+		sourceColumn: EMS
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CRM Energia'
+		dataType: string
+		lineageTag: f5e9ccea-ac15-4ae3-98da-9159add7f5d4
+		summarizeBy: none
+		sourceColumn: CRM Energia
+
+		annotation SummarizationSetBy = Automatic
+
+	column LEGAL
+		dataType: string
+		lineageTag: c606245e-33b8-4978-b23b-562ffba40044
+		summarizeBy: none
+		sourceColumn: LEGAL
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Componentes-52f57b4e-de8c-42d5-8f9a-5e7c1f7acde0 = m
+		mode: import
+		queryGroup: 'Tablas Modelo'
+		source =
+				let
+				    Origen = Excel.Workbook(Web.Contents(sharepointSource & Entorno & componentesPath & xlsx), null, true),
+				    Personalizado1 = Origen{[Name="Componentes Jira por Servicio"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Personalizado1, [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"ENABLON", type text}, {"MAXIMO", type text}, {"IAR", type text}, {"AMS CORE GFI", type text}, {"SERVICENOW", type text}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado1",{"MAXIMO", "IAR", "AMS CORE GFI", "SERVICENOW", "BI", "CRMSF", "GDOC", "LWAS", "RPA", "BESTINVER", "SAPHR", "BESTINVERAPP", "SAC", "SCS"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each ([ENABLON] <> null))
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

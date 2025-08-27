@@ -1,0 +1,111 @@
+expression Parámetro1 = #"Archivo de ejemplo" meta [IsParameterQuery=true, BinaryIdentifier=#"Archivo de ejemplo", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: bde306a7-2deb-42b4-9a92-86d03b585c9d
+	queryGroup: 'Transformar archivo de Consulta1\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo de ejemplo' =
+		let
+		    Origen = Excel.Workbook(Parámetro1, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+	lineageTag: 3a1069f1-5280-45ac-9588-1f6f1d92336e
+	queryGroup: 'Transformar archivo de Consulta1'
+
+	annotation PBI_ResultType = Table
+
+expression 'Archivo de ejemplo' =
+		let
+		    Origen = SharePoint.Files("https://acciona365.sharepoint.com/sites/ServicioOGO", [ApiVersion = 15]),
+		    #"Filas ordenadas" = Table.Sort(Origen,{{"Date created", Order.Descending}}),
+		    #"Filas filtradas" = Table.SelectRows(#"Filas ordenadas", each ([Name] = "Aplicaciones.xlsx") and ([Date created] = #datetime(2023, 8, 24, 13, 21, 29))),
+		    Navegación1 = #"Filas filtradas"{0}[Content]
+		in
+		    Navegación1
+	lineageTag: 165dedbd-50b1-482a-ab48-f6b7fbbecf8c
+	queryGroup: 'Transformar archivo de Consulta1\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo' =
+		let
+		    Origen = (Parámetro1 as binary) => let
+		    Origen = Excel.Workbook(Parámetro1, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+		in
+		    Origen
+	lineageTag: aad940cc-febe-4782-a34e-7d9247b43e07
+	queryGroup: 'Transformar archivo de Consulta1\Consultas auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression Parámetro2 = #"Archivo de ejemplo (2)" meta [IsParameterQuery=true, BinaryIdentifier=#"Archivo de ejemplo (2)", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: 3e5360c3-25f0-428f-a7fd-79750b27de38
+	queryGroup: 'Transformar archivo de Aplicaciones\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo de ejemplo (2)' =
+		let
+		    Origen = Excel.Workbook(Parámetro2, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+	lineageTag: 57ce4045-6a2f-48a1-9085-58d8601918d4
+	queryGroup: 'Transformar archivo de Aplicaciones'
+
+	annotation PBI_ResultType = Table
+
+expression 'Archivo de ejemplo (2)' =
+		let
+		    Origen = SharePoint.Files("https://acciona365.sharepoint.com/sites/ServicioOGO/", [ApiVersion = 15]),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Extension] = ".xlsx") and ([Name] = "Aplicaciones.xlsx")),
+		    #"Filas superiores quitadas" = Table.Skip(#"Filas filtradas",3),
+		    Navegación1 = #"Filas superiores quitadas"{0}[Content]
+		in
+		    Navegación1
+	lineageTag: f961ae92-3c3e-41f5-9010-68f87a37a41a
+	queryGroup: 'Transformar archivo de Aplicaciones\Consultas auxiliares'
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo (2)' =
+		let
+		    Origen = (Parámetro2 as binary) => let
+		    Origen = Excel.Workbook(Parámetro2, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+		in
+		    Origen
+	lineageTag: 33412e49-4674-4d14-b60f-c255dd787044
+	queryGroup: 'Transformar archivo de Aplicaciones\Consultas auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression Entorno = "PRE" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: f3b7587a-f08e-4deb-b03e-2c41421739ab
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 7c27ef0c-ffe0-4123-9a7f-f09f970761fa
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource2 = "/Documentos compartidos/CdM_SMO/CdM_CROSS/Archivos comunes/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: eed3558e-1ee4-4802-b62b-f90c5023a7b4
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+

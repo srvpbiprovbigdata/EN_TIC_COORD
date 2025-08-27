@@ -1,0 +1,58 @@
+table 'PRO - Jira - Defectos con SLA - UAT'
+	lineageTag: 23c7718e-4221-495e-b4da-3d969eb680e2
+
+	column Priority
+		dataType: string
+		lineageTag: 168e6d30-705a-4e1e-a9e2-95c09d477569
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Defectos UAT'
+		dataType: int64
+		lineageTag: e45c41dd-016a-4ac6-94b8-9601e5bcae2e
+		summarizeBy: sum
+		sourceColumn: Defectos UAT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PRO - Jira - Historias y Ejecuciones.Resolved - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f7c6e500-fe5d-46e3-85df-cd97fafee55d
+		summarizeBy: none
+		sourceColumn: PRO - Jira - Historias y Ejecuciones.Resolved - Copy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Lote
+		dataType: string
+		lineageTag: 7f095ffe-8c74-4c34-be68-aba5c2d4e095
+		summarizeBy: none
+		sourceColumn: Lote
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Jira - Defectos con SLA - UAT-e53b2801-7053-41e3-9aad-452ef88f4cd7' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Source = #"PRO - Jira - Defectos con SLA",
+				    #"Filtered Rows" = Table.SelectRows(Source, each Text.Contains([#"PRO - Jira - Historias y Ejecuciones.PRO - Jira - Ejecuciones.Tipo de prueba"], "UAT")),
+				    #"Filtered Rows1" = Table.SelectRows(#"Filtered Rows", each [Estado_Alegación] <> "1 - Aprobada"),
+				    #"Duplicados quitados" = Table.Distinct(#"Filtered Rows1", {"Key"}),
+				
+				    #"Grouped Rows" = Table.Group(#"Duplicados quitados", {"PRO - Jira - Historias y Ejecuciones.Resolved - Copy", "Priority", "Lote"}, {{"Defectos UAT", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Grouped Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

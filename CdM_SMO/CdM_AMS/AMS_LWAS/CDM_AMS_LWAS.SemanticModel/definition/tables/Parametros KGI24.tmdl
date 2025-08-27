@@ -1,0 +1,63 @@
+table 'Parametros KGI24'
+	excludeFromModelRefresh
+	lineageTag: 2648bf42-c1ed-4ce4-b990-8a2cc97137cd
+
+	column 'Número Máximo de Incidencias'
+		dataType: int64
+		formatString: 0
+		lineageTag: e156e050-f3e5-44dc-b7d7-ffcacf6ff8cc
+		summarizeBy: sum
+		sourceColumn: Número Máximo de Incidencias
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cumplimiento Objetivo %'
+		dataType: string
+		lineageTag: dd94c762-1dc2-4a88-99c7-22738d0922b9
+		summarizeBy: none
+		sourceColumn: Cumplimiento Objetivo %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Peso %'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5740d654-3e3f-4afa-b6e6-5cb4f79d6ee0
+		summarizeBy: sum
+		sourceColumn: Peso %
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Puntos de KGI24'
+		dataType: int64
+		formatString: 0
+		lineageTag: 58cf5b7d-e86a-4373-98d9-17c35d75f37c
+		summarizeBy: sum
+		sourceColumn: Puntos de KGI24
+
+		annotation SummarizationSetBy = Automatic
+
+	column KGI
+		dataType: string
+		lineageTag: 0cb93a55-a3a5-4e90-ab8e-8b42444cd3bd
+		summarizeBy: none
+		sourceColumn: KGI
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parametros KGI24-eb3c6bf0-c7db-4ea1-841f-0c7749dc2177' = m
+		mode: import
+		queryGroup: Parametros
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(globalPath & kgi & xlsx), null, true),
+				    #"P_KGI24_Sheet" = Source{[Item="P_KGI24",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"P_KGI24_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Número Máximo de Incidencias", Int64.Type}, {"Cumplimiento Objetivo %", type text}, {"Peso %", Int64.Type}, {"Puntos de KGI24", Int64.Type}, {"KGI", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

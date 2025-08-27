@@ -1,0 +1,51 @@
+table 'PRO - Planificaciones PRJ y ENH con SLA_M - Incumplidas Sin Lote'
+	lineageTag: ab53b2e0-6391-4260-9eb7-814b81e7b28b
+
+	column Prioridad
+		dataType: string
+		lineageTag: 683e440c-bf1f-446d-b48c-a8fd96812e96
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha fin real - Copy'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 57c10aec-b7bc-4fd2-aea9-ae5cc8d54d21
+		summarizeBy: none
+		sourceColumn: Fecha fin real - Copy
+
+		variation Variación
+			isDefault
+			relationship: 614de10b-5989-4aca-bc58-023bda80bd09
+			defaultHierarchy: LocalDateTable_4503cd76-eb96-49b4-b026-ede66e83301e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Recuento
+		dataType: int64
+		formatString: 0
+		lineageTag: 91e56882-a722-4889-8be4-c7fda28592d4
+		summarizeBy: sum
+		sourceColumn: Recuento
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PRO - Planificaciones PRJ y ENH con SLA_M - Incumplidas Sin Lote-c2ebbe66-331e-433e-8a07-13015ce9da09' = m
+		mode: import
+		queryGroup: KGIs_I
+		source =
+				let
+				    Origen = #"PRO - Planificaciones PRJ y ENH con SLA_M",
+				    #"Filas filtradas" = Table.SelectRows(Origen, each ([Estimación incumplida] = true)),
+				    #"Filas agrupadas" = Table.Group(#"Filas filtradas", {"Prioridad", "Fecha fin real - Copy"}, {{"Recuento", each Table.RowCount(_), Int64.Type}})
+				in
+				    #"Filas agrupadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
