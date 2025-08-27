@@ -1,0 +1,112 @@
+table Backlog_Mensual_task
+	lineageTag: 3716259d-0eb6-430c-9c2d-d61c525b6f0d
+
+	column Date
+		formatString: General Date
+		lineageTag: eb1bed9a-e9b0-465e-b54b-10d6acfdf8af
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variación
+			isDefault
+			relationship: 83bbae97-4537-42f0-9bcd-77a767b253af
+			defaultHierarchy: LocalDateTable_77901b2d-019e-4aaa-b538-e436051540b4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column PrimerDiaMes
+		formatString: General Date
+		lineageTag: fb53f795-ca97-4f2f-b54f-078eff2eff6c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [PrimerDiaMes]
+
+		variation Variación
+			isDefault
+			relationship: 6cd4566c-776a-4917-9299-8cc0574f8575
+			defaultHierarchy: LocalDateTable_2ce9505b-9554-4066-8c02-7b424e03aa79.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Soportes abiertos' = ```
+			
+			VAR FechaMes = FORMAT('Backlog_Mensual_task'[Date], "YYYY-MM-DD")
+			RETURN 
+			    COUNTROWS(
+			        FILTER(
+			            'SERV_NOW sc_task',
+			            FORMAT('SERV_NOW sc_task'[Primer_Dia_Mes_abierto_task], "YYYY-MM-DD") = FechaMes
+			        )
+			    )
+			
+			```
+		formatString: 0
+		lineageTag: 536e285a-bc45-401e-843a-7441f3c134ed
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Soportes Cerrados' = ```
+			
+			VAR FechaMes = FORMAT('Backlog_Mensual_task'[Date], "YYYY-MM-DD")
+			RETURN 
+			    COUNTROWS(
+			        FILTER(
+			            'SERV_NOW sc_task',
+			            FORMAT('SERV_NOW sc_task'[Primer_Dia_Mes_cerrado_task], "YYYY-MM-DD") = FechaMes
+			        )
+			    )
+			
+			```
+		formatString: 0
+		lineageTag: 302d532a-4d5b-4246-bf03-bc975bc9def8
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'soportes acumulados mes' = ```
+			
+			VAR FechaActual = 'Backlog_Mensual_task'[Date]
+			RETURN
+			    SUMX(
+			        FILTER(
+			            'Backlog_Mensual_task',
+			            'Backlog_Mensual_task'[Date] <= FechaActual
+			        ),
+			        'Backlog_Mensual_task'[Soportes abiertos] - 'Backlog_Mensual_task'[Soportes Cerrados]
+			    )
+			
+			```
+		formatString: 0
+		lineageTag: b4cba3af-f1c0-423a-a478-0a1fb723e342
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes_Año = ```
+			FORMAT('Backlog_Mensual_task'[Date], "mmm yyyy")
+			
+			```
+		lineageTag: d0957e5d-982a-4c66-b193-d32178619fd9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_Mensual_task = calculated
+		mode: import
+		source =
+				
+				VAR FechaInicio = DATE(2023, 1, 1)
+				VAR FechaFin = TODAY()
+				RETURN
+				    FILTER(
+				        ADDCOLUMNS(
+				            CALENDAR(FechaInicio, FechaFin),
+				            "PrimerDiaMes", IF(DAY([Date]) = 1, [Date], BLANK())  -- Marca el día 1 de cada mes
+				        ),
+				        NOT(ISBLANK([PrimerDiaMes]))  -- Filtra solo los días 1
+				    )
+
+	annotation PBI_Id = 619eaaaa9aee4daeb23c3c084c7b1660
+

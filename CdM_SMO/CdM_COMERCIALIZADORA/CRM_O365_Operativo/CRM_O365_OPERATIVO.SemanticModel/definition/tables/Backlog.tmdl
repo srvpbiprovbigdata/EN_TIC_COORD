@@ -1,0 +1,126 @@
+table Backlog
+	lineageTag: e09f3c2d-62c0-44a5-b70d-83d6e28ce2ee
+
+	column Date
+		formatString: Short Date
+		lineageTag: 5be24df5-fb42-46bd-be82-db744b6f6a38
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variación
+			isDefault
+			relationship: c71b2fdd-b72f-40c8-b090-b261f2a19b7d
+			defaultHierarchy: LocalDateTable_55488463-0493-46f3-ab76-45026717880c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Lunes
+		formatString: Short Date
+		lineageTag: 3c690aa7-80ea-4203-90fb-1fd0cbc57237
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Lunes]
+
+		variation Variación
+			isDefault
+			relationship: 3a7898c0-5c6e-41e2-bb80-412221fd4229
+			defaultHierarchy: LocalDateTable_853d0d69-70bd-428a-b28f-249a7e511a3d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Incidencias abiertas' = ```
+			
+			VAR FechaLunes = FORMAT('Backlog'[Date], "YYYY-MM-DD")  -- Convierte la fecha a formato solo de fecha
+			RETURN 
+			    COUNTROWS(
+			        FILTER(
+			            'SERV_NOW incident',
+			            FORMAT('SERV_NOW incident'[Lunes_Anterior_abierto], "YYYY-MM-DD") = FechaLunes  -- Compara las fechas sin la parte de hora
+			        )
+			    )
+			
+			
+			```
+		formatString: 0
+		lineageTag: 4b325049-b939-44d3-8e63-f4f3c8422077
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Incidencias Cerradas' = ```
+			
+			VAR FechaLunes = FORMAT('Backlog'[Date], "YYYY-MM-DD")  -- Convierte la fecha a formato solo de fecha
+			RETURN 
+			    COUNTROWS(
+			        FILTER(
+			            'SERV_NOW incident',
+			            FORMAT('SERV_NOW incident'[Lunes_Anterior_cerrada], "YYYY-MM-DD") = FechaLunes  -- Compara las fechas sin la parte de hora
+			        )
+			    )
+			
+			```
+		formatString: 0
+		lineageTag: 57ebc908-6ca2-4e30-842e-97c6103cc5ac
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Acumulado = ```
+			
+			VAR FechaActual = 'Backlog'[Date]
+			RETURN
+			   SUMX(
+			       FILTER(
+			           'Backlog',
+			           'Backlog'[Date] <= FechaActual
+			       ),
+			       'Backlog'[Incidencias abiertas] - 'Backlog'[Incidencias Cerradas]
+			   )
+			
+			```
+		formatString: 0
+		lineageTag: 317a7066-1099-4134-be10-68652a2e0d83
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Etiqueta_Semana = ```
+			"Semana " & WEEKNUM('Backlog'[Date], 2)
+			
+			```
+		lineageTag: 09d2c1cf-63ff-4365-9247-590406c205d5
+		summarizeBy: none
+		sortByColumn: Numero_Semana
+
+		annotation SummarizationSetBy = Automatic
+
+	column Numero_Semana = ```
+			WEEKNUM('Backlog'[Date], 2)  -- Asegúrate de usar la fecha de apertura o de la semana
+			
+			```
+		formatString: 0
+		lineageTag: 2f382d65-d19e-46a4-b908-082afe08a376
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog = calculated
+		mode: import
+		source = ```
+				
+				VAR FechaInicio = DATE(2023, 1, 1)  -- Fecha de inicio
+				VAR FechaFin = TODAY()  -- Fecha de fin (hoy)
+				RETURN
+				    FILTER(
+				        ADDCOLUMNS(
+				            CALENDAR(FechaInicio, FechaFin),  -- Crea la tabla de fechas entre FechaInicio y FechaFin
+				            "Lunes", IF(WEEKDAY([Date], 2) = 1, [Date], BLANK())  -- Marca el lunes
+				        ),
+				        NOT(ISBLANK([Lunes]))  -- Filtra solo los lunes
+				    )
+				
+				```
+
+	annotation PBI_Id = f9542e6f680b4a6c9c7c150185d189ee
+

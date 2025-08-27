@@ -1,0 +1,62 @@
+table backlog_cerradas_mes
+	lineageTag: 6bee22b3-a413-417c-8991-0681af6ee4e7
+
+	column '1 - Number'
+		lineageTag: 5c6f0ddd-6a31-4c22-86b9-70b48f919792
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 2-estado
+		lineageTag: 8b35f546-ed7c-45da-94db-539ecde1b4cf
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2-estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - mes'
+		formatString: General Date
+		lineageTag: fb9552d6-7d22-439e-8cfb-e9b2cd2bd726
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 - mes]
+
+		variation Variación
+			isDefault
+			relationship: 7d1c10c5-0054-4ba6-bba1-698d58af54a7
+			defaultHierarchy: LocalDateTable_77e8f7a7-a20b-4044-b26b-6b06ea3a27a9.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Subcategoría'
+		lineageTag: 88da3f59-5061-4300-adb5-714e838448bd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [4 - Subcategoría]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Tipo'
+		lineageTag: 6644ae70-f234-4d40-bd2d-6cbb36f6c1d4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [5 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes_Numero = MONTH('backlog_cerradas_mes'[3 - mes])
+		formatString: 0
+		lineageTag: 47cbf809-9415-475a-baf1-4066292f4e34
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition backlog_cerradas_mes = calculated
+		mode: import
+		source = SELECTCOLUMNS('SERV_NOW incident', "1 - Number",'SERV_NOW incident'[Tarea], "2-estado", 'SERV_NOW incident'[Estado],"3 - mes",'SERV_NOW incident'[Primer_Dia_Mes_Cerrado], "4 - Subcategoría", 'SERV_NOW incident'[dv_u_subcategory], "5 - Tipo" , "cerradas")
+
+	annotation PBI_Id = d732dddec1ba449eacae59fbe4f4c41b
+

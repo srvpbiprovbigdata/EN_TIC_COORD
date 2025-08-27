@@ -1,0 +1,115 @@
+table Backlog_Tdemandas_cerrado
+	lineageTag: 12d4dc82-d588-4232-8639-4c7e4b382e55
+
+	column '1 - Number'
+		lineageTag: d4300138-e75c-4cea-a77b-b303fcebcdc7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Estado'
+		lineageTag: 1b698749-7e2e-4f2f-8518-9cdf56a723b3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - FechaMes'
+		formatString: 0
+		lineageTag: 155b9075-d9c5-444e-b595-55998e7f7127
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [3 - FechaMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - FechaAño'
+		formatString: 0
+		lineageTag: fdfca4cf-a774-46fe-a86d-a22be37cd0ef
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [4 - FechaAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Aplicacion'
+		lineageTag: 2de90828-3c3c-4c44-95e7-486639128641
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [5 - Aplicacion]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Grupo'
+		lineageTag: 478cd9f2-f67b-4976-ab63-cc42e4e0d7a1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [6 - Grupo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '7 - Tipo'
+		lineageTag: 46e4dc5c-dbe0-40a8-bb3c-4df3d0f57fae
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [7 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '8 - Porfolio'
+		lineageTag: fdab7341-0486-42c0-b5f7-2630ccd66a6b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [8 - Porfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '9 - Prioridad'
+		lineageTag: 865e3cad-35ac-4eee-9b24-dec2b7567042
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [9 - Prioridad]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '10 - Tallaje'
+		lineageTag: fc86dc03-25bd-4884-9eca-cc7c312430c8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [10 - Tallaje]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '11 - Negocio'
+		lineageTag: cf76e15b-3834-449c-807f-e751e7199309
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [11 - Negocio]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_Tdemandas_cerrado = calculated
+		mode: import
+		source = ```
+				
+				    SELECTCOLUMNS(
+				        'Demandas_Tasks',
+				        "1 - Number", Demandas_Tasks[number],
+				        "2 - Estado", Demandas_Tasks[dv_state],
+				        "3 - FechaMes", Demandas_Tasks[closed_at].[NroMes],
+				        "4 - FechaAño", Demandas_Tasks[closed_at].[Año],
+				        "5 - Aplicacion" , Demandas_Tasks[AplicacionDemanda],
+				        "6 - Grupo" , Demandas_Tasks[dv_assignment_group],
+				        "7 - Tipo" , "Cerradas",
+				        "8 - Porfolio", Demandas_Tasks[Demandas.dv_portfolio],
+				        "9 - Prioridad", Demandas_Tasks[_dv_priority - español],
+				        "10 - Tallaje", Demandas_Tasks[TallajeDemanda_SoloLetra],
+				        "11 - Negocio", RELATED('Grupo Asignación'[Unidad Tecnología])
+				    )
+				```
+
+	annotation PBI_Id = 2e0b25cae0574e5da6ca55690570affd
+

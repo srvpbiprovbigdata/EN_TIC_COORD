@@ -1,0 +1,128 @@
+expression Parámetro1 = "Todos" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 8d6b0140-eb94-461e-9382-d6d916e9b6aa
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression Parámetro3 = #"Archivo de ejemplo (2)" meta [IsParameterQuery=true, BinaryIdentifier=#"Archivo de ejemplo (2)", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: a9d37982-c8c2-4727-8aac-153482b9471f
+	queryGroup: 'Transformar archivo de Consulta1 (2)\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo de ejemplo (2)' =
+		let
+		    Origen = Excel.Workbook(Parámetro3, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+	lineageTag: f6720788-e479-4961-a278-8baf9a1ff938
+	queryGroup: 'Transformar archivo de Consulta1 (2)'
+
+	annotation PBI_ResultType = Table
+
+expression 'Archivo de ejemplo (2)' =
+		let
+		URL = sharepointSource & Entorno,
+		URLcompleta = sharepointSource & Entorno & sharepointSource2,
+		    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Extension] = ".xlsx")),
+		    #"Filas ordenadas" = Table.Sort(#"Filas filtradas",{{"Date created", Order.Descending}}),
+		    #"Filas filtradas1" = Table.SelectRows(#"Filas ordenadas", each ([Name] = "Aplicaciones.xlsx") and ([Folder Path] = URLcompleta)),
+		    Navegación1 = #"Filas filtradas1"{0}[Content]
+		in
+		    Navegación1
+	lineageTag: 292d646f-aed0-4f02-b564-6b4bdfdb9b0d
+	queryGroup: 'Transformar archivo de Consulta1 (2)\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'Transformar archivo (2)' =
+		let
+		    Origen = (Parámetro3 as binary) => let
+		    Origen = Excel.Workbook(Parámetro3, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+		in
+		    Origen
+	mAttributes: [ FunctionQueryBinding = "{""exemplarFormulaName"":""Transformar archivo de ejemplo (2)""}" ]
+	lineageTag: 6cce7002-f568-40a2-ba06-79a0a221697b
+	queryGroup: 'Transformar archivo de Consulta1 (2)\Consultas auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression Parámetro4 = #"Archivo de ejemplo (3)" meta [IsParameterQuery=true, BinaryIdentifier=#"Archivo de ejemplo (3)", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: 282a9011-ee01-45c9-984a-b1c388c2f47f
+	queryGroup: 'Transformar archivo de Consulta1 (3)\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar archivo de ejemplo (3)' =
+		let
+		    Origen = Excel.Workbook(Parámetro4, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+	lineageTag: 290bd904-706e-45a5-bac3-06841c500614
+	queryGroup: 'Transformar archivo de Consulta1 (3)'
+
+	annotation PBI_ResultType = Table
+
+expression 'Archivo de ejemplo (3)' =
+		let
+		URL = sharepointSource & Entorno,
+		URLcompleta = sharepointSource & Entorno & sharepointSource2,
+		    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+		    #"Filas filtradas" = Table.SelectRows(Origen, each ([Extension] = ".xlsx")),
+		    #"Filas ordenadas" = Table.Sort(#"Filas filtradas",{{"Date created", Order.Descending}}),
+		    #"Filas filtradas1" = Table.SelectRows(#"Filas ordenadas", each ([Name] = "GruposEstimacion.xlsx")),
+		    Navegación1 = #"Filas filtradas1"{0}[Content]
+		in
+		    Navegación1
+	lineageTag: 9878220d-e9ba-4230-9c72-dd8c70269ce9
+	queryGroup: 'Transformar archivo de Consulta1 (3)\Consultas auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+	annotation PBI_NavigationStepName = Navegación
+
+expression 'Transformar archivo (3)' =
+		let
+		    Origen = (Parámetro4 as binary) => let
+		    Origen = Excel.Workbook(Parámetro4, null, true),
+		    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data]
+		in
+		    Hoja1_Sheet
+		in
+		    Origen
+	mAttributes: [ FunctionQueryBinding = "{""exemplarFormulaName"":""Transformar archivo de ejemplo (3)""}" ]
+	lineageTag: 46454e77-785e-4223-a93a-28af79c25aa2
+	queryGroup: 'Transformar archivo de Consulta1 (3)\Consultas auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression Entorno = "PRE" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 3514bd77-185f-4771-a781-6551c4df67b8
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource = "https://acciona365.sharepoint.com/sites/EN_TIC_COORD_" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: d280bf93-33d7-46f3-869a-b4554f4f1c2b
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+
+expression sharepointSource2 = "/Documentos compartidos/CdM_SMO/CdM_CROSS/Archivos comunes energía/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 4107fb92-645e-4026-a1bf-0c1b320a7e91
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Text
+

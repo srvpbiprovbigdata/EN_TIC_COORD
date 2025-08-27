@@ -1,0 +1,109 @@
+table Backlog_Semana
+	lineageTag: b2a3d906-d0c2-46e9-bb93-1fa189f3e53c
+
+	measure abiertas_este_semana = COUNTROWS(FILTER(Backlog_Semana, [5 - Tipo] = "abiertas"))
+		formatString: 0
+		lineageTag: a1c0ea03-b053-4ff8-8b6c-5f4a0accb059
+
+	measure cerradas_este_semana = COUNTROWS(FILTER(Backlog_Semana, [5 - Tipo] = "cerradas"))
+		formatString: 0
+		lineageTag: 0a938e73-d397-4525-9154-99a776e21d62
+
+	measure Backlog_semana_acumulado = ```
+			
+			VAR semanaActual = MAX('Backlog_Semana'[3 - Lunes])
+			RETURN
+			    CALCULATE(
+			        COUNTROWS('Backlog_Semana'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_Semana', Backlog_Semana[Etiqueta_Semana]),
+			            'Backlog_Semana'[3 - Lunes] < semanaActual &&
+			            'Backlog_Semana'[5 - Tipo] = "abiertas"
+			        )
+			    ) - 
+			    CALCULATE(
+			        COUNTROWS('Backlog_Semana'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_Semana', Backlog_Semana[Etiqueta_Semana]),
+			            'Backlog_Semana'[3 - Lunes] < semanaActual &&
+			            'Backlog_Semana'[3 - Lunes] >= DATE(2023,1,1) &&
+			            'Backlog_Semana'[5 - Tipo] = "cerradas"           
+			        )
+			    )
+			```
+		formatString: 0
+		lineageTag: e324ae8a-a67c-4d3c-b0e7-7f1bf487bf37
+
+	measure Valores_backlog = [abiertas_este_semana] - [cerradas_este_semana]
+		formatString: 0
+		lineageTag: 49498b18-4f5c-4598-aaca-52a855177ae3
+
+	column '1 - Number'
+		lineageTag: 0983f090-f40f-42a0-acc6-767bbdeaa30e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_semana[1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 2-estado
+		lineageTag: e16ddd70-5d01-4127-9aba-fa9cc7a3974d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_semana[2-estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Subcategoría'
+		lineageTag: 88a45315-4451-495a-850c-0493ec002a04
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_semana[4 - Subcategoría]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Numero_Semana
+		formatString: 0
+		lineageTag: 819fae50-a4bf-4670-964f-6311797cf25d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: backlog_abiertas_semana[Numero_Semana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Etiqueta_Semana
+		lineageTag: 4b5773b2-54c9-4382-b3b7-a16c6aa6d340
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_semana[Etiqueta_Semana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - Lunes'
+		formatString: General Date
+		lineageTag: 18e99e03-1700-4dcf-86d6-e0441ea9850e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_semana[3 - Lunes]
+
+		variation Variación
+			isDefault
+			relationship: 72e6265a-055e-4f60-9925-0e6e15319af0
+			defaultHierarchy: LocalDateTable_662f26a4-4c67-45dc-80a0-e02218a5c293.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Tipo'
+		lineageTag: f04aabd6-9a79-4c01-8021-1db02ff92e63
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_semana[5 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_Semana = calculated
+		mode: import
+		source = UNION(backlog_abiertas_semana,backlog_cerradas_semana)
+
+	annotation PBI_Id = b47c952a60474f2db055a4578060b55d
+

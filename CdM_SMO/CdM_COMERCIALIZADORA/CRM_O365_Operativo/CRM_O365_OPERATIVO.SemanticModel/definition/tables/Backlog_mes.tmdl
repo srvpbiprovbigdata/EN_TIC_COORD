@@ -1,0 +1,97 @@
+table Backlog_mes
+	lineageTag: f6c7e5d3-a824-4d7c-add3-957a75b32d63
+
+	measure abiertas_este_mes = COUNTROWS(FILTER(Backlog_mes, [5 - Tipo] = "abiertas"))
+		formatString: 0
+		lineageTag: 87a7d9f9-c2d7-487b-b2bd-1be9267063e0
+
+	measure cerradas_este_mes = COUNTROWS(FILTER(Backlog_mes, [5 - Tipo] = "cerradas"))
+		formatString: 0
+		lineageTag: 2a4be519-904f-4945-8702-adcc5ce506e9
+
+	measure Backlog_mes_acumulado = ```
+			
+			VAR mesActual = MAX('Backlog_mes'[3 - mes])
+			RETURN
+			    CALCULATE(
+			        COUNTROWS('Backlog_mes'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_mes', Backlog_mes[4 - Subcategoría], Backlog_mes[1 - Number]),
+			            'Backlog_mes'[3 - mes] < mesActual &&
+			            'Backlog_mes'[5 - Tipo] = "abiertas"
+			        )
+			    ) - 
+			    CALCULATE(
+			        COUNTROWS('Backlog_mes'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_mes', Backlog_mes[4 - Subcategoría],Backlog_mes[1 - Number]),
+			            'Backlog_mes'[3 - mes] < mesActual &&
+			            'Backlog_mes'[3 - mes] >= DATE(2023,1,1) &&
+			            'Backlog_mes'[5 - Tipo] = "cerradas"           
+			        )
+			    )
+			```
+		formatString: 0
+		lineageTag: f587fd4b-5290-479c-8033-d16b70e5bfdb
+
+	column '1 - Number'
+		lineageTag: b21a8516-44e8-49b0-b1b1-3401040e6ff5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_mes[1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 2-estado
+		lineageTag: b1cc6a47-2b6c-428d-a46c-0f98a6085ffb
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_mes[2-estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - mes'
+		formatString: General Date
+		lineageTag: 98deeaea-78de-4f63-8c4e-3f8619525558
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_mes[3 - mes]
+
+		variation Variación
+			isDefault
+			relationship: 36071c69-c72a-46cb-9711-025837244e95
+			defaultHierarchy: LocalDateTable_90a9b478-9b86-4482-b052-73659b02b120.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Subcategoría'
+		lineageTag: 884a1f09-c2f1-4368-bf19-0c36ef030525
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_mes[4 - Subcategoría]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Tipo'
+		lineageTag: 44ea6468-d9ee-40f2-b69e-55f88fc77020
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: backlog_abiertas_mes[5 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes_Numero
+		formatString: 0
+		lineageTag: a7c5ed6d-1c04-4ca5-ad2c-fd8da06d26b7
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: backlog_abiertas_mes[Mes_Numero]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_mes = calculated
+		mode: import
+		source = UNION(backlog_abiertas_mes,backlog_cerradas_mes)
+
+	annotation PBI_Id = 538bcb5b738c47be993c9b347b24d3a5
+

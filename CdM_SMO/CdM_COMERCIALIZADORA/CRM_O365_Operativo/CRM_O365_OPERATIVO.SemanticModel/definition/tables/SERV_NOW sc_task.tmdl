@@ -1,0 +1,146 @@
+table 'SERV_NOW sc_task'
+	lineageTag: 18938ff3-815a-44bc-928a-562c2399cbdd
+
+	column 'Asignado a'
+		dataType: string
+		lineageTag: 59a14115-b78f-4090-ae6a-b28102c64c4b
+		summarizeBy: none
+		sourceColumn: Asignado a
+
+		annotation SummarizationSetBy = Automatic
+
+	column Soporte
+		dataType: string
+		lineageTag: 7e9988bc-c512-451e-89ca-af3d673b0564
+		summarizeBy: none
+		sourceColumn: Soporte
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 75013389-9dad-4ae3-b2bf-5a862e27b7ee
+		summarizeBy: none
+		sourceColumn: opened_at
+
+		variation Variación
+			isDefault
+			relationship: c289b173-60e8-4a1a-8c8d-92a1f232a8eb
+			defaultHierarchy: LocalDateTable_594d2f0d-876a-4fa2-8ec1-72bfc8581c84.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: 11bb2bab-1932-43d7-b1ca-cd1cfcbd2e0c
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column closed_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5ba5c418-f546-491e-a17d-cf9d6f275252
+		summarizeBy: none
+		sourceColumn: closed_at
+
+		variation Variación
+			isDefault
+			relationship: 5151b787-ccb1-4189-ab9d-6b1a3e07c294
+			defaultHierarchy: LocalDateTable_04bcb25d-43db-4b90-bc64-fd31546a6ae9.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Primer_Dia_Mes_abierto_task = ```
+			
+			VAR FechaInicio = 'SERV_NOW sc_task'[opened_at]
+			VAR MesActual = MONTH(FechaInicio)
+			VAR AnoActual = YEAR(FechaInicio)
+			RETURN
+			    IF(
+			        NOT(ISBLANK(FechaInicio)),
+			        DATE(AnoActual, MesActual, 1),
+			        BLANK()
+			    )
+			
+			```
+		formatString: General Date
+		lineageTag: d43963d2-3014-41b8-b34d-48e7a00425d9
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 923eefff-fac2-4eaf-8b69-f103a938e733
+			defaultHierarchy: LocalDateTable_15c0c1a0-34ff-4e2c-ab97-20f2f31821f9.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Primer_Dia_Mes_cerrado_task = ```
+			
+			VAR FechaCierre = 'SERV_NOW sc_task'[closed_at]
+			VAR FechaSolo = IF(NOT(ISBLANK(FechaCierre)), DATEVALUE(FechaCierre), BLANK())
+			VAR MesActual = IF(NOT(ISBLANK(FechaSolo)), MONTH(FechaSolo), BLANK())
+			VAR AnoActual = IF(NOT(ISBLANK(FechaSolo)), YEAR(FechaSolo), BLANK())
+			RETURN 
+			    IF(
+			        NOT(ISBLANK(FechaSolo)),
+			        DATE(AnoActual, MesActual, 1),
+			        BLANK()
+			    )
+			
+			```
+		formatString: General Date
+		lineageTag: 024d3ce7-e931-4851-80b9-dfd694b57522
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: ff7562e9-c92b-473f-b468-d668763ce762
+			defaultHierarchy: LocalDateTable_cce93887-1df3-4cbc-80ed-e783115c2e0c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Apertura' = ```
+			FORMAT('SERV_NOW sc_task'[opened_at], "dd/mm/yyyy")
+			
+			```
+		lineageTag: 46b58ddf-8386-40db-a617-65b8c560a44f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_assignment_group
+		dataType: string
+		lineageTag: 3fcc7aa0-8b3c-4b74-a069-ee59ba04ec7a
+		summarizeBy: none
+		sourceColumn: dv_assignment_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_state
+		dataType: string
+		lineageTag: 563dd698-c65a-421a-bcab-ef36b5045fb5
+		summarizeBy: none
+		sourceColumn: dv_state
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SERV_NOW sc_task' = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Databases("QECCDWH.acciona.int,60001"),
+				    DWH = Origen{[Name="DWH"]}[Data],
+				    SERV_NOW_sc_task = DWH{[Schema="SERV_NOW",Item="sc_task"]}[Data],
+				    #"Filas filtradas" = Table.SelectRows(SERV_NOW_sc_task, each ([dv_assignment_group] = "EJE.SOPCRM365_EXT.AE")),
+				    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas filtradas",{"dv_assigned_to", "dv_assignment_group", "closed_at", "number", "opened_at", "dv_priority", "dv_state"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Otras columnas quitadas",{{"dv_priority", "Prioridad"}, {"number", "Soporte"}, {"dv_assigned_to", "Asignado a"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

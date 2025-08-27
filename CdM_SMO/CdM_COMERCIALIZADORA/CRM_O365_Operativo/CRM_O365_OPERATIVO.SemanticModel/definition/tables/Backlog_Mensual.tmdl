@@ -1,0 +1,105 @@
+table Backlog_Mensual
+	lineageTag: 3867f023-b20d-4315-8bfd-40262338a688
+
+	column Date
+		formatString: General Date
+		lineageTag: 7a3d393f-130b-4d74-bd4b-564b1d080007
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variación
+			isDefault
+			relationship: 8bac3686-403a-451c-9eb2-91c01658f492
+			defaultHierarchy: LocalDateTable_2f115e82-4df4-4603-91cc-bbe279ac4cf6.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column PrimerDiaMes
+		formatString: General Date
+		lineageTag: bb8f8319-c5ed-4632-ad12-ee81ba2aeb0c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [PrimerDiaMes]
+
+		variation Variación
+			isDefault
+			relationship: aa9c1f34-b654-4ff4-bcb0-493aa9d90e82
+			defaultHierarchy: LocalDateTable_90890997-948c-44a2-ae2b-e98d6896eb92.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Incidencias abiertas Mes' = ```
+			
+			VAR FechaMes = FORMAT('Backlog_Mensual'[Date], "YYYY-MM-DD")  -- Fecha del primer día del mes desde la tabla Backlog_Mensual
+			RETURN 
+			    COUNTROWS(
+			        FILTER(
+			            'SERV_NOW incident',
+			            FORMAT('SERV_NOW incident'[Primer_Dia_Mes_abierto], "YYYY-MM-DD") = FechaMes
+			        )
+			    )
+			
+			```
+		formatString: 0
+		lineageTag: 130d2e83-8805-4f23-b756-07def6466228
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Incidencias Cerradas Mes' = ```
+			
+			VAR FechaMes = FORMAT('Backlog_Mensual'[Date], "YYYY-MM-DD")  -- Fecha del primer día del mes
+			RETURN 
+			    COUNTROWS(
+			        FILTER(
+			            'SERV_NOW incident',
+			            FORMAT('SERV_NOW incident'[Primer_Dia_Mes_Cerrado], "YYYY-MM-DD") = FechaMes
+			        )
+			    )
+			
+			```
+		formatString: 0
+		lineageTag: 300624c7-29ed-4840-9eb7-6dfe2a18c2d3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Acumulado mes' = ```
+			
+			VAR FechaActual = 'Backlog_Mensual'[Date]
+			RETURN
+			    SUMX(
+			        FILTER(
+			            'Backlog_Mensual',
+			            'Backlog_Mensual'[Date] <= FechaActual
+			        ),
+			        'Backlog_Mensual'[Incidencias abiertas Mes] - 'Backlog_Mensual'[Incidencias Cerradas Mes]
+			    )
+			
+			```
+		formatString: 0
+		lineageTag: 5309e0b6-c0be-4d5c-8c47-4ff246c83fa9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_Mensual = calculated
+		mode: import
+		source = ```
+				
+				VAR FechaInicio = DATE(2023, 1, 1)
+				VAR FechaFin = TODAY()
+				RETURN
+				    FILTER(
+				        ADDCOLUMNS(
+				            CALENDAR(FechaInicio, FechaFin),
+				            "PrimerDiaMes", IF(DAY([Date]) = 1, [Date], BLANK())  -- Marca el día 1 de cada mes
+				        ),
+				        NOT(ISBLANK([PrimerDiaMes]))  -- Filtra solo los días 1
+				    )
+				
+				```
+
+	annotation PBI_Id = 315eca1164b547de869ac9c6af056fa0
+

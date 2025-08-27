@@ -1,0 +1,153 @@
+table Backlog_tareas_demanda
+	lineageTag: 3274f61f-b655-4f32-b5d3-629b30c29c14
+
+	measure abiertas_este_mes = COUNTROWS(FILTER(Backlog_tareas_demanda, [7 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: b23cbcd5-4382-4159-8bb5-bb8e784fb56a
+
+	measure cerradas_este_mes = COUNTROWS(FILTER(Backlog_tareas_demanda, [7 - Tipo] = "Cerradas"))
+		formatString: 0
+		lineageTag: 5501b04b-a74b-4af2-aa31-4e1bdd21b31f
+
+	measure Backlog_demandas_acumulado = ```
+			
+			VAR MesActual = MAX('Backlog_tareas_demanda'[9 - Fecha])
+			RETURN
+			    CALCULATE(
+			        COUNTROWS('Backlog_tareas_demanda'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_tareas_demanda', Backlog_tareas_demanda[2 - Estado],'Backlog_tareas_demanda'[5 - Aplicacion] , 'Backlog_tareas_demanda'[6 - Grupo], 'Backlog_tareas_demanda'[8 - Porfolio], 'Backlog_tareas_demanda'[9 - Prioridad], 'Backlog_tareas_demanda'[10 - Tallaje], 'Backlog_tareas_demanda'[11 - Negocio]),
+			            'Backlog_tareas_demanda'[9 - Fecha] < MesActual &&
+			            'Backlog_tareas_demanda'[7 - Tipo] = "Abiertas" &&
+			            RELATED(Demandas_Tasks[PortfolioDemanda]) <> "Vacio"
+			        )
+			    ) - 
+			    CALCULATE(
+			        COUNTROWS('Backlog_tareas_demanda'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_tareas_demanda', 'Backlog_tareas_demanda'[2 - Estado],'Backlog_tareas_demanda'[5 - Aplicacion] , 'Backlog_tareas_demanda'[6 - Grupo], 'Backlog_tareas_demanda'[8 - Porfolio], 'Backlog_tareas_demanda'[9 - Prioridad], 'Backlog_tareas_demanda'[10 - Tallaje], 'Backlog_tareas_demanda'[11 - Negocio]),
+			            'Backlog_tareas_demanda'[9 - Fecha] < MesActual &&
+			            'Backlog_tareas_demanda'[9 - Fecha] >= DATE(2019,12,1) &&
+			            'Backlog_tareas_demanda'[7 - Tipo] = "Cerradas" && 
+			            RELATED(Demandas_Tasks[PortfolioDemanda]) <> "Vacio"
+			        )
+			    )
+			```
+		formatString: 0
+		lineageTag: 73966a86-ef65-40c0-902a-a93077cb4e1a
+
+	column '1 - Number'
+		lineageTag: fc76c735-94f6-46a8-95ff-f2663c02fd1d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Estado'
+		lineageTag: e10c2728-489e-4e28-9e07-1a5f77942fd4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[2 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - FechaMes'
+		lineageTag: 0a33fffd-a616-43c9-8654-f892d42b8c1a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[3 - FechaMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - FechaAño'
+		lineageTag: 71bba6ed-4b7a-47b2-aa63-09292e4fa6ec
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[4 - FechaAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Aplicacion'
+		lineageTag: e912bd0c-70ab-43da-8492-464adb333ae9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[5 - Aplicacion]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Grupo'
+		lineageTag: d07c489a-78f3-4e2d-9b86-e0868c21c74d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[6 - Grupo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '7 - Tipo'
+		lineageTag: 0890e57f-ae47-46aa-984d-52454c5c01a9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[7 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '9 - Fecha' = DATE([4 - FechaAño],[3 - FechaMes],1)
+		formatString: d-m-yy
+		lineageTag: 3ad64959-159d-4385-9c8f-cf483b61b12e
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 062e2b58-837b-403a-aa6c-dd95d4f64f62
+			defaultHierarchy: LocalDateTable_708802fe-e71a-4a89-aee4-6f64805a29ac.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column '8 - Porfolio'
+		lineageTag: 999afa46-ecf9-47e4-a67d-0293389d7a31
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[8 - Porfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '9 - Prioridad'
+		lineageTag: 6965505f-3de9-476f-9e60-451f81953c89
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[9 - Prioridad]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '10 - Tallaje'
+		lineageTag: adb6c799-378b-4746-95a3-9dd2fb9d50aa
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[10 - Tallaje]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DuracionAbiertas = DATEDIFF([9 - Fecha], today(), DAY)
+		formatString: 0
+		lineageTag: 98b9dec5-6edf-4577-846f-f8462f487bb9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column '11 - Negocio'
+		lineageTag: d619eaf4-d1b9-4004-99aa-30ad6a92bad8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_Tdemandas_abierto[11 - Negocio]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_tareas_demanda = calculated
+		mode: import
+		source = UNION(Backlog_Tdemandas_abierto,Backlog_Tdemandas_cerrado)
+
+	annotation PBI_Id = d1008ce1d8e3470684a31db844cb4c9c
+

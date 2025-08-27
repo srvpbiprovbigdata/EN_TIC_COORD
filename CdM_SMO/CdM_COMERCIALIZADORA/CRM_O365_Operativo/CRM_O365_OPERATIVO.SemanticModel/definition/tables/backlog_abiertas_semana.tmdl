@@ -1,0 +1,68 @@
+table backlog_abiertas_semana
+	lineageTag: 0048627a-d146-477e-abe7-11eca5bb80e7
+
+	column '1 - Number'
+		lineageTag: 2b7c7799-3c44-4717-9c31-314191472e65
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 2-estado
+		lineageTag: 634d9550-a4ff-478b-b000-ac97d1dcc6d4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2-estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Subcategoría'
+		lineageTag: 40cd19c8-b8a3-4d4e-bdc1-b74f03e534c6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [4 - Subcategoría]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Numero_Semana = WEEKNUM('backlog_abiertas_semana'[3 - Lunes], 2)
+		formatString: 0
+		lineageTag: 6f6857bb-0d71-4ca7-bf02-3ab2f7832b6d
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Etiqueta_Semana = "Semana " & WEEKNUM('backlog_abiertas_semana'[3 - Lunes], 2)
+		lineageTag: 3836010f-cacb-459c-9362-b2e5e4aa20ec
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - Lunes'
+		formatString: General Date
+		lineageTag: 547dc412-a7b5-4e47-931e-93cad9be51b0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 - Lunes]
+
+		variation Variación
+			isDefault
+			relationship: ea711eea-f1c8-4106-821c-060d17444c4d
+			defaultHierarchy: LocalDateTable_ff25730e-64f2-4e79-8b72-a90176f18f52.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Tipo'
+		lineageTag: 6f916c99-37cb-470e-806c-d7631a3a7822
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [5 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition backlog_abiertas_semana = calculated
+		mode: import
+		source = SELECTCOLUMNS('SERV_NOW incident', "1 - Number",'SERV_NOW incident'[Tarea], "2-estado", 'SERV_NOW incident'[Estado],"3 - Lunes",'SERV_NOW incident'[Lunes_Anterior_abierto], "4 - Subcategoría", 'SERV_NOW incident'[dv_u_subcategory], "5 - Tipo" , "abiertas")
+
+	annotation PBI_Id = 54c39d0eb6224bf0a75e22d8a6e7c826
+

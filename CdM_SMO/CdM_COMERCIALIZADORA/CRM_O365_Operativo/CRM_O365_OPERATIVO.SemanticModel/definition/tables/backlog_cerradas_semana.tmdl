@@ -1,0 +1,68 @@
+table backlog_cerradas_semana
+	lineageTag: 7e45d243-c6e5-47d6-9fe6-cd68b819b243
+
+	column '1 - Number'
+		lineageTag: 5301d213-5e94-4a64-8dd5-8ba617574a65
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 2-estado
+		lineageTag: 1ff59de1-a740-40e5-8d07-c94b4cd085ea
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2-estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Subcategoría'
+		lineageTag: ef887699-762e-4421-b7df-c35089dc653a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [4 - Subcategoría]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Numero_Semana = WEEKNUM('backlog_cerradas_semana'[3 - Lunes], 2)
+		formatString: 0
+		lineageTag: ecc2caa6-b58e-4063-afe7-928df8024014
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Etiqueta_Semana = "Semana " & WEEKNUM('backlog_cerradas_semana'[3 - Lunes], 2)
+		lineageTag: 61a6bddd-3b0f-4c08-8d97-c04c80c0b5fc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - Lunes'
+		formatString: General Date
+		lineageTag: e22c0fb3-8afc-4b3f-8a95-e9aa26699aa3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 - Lunes]
+
+		variation Variación
+			isDefault
+			relationship: 08e6d8e8-8782-4839-9d02-fcbcdfd8bc5a
+			defaultHierarchy: LocalDateTable_ccb020aa-b431-47f6-9f73-64f3b9c840b3.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Tipo'
+		lineageTag: 87938487-e4a8-42c8-8fee-132e95281ce9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [5 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition backlog_cerradas_semana = calculated
+		mode: import
+		source = SELECTCOLUMNS('SERV_NOW incident', "1 - Number",'SERV_NOW incident'[Tarea], "2-estado", 'SERV_NOW incident'[Estado],"3 - Lunes",'SERV_NOW incident'[Lunes_Anterior_cerrada], "4 - Subcategoría", 'SERV_NOW incident'[dv_u_subcategory],"5 - Tipo", "cerradas")
+
+	annotation PBI_Id = dd67b7b91f9743ab8692ae9b0973ac33
+
