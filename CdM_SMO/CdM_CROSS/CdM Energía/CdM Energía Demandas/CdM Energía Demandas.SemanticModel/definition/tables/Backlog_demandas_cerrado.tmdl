@@ -1,0 +1,121 @@
+table Backlog_demandas_cerrado
+	lineageTag: 444f4622-8955-4205-b48a-875763210075
+
+	column '1 - Number'
+		lineageTag: 4ebbff94-a8de-4af3-8a43-ecb05d145ca6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Estado'
+		lineageTag: 21edb670-9727-4039-afc2-9922ea6538d0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - MesAño'
+		lineageTag: 84ded6ea-14a1-4a32-8d99-ff20d9785fdf
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 - MesAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - NroMes'
+		formatString: 0
+		lineageTag: 0cbee780-493a-4b28-9ff6-b27c3cc0f52d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [4 - NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Año'
+		formatString: 0
+		lineageTag: d70fe843-9c2c-478d-a1a8-01436242d181
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [5 - Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Porfolio'
+		lineageTag: 13837d19-1472-4925-8e35-fbf062cf19f4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [6 - Porfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '7 - Prioridad'
+		lineageTag: bb832a29-3a32-49f8-8d11-0a688888509e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [7 - Prioridad]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '8 - Tallaje'
+		lineageTag: b83ba9f0-633c-4d27-add4-9ff71c174807
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [8 - Tallaje]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '9 - Presupuesto'
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: f03cfbc5-216c-45e8-bacc-bf6d52bfb200
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [9 - Presupuesto]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '10 - Tipo'
+		lineageTag: fa045502-e3f3-4c7e-a0c9-a2c02fa460de
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [10 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '11 - Fecha' = DATE([5 - Año],[4 - NroMes],1)
+		formatString: d-m-yy
+		lineageTag: b428fbdd-a8f5-4a3b-b61d-b8da5f52dc0f
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 469d44b6-0d53-4eab-a1c4-4e14048989cc
+			defaultHierarchy: LocalDateTable_7f8fb936-dfc8-488d-a3d3-4cfdc5fa3ba5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition Backlog_demandas_cerrado = calculated
+		mode: import
+		source = ```
+				
+				    SELECTCOLUMNS(
+				        'dmn_demand',
+				        "1 - Number", dmn_demand[number],
+				        "2 - Estado", dmn_demand[dv_state],
+				        "3 - MesAño", dmn_demand[MesAñoCerrada],
+				        "4 - NroMes", dmn_demand[closed_at].[NroMes], 
+				        "5 - Año", dmn_demand[closed_at].[Año],
+				        "6 - Porfolio", dmn_demand[dv_portfolio],
+				        "7 - Prioridad", dmn_demand[dv_priority],
+				        "8 - Tallaje", dmn_demand[Tallaje],
+				        "9 - Presupuesto", dmn_demand[u_total_budget],
+				        "10 - Tipo", "Cerradas"
+				            )
+				```
+
+	annotation PBI_Id = 2ac937afffd64d40aee995eb8ca79e8a
+

@@ -1,0 +1,214 @@
+table metric_instance_demandas
+	lineageTag: bebb1f06-8abd-4e45-8644-8778147aa6c5
+
+	column calculation_complete
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d01471e9-35d6-4c16-bcf7-6aa905038697
+		summarizeBy: none
+		sourceColumn: calculation_complete
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_definition
+		dataType: string
+		lineageTag: 3822cacd-4a37-4333-873a-6bb363ddb8ce
+		summarizeBy: none
+		sourceColumn: dv_definition
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 03a105b6-ae9c-41c8-833d-f0953d2d4a01
+		summarizeBy: none
+		sourceColumn: duration
+
+		variation Variación
+			isDefault
+			relationship: e4da0125-b166-492f-92b0-84c708e7b632
+			defaultHierarchy: LocalDateTable_a4a20c4f-2aae-468c-a45a-f2dded4b0fc3.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_duration
+		dataType: string
+		lineageTag: 3bc9dea3-7fb4-498a-92f3-f9cfc147ca37
+		summarizeBy: none
+		sourceColumn: dv_duration
+
+		annotation SummarizationSetBy = Automatic
+
+	column end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0be62d00-a45e-46bc-bbd6-391670bd0436
+		summarizeBy: none
+		sourceColumn: end
+
+		variation Variación
+			isDefault
+			relationship: 097a6854-bfb9-42e2-9bc5-560b771d0bf3
+			defaultHierarchy: LocalDateTable_498c32fe-b792-4365-a920-58f04c232e76.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column field
+		dataType: string
+		lineageTag: 17807586-aeca-4b36-bb90-1841dae04dcf
+		summarizeBy: none
+		sourceColumn: field
+
+		annotation SummarizationSetBy = Automatic
+
+	column field_value
+		dataType: string
+		lineageTag: 02ab5deb-f85c-415a-9450-4fa6b45ef6bc
+		summarizeBy: none
+		sourceColumn: field_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column id
+		dataType: string
+		lineageTag: 3424b5a3-449a-4d52-931d-e1e8f3328831
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ec009b32-4b11-4da1-9eed-16b5aca3ad62
+		summarizeBy: none
+		sourceColumn: start
+
+		variation Variación
+			isDefault
+			relationship: 57527b25-d564-4ebc-aa89-193f98bc58a6
+			defaultHierarchy: LocalDateTable_a7342dab-a0c8-4ae4-b95b-c966890a6107.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9a3d8c3e-8668-47a2-a8e7-2e2efb28aecb
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: 6cdb737e-d10f-414e-92d6-2e16e0062db3
+			defaultHierarchy: LocalDateTable_fc3b549e-de1b-44e8-ab12-518acabd9449.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: 752f0a59-fa0c-48c8-8e52-2312f7d712d7
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_mod_count
+		dataType: int64
+		formatString: 0
+		lineageTag: cc5f16fe-6512-44e3-b1a4-aa667c0338f9
+		summarizeBy: sum
+		sourceColumn: sys_mod_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_updated_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3cec3725-39f2-4618-a330-2ff4f793928a
+		summarizeBy: none
+		sourceColumn: sys_updated_on
+
+		variation Variación
+			isDefault
+			relationship: e78511ff-1b39-4677-8d5f-fffe853345ff
+			defaultHierarchy: LocalDateTable_cf52d36f-5ec3-472b-8c4f-d1fcfcd2d9c1.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: a49b0067-60e3-4f43-a433-d0d8399168a4
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'dmn_demand.number'
+		dataType: string
+		lineageTag: ec28f624-c564-42dd-b716-4e69e3a328b8
+		summarizeBy: none
+		sourceColumn: dmn_demand.number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Duración_demandas (días)' = DATEDIFF([start],[end],DAY)
+		formatString: 0
+		lineageTag: d639bc7f-6014-497b-865e-f16d595dec46
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: a1599ab8-4097-41eb-bda5-3e4c1a02aa8d
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metric_instance_demandas = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "dwh"),
+				    SERV_NOW_metric_instance_demandas = Origen{[Schema="SERV_NOW",Item="metric_instance_demandas"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_metric_instance_demandas,{"business_duration", "dv_business_duration", "definition", "table", "sys_updated_by", "sys_created_by"}),
+				    #"Consultas combinadas" = Table.NestedJoin(#"Columnas quitadas", {"id"}, dmn_demand, {"sys_id"}, "dmn_demand", JoinKind.Inner),
+				    #"Se expandió dmn_demand" = Table.ExpandTableColumn(#"Consultas combinadas", "dmn_demand", {"number"}, {"dmn_demand.number"}),
+				    #"Columna duplicada" = Table.DuplicateColumn(#"Se expandió dmn_demand", "value", "value - Copia"),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columna duplicada",{{"value - Copia", "Valor"}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas con nombre cambiado","Completed","Completado",Replacer.ReplaceText,{"Valor"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Analysis","Análisis",Replacer.ReplaceText,{"Valor"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Valor reemplazado1", each true),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Filas filtradas","Approved","Aprobado",Replacer.ReplaceText,{"Valor"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Does Not Apply","No Aplica",Replacer.ReplaceText,{"Valor"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Draft","Borrador",Replacer.ReplaceText,{"Valor"}),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado4","Qualification","Cualificación",Replacer.ReplaceText,{"Valor"}),
+				    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","Rejected","Rechazado",Replacer.ReplaceText,{"Valor"}),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Valor reemplazado6",{{"Valor", "Estado"}}),
+				    #"Valor reemplazado7" = Table.ReplaceValue(#"Columnas con nombre cambiado1","Business Requirement","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado7","Business Stop","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado9" = Table.ReplaceValue(#"Valor reemplazado8","Dependence on Another","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado10" = Table.ReplaceValue(#"Valor reemplazado9","Deferred","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado11" = Table.ReplaceValue(#"Valor reemplazado10","Demand Capacity","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado12" = Table.ReplaceValue(#"Valor reemplazado11","Ya no es necesaria","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado13" = Table.ReplaceValue(#"Valor reemplazado12","XXL","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado14" = Table.ReplaceValue(#"Valor reemplazado13","XL","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado15" = Table.ReplaceValue(#"Valor reemplazado14","XS","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado16" = Table.ReplaceValue(#"Valor reemplazado15","L","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado18" = Table.ReplaceValue(#"Valor reemplazado16","Submiion","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado17" = Table.ReplaceValue(#"Valor reemplazado18","Requisitos Negocio","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado19" = Table.ReplaceValue(#"Valor reemplazado17","Repriorizada negocio","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado20" = Table.ReplaceValue(#"Valor reemplazado19","Pending","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado21" = Table.ReplaceValue(#"Valor reemplazado20","Parada Negocio","",Replacer.ReplaceText,{"Estado"}),
+				    #"Valor reemplazado22" = Table.ReplaceValue(#"Valor reemplazado21","No technically feasible","",Replacer.ReplaceText,{"Estado"}),
+				    #"Filas filtradas1" = Table.SelectRows(#"Valor reemplazado22", each ([Estado] = "Análisis" or [Estado] = "Aprobado" or [Estado] = "Borrador" or [Estado] = "Completado" or [Estado] = "Cualificación" or [Estado] = "Registro"))
+				in
+				    #"Filas filtradas1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

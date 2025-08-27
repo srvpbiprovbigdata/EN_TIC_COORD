@@ -1,0 +1,116 @@
+table Backlog_demandas_cerrado
+	lineageTag: 2d81b5ad-a94a-419a-a9e8-e299cf2b8f28
+
+	column '1 - Number'
+		lineageTag: 7c3a169f-fe36-4d6e-b391-03f29d152505
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Estado'
+		lineageTag: e5119482-1910-4573-9c35-d1f067244e5d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - NroMes'
+		formatString: 0
+		lineageTag: 963077e1-ca96-42f7-9b9b-9ddb21c739b7
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [3 - NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Año'
+		formatString: 0
+		lineageTag: e219625d-2820-489d-a2db-ea372d7f9dbe
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [4 - Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Porfolio'
+		lineageTag: 85ec10a7-c620-46e6-9c7e-c5b84f762662
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [5 - Porfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Prioridad'
+		lineageTag: 223cc424-5d88-4e08-9b80-8b6ba6d5b33e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [6 - Prioridad]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '7 - Tallaje'
+		lineageTag: 2174fa95-e05f-4aa4-88db-1f3afe518a58
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [7 - Tallaje]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '8 - Presupuesto'
+		lineageTag: 0a998123-da80-462a-8db8-664ee8a7251f
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [8 - Presupuesto]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column '9 - Tipo'
+		lineageTag: 7bf63b69-660a-4c4d-a989-544fc6caccfd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [9 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '10 - Unidad tecnológica'
+		lineageTag: 0bed7a07-bda0-4e4e-ad52-e6e8545b820e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [10 - Unidad tecnológica]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '11 - Aplicación'
+		lineageTag: 7b945747-1a4b-4190-922b-0079f6de4c88
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [11 - Aplicación]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_demandas_cerrado = calculated
+		mode: import
+		source = ```
+				SELECTCOLUMNS(
+				    'Ficha - dmn_demand',
+				    "1 - Number", 'Ficha - dmn_demand'[number],
+				    "2 - Estado", 'Ficha - dmn_demand'[dv_state],
+				    "3 - NroMes", 'Ficha - dmn_demand'[closed_at].[NroMes], 
+				    "4 - Año", 'Ficha - dmn_demand'[closed_at].[Año],
+				    "5 - Porfolio", 'Ficha - dmn_demand'[dv_portfolio],
+				    "6 - Prioridad", 'Ficha - dmn_demand'[dv_priority],
+				    "7 - Tallaje", 'Ficha - dmn_demand'[dv_size.1],
+				    "8 - Presupuesto", 'Ficha - dmn_demand'[u_total_budget],
+				    "9 - Tipo", "Cerradas",
+				    "10 - Unidad tecnológica", RELATED('Porfolios 3'[Unidad Tecnología]),
+				    "11 - Aplicación", 'Ficha - dmn_demand'[dv_u_business_applications]
+				)
+				```
+
+	annotation PBI_Id = d27bcb9406c04517892e770019223aa5
+

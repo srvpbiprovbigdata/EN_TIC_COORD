@@ -1,0 +1,58 @@
+table Grupos
+	lineageTag: ba7a8803-0964-4a6c-a131-539727856302
+
+	column g_name
+		dataType: string
+		lineageTag: 31e74df4-4776-4cce-8c3b-377929c6e864
+		summarizeBy: none
+		sourceColumn: g_name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column g_sys_id
+		dataType: string
+		lineageTag: 5317e25e-c012-41ad-b570-1ea8abe4069d
+		summarizeBy: none
+		sourceColumn: g_sys_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column g_u_country
+		dataType: string
+		lineageTag: aae75637-0329-45ea-9a35-ed14d7ef79a1
+		summarizeBy: none
+		sourceColumn: g_u_country
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'g_u_country - Copia'
+		dataType: string
+		lineageTag: 2e69c5aa-1414-44aa-b29d-3e4121f71a78
+		summarizeBy: none
+		sourceColumn: g_u_country - Copia
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Grupos-7a0e7f57-b1be-405f-9313-3f6503563c1d = m
+		mode: import
+		source =
+				let
+				   Origen5 = Sql.Database("QECCDWH.acciona.int,60001", "DWH", [Query="select g_name, g_sys_id, g_u_country FROM DWH.SERV_NOW.u_groups"]),
+				    #"Columna duplicada" = Table.DuplicateColumn(Origen5, "g_u_country", "g_u_country - Copia")
+				in
+				    #"Columna duplicada"
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

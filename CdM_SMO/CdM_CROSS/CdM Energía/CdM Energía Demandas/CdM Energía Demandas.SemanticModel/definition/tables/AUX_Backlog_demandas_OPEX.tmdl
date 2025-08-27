@@ -1,0 +1,92 @@
+table AUX_Backlog_demandas_OPEX
+	lineageTag: 210396b1-143d-4fc0-bef8-3e0927bdd3b8
+
+	measure AcumuladoO =
+			
+			CALCULATE(
+			    Sum(AUX_Backlog_demandas_OPEX[OPEX abierto este mes]),
+			    FILTER(ALLSELECTED(AUX_Backlog_demandas_OPEX),AUX_Backlog_demandas_OPEX[fecha]<=MAX(AUX_Backlog_demandas_OPEX[fecha])))
+		lineageTag: 12af5532-1425-429a-b8a2-d5ae491b4700
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MesAño
+		lineageTag: 97ac9973-411d-4455-af4b-ed31cc60bb13
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: dmn_demand[MesAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column NroMes
+		formatString: 0
+		lineageTag: 9afaeea8-707d-442a-bdff-cb4cf2cc5028
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_0943ce9e-af29-4d16-bd81-6a824477449a[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 79ec30a9-b053-404d-8f87-b6a5cbfb9916
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_0943ce9e-af29-4d16-bd81-6a824477449a[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abiertas este mes'
+		formatString: 0
+		lineageTag: 30be0aaa-67dd-48cc-92cf-dfde0af5f0b0
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Abiertas este mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'OPEX abierto este mes'
+		formatString: #,0\ "€";-#,0\ "€";#,0\ "€"
+		lineageTag: 7404abcd-24fa-435e-a513-f3fd827587f3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [OPEX abierto este mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha = DATE([Año],[NroMes],1)
+		formatString: General Date
+		lineageTag: 2bb4acf9-b277-42b2-b11c-a57cf9c60bc7
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: b55f8992-ae85-499f-adcd-5f2d6e32dc6f
+			defaultHierarchy: LocalDateTable_0e9949b8-5988-4947-ad8b-e56db0717163.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'OPEX meses anteriores' = [AcumuladoO]-[OPEX abierto este mes]
+		lineageTag: b3205d23-c4d7-4ba9-8f2a-aa6d63236279
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition AUX_Backlog_demandas_OPEX = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'dmn_demand',
+				    dmn_demand[MesAño],
+				    dmn_demand[opened_at].[NroMes], 
+				    dmn_demand[opened_at].[Año],
+				    "Abiertas este mes", CALCULATE(COUNT(dmn_demand[MesAño]))+0,
+				  "OPEX abierto este mes", CALCULATE(SUM('dmn_demand'[operational_budget])) + 0
+				    )
+				```
+
+	annotation PBI_Id = 5741c5ffaa4a4821b8b9adb766b1e08a
+

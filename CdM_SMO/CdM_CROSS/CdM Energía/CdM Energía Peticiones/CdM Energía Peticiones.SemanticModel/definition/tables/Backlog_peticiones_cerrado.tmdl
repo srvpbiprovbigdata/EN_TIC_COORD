@@ -1,0 +1,70 @@
+table Backlog_peticiones_cerrado
+	lineageTag: 63f81128-d36a-4a72-8ead-32c36c2d868d
+
+	column '1 - Number'
+		lineageTag: b9faccc2-6004-45f5-8a22-25e0a3be33e7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Estado'
+		lineageTag: d9030a9a-1d9a-4c07-8754-81c7a79d01ef
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - MesAño'
+		formatString: 0
+		lineageTag: a6a27cf8-0348-4cb5-a5d6-50935b56cd8e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [3 - MesAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - NroMes'
+		formatString: 0
+		lineageTag: ed8485f6-869c-4f24-a4fe-dcff33b8714f
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [4 - NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Elemento'
+		lineageTag: baf90ea0-812c-4e66-9358-613a87d7ea1d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [5 - Elemento]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Tipo'
+		lineageTag: 338f2755-5ca2-4d66-82ea-f4fdde3184ae
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [6 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_peticiones_cerrado = calculated
+		mode: import
+		source = ```
+				
+				    SELECTCOLUMNS(
+				        'Peticiones',
+				        "1 - Number", Peticiones[number],
+				        "2 - Estado", Peticiones[dv_state],
+				        "3 - MesAño", Peticiones[closed_at].[Año],
+				        "4 - NroMes", Peticiones[closed_at].[NroMes], 
+				        "5 - Elemento", Peticiones[dv_cat_item],
+				        "6 - Tipo", "Cerrado"
+				            )
+				```
+
+	annotation PBI_Id = 9474541e8f614e85b31b5c0e86d27f87
+

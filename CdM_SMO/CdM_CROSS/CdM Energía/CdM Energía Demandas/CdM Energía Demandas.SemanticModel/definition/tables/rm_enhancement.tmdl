@@ -1,0 +1,138 @@
+table rm_enhancement
+	lineageTag: 04d6c266-47f8-4348-b695-e2b4121ac5b2
+
+	column number
+		dataType: string
+		lineageTag: b837d57c-be4e-4d1e-9cf6-7fb2029930bd
+		summarizeBy: none
+		sourceColumn: number
+
+		annotation SummarizationSetBy = Automatic
+
+	column short_description
+		dataType: string
+		lineageTag: 8e5b3fb6-8bf2-4197-9852-5bd61c65f2c7
+		summarizeBy: none
+		sourceColumn: short_description
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a33ab05a-5910-4400-a007-71ced21877f5
+		summarizeBy: none
+		sourceColumn: start_date
+
+		variation Variación
+			isDefault
+			relationship: 94227f65-9582-415f-a4bf-6046d55e1b71
+			defaultHierarchy: LocalDateTable_8e47142d-1c6e-4da7-ae66-f0dd4db52f37.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_state
+		dataType: string
+		lineageTag: 876bdaf2-8297-411f-8d77-5336b628c032
+		summarizeBy: none
+		sourceColumn: dv_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: 9d989d22-c332-4344-b9b1-9fb3dcabf302
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 016343f4-b704-4483-9491-3fd92c0b1e36
+		summarizeBy: none
+		sourceColumn: end_date
+
+		variation Variación
+			isDefault
+			relationship: ad88d0db-7af9-4bd5-bb63-17fe171fb27a
+			defaultHierarchy: LocalDateTable_a8735546-ec9f-4934-abb1-a9c4394a82ed.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column percent_complete
+		dataType: double
+		lineageTag: bb2352bf-513b-45aa-8b03-4fe3200b839c
+		summarizeBy: sum
+		sourceColumn: percent_complete
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column u_progress
+		dataType: double
+		lineageTag: 50d5fea8-b0df-474c-98f4-ae8d5016b968
+		summarizeBy: sum
+		sourceColumn: u_progress
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column work_end
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 76af2d34-1169-4543-94aa-2c8b50ca634f
+		summarizeBy: none
+		sourceColumn: work_end
+
+		variation Variación
+			isDefault
+			relationship: 3bfa7519-4efc-4f9f-ae05-c3564d1ab1bb
+			defaultHierarchy: LocalDateTable_f6d87406-eaf3-4430-966a-f41b248a3f23.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column work_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c40b5312-bcb9-4761-9981-31c0531d239a
+		summarizeBy: none
+		sourceColumn: work_start
+
+		variation Variación
+			isDefault
+			relationship: 43ce939b-4f87-4d3e-be9a-d817eeeda42d
+			defaultHierarchy: LocalDateTable_a8c3d3bd-d3e1-4dc6-976c-6dd8c967de76.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column approval_set
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b7cb747e-8288-4db2-91be-85e6752898da
+		summarizeBy: none
+		sourceColumn: approval_set
+
+		variation Variación
+			isDefault
+			relationship: f3667030-f96b-4e0d-aa17-5ca49129ef1f
+			defaultHierarchy: LocalDateTable_e4c5e17a-8c71-4fb4-a45b-227424b157c4.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition rm_enhancement = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Databases("QECCDWH.acciona.int,60001"),
+				    DWH = Origen{[Name="DWH"]}[Data],
+				    SERV_NOW_rm_enhancement = DWH{[Schema="SERV_NOW",Item="rm_enhancement"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_rm_enhancement,{"active", "activity_due", "actual_benefits", "additional_assignee_list", "allow_dates_outside_schedule", "approval", "dv_approval", "approval_history", "assigned_to", "dv_assigned_to", "assignment_group", "dv_assignment_group", "benefits", "budget_cost", "business_duration", "dv_business_duration", "business_service", "dv_business_service", "calculation_type", "dv_calculation_type", "calendar_duration", "dv_calendar_duration", "capex_cost", "close_notes", "closed_at", "closed_by", "dv_closed_by", "cmdb_ci", "dv_cmdb_ci", "cmdb_ci_business_app", "dv_cmdb_ci_business_app", "comments", "comments_and_work_notes", "company", "dv_company", "constraint_date", "contact_type", "dv_contact_type", "correlation_display", "correlation_id", "cost", "critical_path", "delivery_plan", "dv_delivery_plan", "delivery_task", "dv_delivery_task", "dependency", "description", "due_date", "duration", "dv_duration", "effort", "dv_effort", "end_date_derived_from", "dv_end_date_derived_from", "escalation", "dv_escalation", "expected_start", "follow_up", "group_list", "has_conflict", "html_description", "impact", "dv_impact", "key_milestone", "knowledge", "level", "location", "dv_location", "made_sla", "milestone", "mpp_task_id", "opened_at", "opened_by", "dv_opened_by", "opex_cost", "order", "orig_sys_id", "dv_orig_sys_id", "orig_top_task_id", "dv_orig_top_task_id", "parent", "dv_parent", "phase_type", "dv_phase_type", "priority", "dv_priority", "product", "dv_product", "reassignment_count", "rejection_goto", "dv_rejection_goto", "relation_applied", "dv_relation_applied", "remaining_duration", "dv_remaining_duration", "remaining_effort", "dv_remaining_effort", "resource_allocated_cost", "resource_planned_cost", "rollup", "route_reason", "dv_route_reason", "schedule_end_date", "schedule_start_date", "service_offering", "dv_service_offering", "shadow", "skills", "sla_due", "start_date_derived_from", "dv_start_date_derived_from", "state", "status", "dv_status", "sub_tree_root", "dv_sub_tree_root", "sys_class_name", "dv_sys_class_name", "sys_created_by", "sys_created_on", "sys_domain", "sys_domain_path", "sys_mod_count", "sys_tags", "sys_updated_by", "sys_updated_on", "task", "task_effective_number", "task_for", "dv_task_for", "time_card_at_top_task", "time_constraint", "dv_time_constraint", "time_worked", "dv_time_worked", "top_portfolio", "dv_top_portfolio", "top_program", "dv_top_program", "top_task", "dv_top_task", "u_acciona_priority", "u_business_application", "dv_u_business_application", "u_business_line", "dv_u_business_line", "u_catalog", "dv_u_catalog", "u_department", "dv_u_department", "u_execution_type", "dv_u_execution_type", "u_external_vendor", "dv_u_external_vendor", "u_metal", "dv_u_metal", "u_phone", "u_previous_groups","u_ref_country", "dv_u_ref_country", "u_responded", "u_size", "dv_u_size", "u_state_date", "universal_request", "dv_universal_request", "upon_approval", "dv_upon_approval", "upon_reject", "dv_upon_reject", "urgency", "dv_urgency", "user_input", "variables", "version", "watch_list", "wbs", "wbs_order", "wf_activity", "dv_wf_activity", "work_cost", "work_duration", "dv_work_duration", "work_effort", "dv_work_effort", "work_notes", "work_notes_list"})
+				in
+				    #"Columnas quitadas"
+
+	annotation PBI_ResultType = Table
+

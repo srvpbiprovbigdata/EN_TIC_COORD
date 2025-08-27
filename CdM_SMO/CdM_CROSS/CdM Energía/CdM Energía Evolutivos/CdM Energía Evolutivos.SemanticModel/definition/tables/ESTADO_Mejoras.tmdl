@@ -1,0 +1,48 @@
+table ESTADO_Mejoras
+	lineageTag: 46187c42-41c5-4a91-b402-a76eb3417055
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 1a4a5eea-df66-4834-963c-fe8d3c8a95bb
+		summarizeBy: none
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_en
+		dataType: string
+		lineageTag: f9ce374a-195d-42b1-aaaa-d41a2679b9ab
+		summarizeBy: none
+		sourceColumn: Estado_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_es
+		dataType: string
+		lineageTag: 86c1555e-e4f1-4681-abb9-d93ea4117c1d
+		summarizeBy: none
+		sourceColumn: Estado_es
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Generico
+		dataType: string
+		lineageTag: e9aa6b1a-b7f5-45d3-8f9e-6dbefadef333
+		summarizeBy: none
+		sourceColumn: Estado_Generico
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ESTADO_Mejoras-9ad870cf-e8b7-4939-bd1c-2753ab9389e8 = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("ZY/bCoJAEIZfRbwWpHO3pkFBEEF34sXmTiaMO8seAh+nZ+nF2tUSsav5v38+ht08D2dhFGaK3Y2bO1KKcVLjWER5OHfFUQSJYNjqWjvae3q/sB4wtUpTZy96O4MnIMkGhOkNqagE50z0pSuuoE0tqviS/FQLN/Z3eeXfChKpjU/MivLRsZZYQ2Vhaq9dcRbBgZD3K2eCYlNt44oUSQMPUmokgvGXUuj+P0re3XpmogRE4EP+ekMuig8=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t, Columna2 = _t, Columna3 = _t, Columna4 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", Int64.Type}, {"Columna2", type text}, {"Columna3", type text}, {"Columna4", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Columna1", "Index"}, {"Columna2", "Estado_en"}, {"Columna3", "Estado_es"}, {"Columna4", "Estado_Generico"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_ResultType = Table
+

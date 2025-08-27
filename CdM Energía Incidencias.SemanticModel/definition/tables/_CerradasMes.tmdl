@@ -1,0 +1,90 @@
+table _CerradasMes
+	lineageTag: 46bbc412-1f82-4ae7-af70-2087c9e1a199
+
+	measure CerradasAcumuladas =
+			
+			CALCULATE(
+			    Sum(_CerradasMes[ceTotal])+0,
+			    FILTER(ALLSELECTED(_CerradasMes), -_CerradasMes[fecha]<=MAX(_CerradasMes[fecha]))
+			)
+		formatString: 0
+		lineageTag: b2d17a50-b536-4c23-b771-3b8a33c140cf
+
+	column NroMes
+		formatString: 0
+		lineageTag: c287e110-50e8-4e03-8037-615b65be5e41
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_209e297f-f793-4dd3-ae5f-2d902a778055[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 9e066ac4-5a6c-4302-b1fc-1c09c2466ccd
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_209e297f-f793-4dd3-ae5f-2d902a778055[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerradas
+		formatString: 0
+		lineageTag: b8c12c61-48f9-4acc-b2e5-866cbe8f3b67
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Cerradas]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _myMesAñoIncCerrada
+		lineageTag: 28fdd2e6-558f-427a-a633-f38b65980f20
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: incident[_myMesAñoIncCerrada]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ceTotal = if(_CerradasMes[Cerradas]=BLANK(), 0, _CerradasMes[Cerradas])
+		formatString: 0
+		lineageTag: 8b549ee8-d0ee-4713-85c5-bf4705e51138
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha = DATE(_CerradasMes[Año],_CerradasMes[NroMes],1)
+		formatString: d-m-yy
+		lineageTag: 398cccc3-dcac-413c-bf35-5e9a59ab71c5
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: d211027e-8a26-41df-86d3-fbf36de598b4
+			defaultHierarchy: LocalDateTable_5cfc775a-2454-492a-a10b-d6e351ac1586.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column CerradasPasadosTotal = [CerradasAcumuladas]-_CerradasMes[ceTotal]
+		formatString: 0
+		lineageTag: 4fb5b793-6a1d-4d02-9b5b-eb3577311774
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _CerradasMes-4ecd8687-7582-4aa4-8a76-085dba76eb61 = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'incident',
+				    incident[_myMesAñoIncCerrada],
+				    incident[Fecha Cierre].[NroMes], 
+				    incident[Fecha Cierre].[Año],
+				    "Cerradas", CALCULATE(COUNT(incident[_myMesAñoInc]),FILTER(incident,and(incident[__Util]="Si",incident[Estado]="Cerrado")))
+				    )
+				```
+
+	annotation PBI_Id = 35af12a035b449cfb2f4962027e35d22
+

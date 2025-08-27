@@ -1,0 +1,34 @@
+table Tabla_fechas
+	lineageTag: e1c32982-f64b-4c81-966e-8b7b5b524a46
+
+	column Date
+		formatString: d-m-yy
+		lineageTag: 2d018b1e-7b8c-4e97-9710-989e0ed04ae4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variación
+			isDefault
+			relationship: d22729be-2c86-4c29-8133-a541630a4420
+			defaultHierarchy: LocalDateTable_78912e60-a9fb-40d1-a28f-aba0f5a05c01.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition Tabla_fechas = calculated
+		mode: import
+		source =
+				
+				VAR FechaInicio = DATE(2019, 10, 1)
+				VAR FechaFin = TODAY()
+				VAR TodasLasFechas = CALENDAR(FechaInicio, FechaFin)
+				RETURN
+				    FILTER(
+				        TodasLasFechas,
+				        DAY([Date]) = 1 && NOT(ISBLANK(DATE(YEAR([Date]), MONTH([Date])-1, 1)))
+				    )
+
+	annotation PBI_Id = 90c7d74d95fa4d5db82fc00129afbdea
+

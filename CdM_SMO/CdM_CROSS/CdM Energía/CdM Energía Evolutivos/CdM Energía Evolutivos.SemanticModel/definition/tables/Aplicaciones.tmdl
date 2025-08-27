@@ -1,0 +1,43 @@
+table Aplicaciones
+	lineageTag: 6c57c1e5-4f3b-4eed-a71f-4ddae887a360
+
+	column 'Aplicación identificada por Energía'
+		dataType: string
+		lineageTag: 2a953738-1fa1-4404-978c-94361570622b
+		summarizeBy: none
+		sourceColumn: Aplicación identificada por Energía
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Aplicación de Negocio'
+		dataType: string
+		lineageTag: fa67afe8-84a0-4881-b0d2-1be2dd0999dd
+		summarizeBy: none
+		sourceColumn: Aplicación de Negocio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Aplicaciones-f1e2e8d4-b5e5-42e0-a5ee-4d6cd09783f9 = m
+		mode: import
+		source =
+				let
+				    URL = sharepointSource & Entorno,
+				    URLcompleta = sharepointSource & Entorno & sharepointSource2,
+				    Origen = SharePoint.Files(URL, [ApiVersion = 15]),
+				    #"Filas filtradas" = Table.SelectRows(Origen, each ([Extension] = ".xlsx") and ([Name] = "Aplicaciones_Evolutivos.xlsx") and ([Folder Path] = URLcompleta)),
+				    #"Archivos ocultos filtrados1" = Table.SelectRows(#"Filas filtradas", each [Attributes]?[Hidden]? <> true),
+				    #"Invocar función personalizada1" = Table.AddColumn(#"Archivos ocultos filtrados1", "Transformar archivo (3)", each #"Transformar archivo (3)"([Content])),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Invocar función personalizada1", {"Name", "Source.Name"}),
+				    #"Otras columnas quitadas1" = Table.SelectColumns(#"Columnas con nombre cambiado1", {"Source.Name", "Transformar archivo (3)"}),
+				    #"Columna de tabla expandida1" = Table.ExpandTableColumn(#"Otras columnas quitadas1", "Transformar archivo (3)", Table.ColumnNames(#"Transformar archivo (3)"(#"Archivo de ejemplo (3)"))),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columna de tabla expandida1",{{"Source.Name", type text}, {"Column1", type text}, {"Column2", type text}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado",{"Source.Name"}),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(#"Columnas quitadas", [PromoteAllScalars=true]),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"Aplicación identificada por Energía", type text}, {"Aplicación de Negocio", type text}})
+				in
+				    #"Tipo cambiado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

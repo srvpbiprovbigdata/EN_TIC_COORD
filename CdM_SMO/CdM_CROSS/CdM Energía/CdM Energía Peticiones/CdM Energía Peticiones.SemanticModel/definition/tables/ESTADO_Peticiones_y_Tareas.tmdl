@@ -1,0 +1,42 @@
+table ESTADO_Peticiones_y_Tareas
+	lineageTag: 30f6cd45-742b-469b-94d2-5cee7ee2c198
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: d7f226f7-0733-42a4-b6e8-3d8784325555
+		summarizeBy: none
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_en
+		dataType: string
+		lineageTag: cca0c3ce-18dd-4f39-815c-e8c3e9990f43
+		summarizeBy: none
+		sourceColumn: Estado_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_es
+		dataType: string
+		lineageTag: c26bbf26-8092-45e6-ab66-9207beae2796
+		summarizeBy: none
+		sourceColumn: Estado_es
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ESTADO_Peticiones_y_Tareas-b46141d6-593a-4702-ab5b-f7094e5acf49 = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("Zcy7DsIwDAXQX7Eyd+HVHVUMTCAxMEQdSmKB1dSOnPD/TclQEJPle49trdmYxlwichnHB6FmMX1jzbbsd9ERiOGq8lRMqUQnBvfWVM1uOWV4SfC1whRRh0+3L0kXJKGHTqYYMOOSoOrgBVyN6pvDSs/s/jHxD29XfhspRvRfVibK5AvsZw==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t, Columna2 = _t, Columna3 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", Int64.Type}, {"Columna2", type text}, {"Columna3", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Columna1", "Index"}, {"Columna2", "Estado_en"}, {"Columna3", "Estado_es"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

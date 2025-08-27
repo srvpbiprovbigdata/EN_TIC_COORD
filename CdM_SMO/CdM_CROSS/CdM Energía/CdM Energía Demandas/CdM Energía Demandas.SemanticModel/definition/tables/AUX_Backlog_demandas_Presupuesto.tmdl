@@ -1,0 +1,92 @@
+table AUX_Backlog_demandas_Presupuesto
+	lineageTag: af2993f1-9a9e-4c3e-9bc9-17531c6b8963
+
+	measure AcumuladoP =
+			
+			CALCULATE(
+			    Sum(AUX_Backlog_demandas_Presupuesto[Presupuesto abierto este mes]),
+			    FILTER(ALLSELECTED(AUX_Backlog_demandas_Presupuesto),AUX_Backlog_demandas_Presupuesto[fecha]<=MAX(AUX_Backlog_demandas_Presupuesto[fecha])))
+		lineageTag: 39dc1730-c239-4901-9a42-85676274be48
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MesAño
+		lineageTag: f43baf78-4bc3-4ea2-896a-0f60956532c5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: dmn_demand[MesAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column NroMes
+		formatString: 0
+		lineageTag: e4d46d86-e6f3-4051-aa12-c21b007b1143
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_0943ce9e-af29-4d16-bd81-6a824477449a[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 5c189d86-dead-4f7c-8c6d-c20bb2781577
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_0943ce9e-af29-4d16-bd81-6a824477449a[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abiertas este mes'
+		formatString: 0
+		lineageTag: 93f8986b-da29-4f15-829a-9afd73a93278
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Abiertas este mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Presupuesto abierto este mes'
+		lineageTag: 649db800-32d5-473d-9efc-28783bc04df2
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Presupuesto abierto este mes]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fecha = DATE([Año],[NroMes],1)
+		formatString: General Date
+		lineageTag: 29e4cf29-ea43-4788-b51c-ef573a55fe03
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 4d379d61-7338-4754-a64c-b8dc5a439f9c
+			defaultHierarchy: LocalDateTable_6e80c756-a196-454a-9758-17ff852dcb92.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Presupuesto meses anteriores' = [AcumuladoP]-[Presupuesto abierto este mes]
+		formatString: #,0\ "€";-#,0\ "€";#,0\ "€"
+		lineageTag: 973b7147-1859-4c12-822f-9ed6492aef6b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition AUX_Backlog_demandas_Presupuesto = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'dmn_demand',
+				    dmn_demand[MesAño],
+				    dmn_demand[opened_at].[NroMes], 
+				    dmn_demand[opened_at].[Año],
+				    "Abiertas este mes", CALCULATE(COUNT(dmn_demand[MesAño]))+0,
+				 "Presupuesto abierto este mes", CALCULATE(SUM('dmn_demand'[u_total_budget])) + 0
+				    )
+				```
+
+	annotation PBI_Id = 602dc599ee694378b603232df73e4a53
+

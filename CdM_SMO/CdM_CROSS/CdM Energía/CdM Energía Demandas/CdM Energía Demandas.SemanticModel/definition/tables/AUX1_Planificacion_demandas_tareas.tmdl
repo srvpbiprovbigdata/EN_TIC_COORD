@@ -1,0 +1,80 @@
+table AUX1_Planificacion_demandas_tareas
+	lineageTag: 8fa1674f-5100-4ef3-8059-e2bd3b54f6f7
+
+	column '1 ID'
+		lineageTag: 7e89071f-0cfa-4351-9623-48d7dfb92d8c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 Iniciativagenerada'
+		lineageTag: d6540697-c455-40fa-8c11-76f9717dc3e1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 Iniciativagenerada]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 Descripcion'
+		lineageTag: c4b2f219-1b1e-49df-acbb-467728de6712
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 Descripcion]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 Fecha inicio'
+		formatString: General Date
+		lineageTag: 43c50420-79f3-464b-934b-319d2695ba92
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [4 Fecha inicio]
+
+		variation Variación
+			isDefault
+			relationship: 0c59fd15-480c-4e1b-b2e3-4dafcede2198
+			defaultHierarchy: LocalDateTable_b0317553-f105-4172-9378-be6665f81a1c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 Fecha fin'
+		formatString: General Date
+		lineageTag: 1dc31307-cd2e-4a8a-a910-0074454d7dea
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [5 Fecha fin]
+
+		variation Variación
+			isDefault
+			relationship: 8edf9bf1-b03a-4b47-9c94-23fcf0ce15fe
+			defaultHierarchy: LocalDateTable_0aa305a3-c2b6-4f6a-8bfc-c21c235b769d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 Porcentaje completo'
+		lineageTag: 445a664d-2bcf-487f-b340-491d628e8647
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [6 Porcentaje completo]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition AUX1_Planificacion_demandas_tareas = calculated
+		mode: import
+		source =
+				
+				SELECTCOLUMNS('Traza_Demandas',
+				 "1 ID", 'Traza_Demandas'[number],
+				 "2 Iniciativagenerada", 'Traza_Demandas'[TareaProyecto1],
+				 "3 Descripcion", RELATED(pm_project_task[short_description]),
+				 "4 Fecha inicio", RELATED(pm_project_task[start_date]),
+				 "5 Fecha fin", RELATED(pm_project_task[end_date]),
+				 "6 Porcentaje completo", RELATED('pm_project_task'[percent_complete])
+				)
+
+	annotation PBI_Id = e14b88902aa643c186e6f86887b16b12
+

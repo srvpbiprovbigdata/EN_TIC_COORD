@@ -1,0 +1,42 @@
+table DEMANDA_TALLAJE
+	lineageTag: 606b76ef-23a7-4d7a-8326-8cbc23aade94
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 97776363-3003-4756-84e3-54111c8c0116
+		summarizeBy: none
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column Letra
+		dataType: string
+		lineageTag: 325db40d-3388-42ec-90d3-b46dec9f15d0
+		summarizeBy: none
+		sourceColumn: Letra
+
+		annotation SummarizationSetBy = Automatic
+
+	column Size
+		dataType: string
+		lineageTag: 1e5fb4ab-7199-4297-8bba-6a1f476d2f48
+		summarizeBy: none
+		sourceColumn: Size
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DEMANDA_TALLAJE-ec6ab09e-c235-4984-960c-7605fd1f4efb = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("Rc69DQIxDAXgVSLXAZxfpKxwdxUNUrgSiR6xAPMwFZPwXi45Cluy/Vl6tYoTK9dLa8WoORh3DNP3/TGnNkV9PGW1VTwIGRQFoXYXCYMOGaAWViHByacOYTCe05ARamYVmnbqEoaPfqeJCefWChmvOgLQYZF1z5ApN8+H20s13P8P2zz8+gM=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t, Columna2 = _t, Columna3 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", Int64.Type}, {"Columna2", type text}, {"Columna3", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Columna1", "Index"}, {"Columna2", "Letra"}, {"Columna3", "Size"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

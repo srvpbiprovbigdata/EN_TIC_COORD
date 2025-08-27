@@ -1,0 +1,40 @@
+table PRIORIDAD_TODAS_LAS_TABLAS
+	lineageTag: e5e0c322-740d-4fef-a9ea-caa5743dd037
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: ca3f297f-6e01-463e-a443-89d1bf88d6ec
+		summarizeBy: sum
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad_en
+		dataType: string
+		lineageTag: 9ed0f292-685f-405c-8d02-6b6408ee652c
+		summarizeBy: none
+		sourceColumn: Prioridad_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad_es
+		dataType: string
+		lineageTag: caba12fb-2616-4844-a0f8-73d6fbeadd0c
+		summarizeBy: none
+		sourceColumn: Prioridad_es
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PRIORIDAD_TODAS_LAS_TABLAS-bbc700f1-ea58-4d63-bd87-8c023d6abca6 = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlTSUTJU0FVwLsosyUxOzIFzD68F8ZVidaKVjICCRkBBj8z0DCjTMacEImcMFDAGCvjmp6QWJZakonBTIGpMgIImQEGf/HIoyykxCyJlChQwBQqEpRZVQuVBXN/SSoUksJpYAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t, Columna2 = _t, Columna3 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", Int64.Type}, {"Columna2", type text}, {"Columna3", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Columna1", "Index"}, {"Columna2", "Prioridad_en"}, {"Columna3", "Prioridad_es"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_ResultType = Table
+

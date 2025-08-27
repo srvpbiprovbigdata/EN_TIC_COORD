@@ -1,0 +1,46 @@
+table ESTADO_Proyectos
+	lineageTag: a6312ff0-81b9-4c3e-bfd1-d95306b52154
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 0ac881d6-a504-4dec-9706-cf09270fa7d2
+		summarizeBy: sum
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_en
+		dataType: string
+		lineageTag: 85291845-669b-454d-b754-e64614cbf4b5
+		summarizeBy: none
+		sourceColumn: Estado_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_es
+		dataType: string
+		lineageTag: 3c7e182c-abf3-444f-9283-8938ff51cff5
+		summarizeBy: none
+		sourceColumn: Estado_es
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ESTADO_Proyectos-8212061c-f6ba-4bf1-bd87-63d09ac69e4a = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlTSUfIvSM2DUbE60UpGQE54flG2QmaeQkBRfnpRanExNiGQWmOgREBqXkpmXjoSCyRjAuQ75+QXp6YoOOfnFuSklqRiEQGpNEWIe+YlY6hFEgOpNkPIBGdnFhSkpmAKxMYCAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t, Columna2 = _t, Columna3 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", Int64.Type}, {"Columna2", type text}, {"Columna3", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Columna1", "Index"}, {"Columna2", "Estado_en"}, {"Columna3", "Estado_es"}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas con nombre cambiado","Open","Abierto",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","Work in Progress","En curso",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","Pending","Pendiente",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Closed Complete","Cerrado completo",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Closed Incomplete","Cerrado incompleto",Replacer.ReplaceText,{"Estado_es"}),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado4","Closed Skipped","Cerrado omitido",Replacer.ReplaceText,{"Estado_es"})
+				in
+				    #"Valor reemplazado5"
+
+	annotation PBI_ResultType = Table
+

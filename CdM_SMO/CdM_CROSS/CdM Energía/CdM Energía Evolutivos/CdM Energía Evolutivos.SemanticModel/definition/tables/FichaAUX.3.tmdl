@@ -1,0 +1,38 @@
+table 'FichaAUX.3'
+	lineageTag: 50e6a834-e36b-42de-8c7f-df35761869a7
+
+	column '1 - ID tarea'
+		lineageTag: c39eefca-f47e-4e14-b6f4-44f9d9d17c4a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - ID tarea]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - ID demanda'
+		lineageTag: a27fe5b2-c980-4de2-9d77-003f99cd65c2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 - ID demanda]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - Portfolio'
+		lineageTag: 88b63287-21a0-4437-98c4-e2ed6ee85ed6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 - Portfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'FichaAUX.3' = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS('Ficha - dmn_demand',
+				"1 - ID tarea", 'Ficha - dmn_demand'[Ficha - pm_project_task.number.3],
+				"2 - ID demanda", 'Ficha - dmn_demand'[number],
+				"3 - Portfolio", 'Ficha - dmn_demand'[dv_portfolio]
+				)
+
+	annotation PBI_Id = d3d6a2f91b93427b8ab531e506ec8a78
+

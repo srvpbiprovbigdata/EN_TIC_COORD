@@ -1,0 +1,65 @@
+table Calendario
+	lineageTag: 5ecda6d1-cdd7-4d32-afbc-d56da746da20
+	dataCategory: Time
+
+	column Date
+		isKey
+		formatString: d-m-yy
+		lineageTag: 635c2446-9356-416b-99da-d08526200896
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Año = Calendario[Date]
+		dataType: dateTime
+		formatString: yy
+		lineageTag: 501fbc23-659e-4981-87b0-be65b51fde3a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Mes = FORMAT(Calendario[Date],"M")
+		dataType: int64
+		formatString: 0
+		lineageTag: 09f92acf-3fc8-43f6-ba95-f83dd60c987f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden = Calendario[Date]
+		formatString: mmmm" de "yyyy
+		lineageTag: 22bf3fbd-a632-4564-91a9-659ddc2fd900
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column _myMesAño = FORMAT(Calendario[Date],"YYYY MMM")
+		lineageTag: ecfc20b8-9b9a-43db-858a-f1740349ce14
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dia = FORMAT(Calendario[Date],"DD")
+		lineageTag: 34598e49-bd9e-49a5-ab52-117ee7d9b604
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calendario-e224dd17-3f27-4564-af1a-61d582c80e19 = calculated
+		mode: import
+		source = CALENDAR(MIN(incident[Fecha Apertura]),TODAY())
+
+	annotation PBI_Id = 8a4879a2b9a14a37aa5046af0d69a388
+

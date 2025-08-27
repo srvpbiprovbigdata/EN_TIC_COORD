@@ -1,0 +1,101 @@
+table _backlogVariosGrupos
+	lineageTag: b734db21-3207-4fff-8415-5d48163ba358
+
+	measure AcumuladoVG =
+			
+			CALCULATE(
+			    Sum(_backlogVariosGrupos[abVG])+0,
+			    FILTER(ALLSELECTED(_backlogVariosGrupos), _backlogVariosGrupos[fecha]<=MAX(_backlogVariosGrupos[fecha]))
+			)
+		formatString: 0
+		lineageTag: bb92e70a-20a5-4f84-8c99-57aed2187a5b
+
+	measure TotalVariosGrupos = sum(_backlogVariosGrupos[abVG])+0
+		formatString: 0
+		lineageTag: 402e7033-bbc9-409e-9f81-d6c8a35554e7
+
+	column _myMesAñoInc
+		lineageTag: 4f79aeda-c9bf-455f-9b60-4b5f85caec95
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: incident[_myMesAñoInc]
+
+		annotation SummarizationSetBy = Automatic
+
+	column NroMes
+		formatString: 0
+		lineageTag: f5adb3e6-0750-40b3-ac85-2921334abd1e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_aff3165d-b0d1-41f3-8899-50f1e94669e0[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 67b6ae3f-3e74-4dfe-b422-4ba6945db459
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_aff3165d-b0d1-41f3-8899-50f1e94669e0[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abiertas
+		formatString: 0
+		lineageTag: 756c64bb-33c9-425b-9dad-4d57c17a3702
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Abiertas]
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha = DATE(_backlogVariosGrupos[Año], _backlogVariosGrupos[NroMes],1)
+		formatString: d-m-yy
+		lineageTag: 87d46bb0-696f-44d5-a1a1-38997ed47dd0
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 9746fbfa-79ba-49bb-ac84-1184950bc254
+			defaultHierarchy: LocalDateTable_2d64e8e5-ba2a-4b11-a7e7-f670e61fefcb.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column abVG = if(_backlogVariosGrupos[Abiertas]=BLANK(), 0, _backlogVariosGrupos[Abiertas])
+		formatString: 0
+		lineageTag: 958169ac-5362-4c56-a5f7-475813de2775
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column abMesesPasadosVG = [AcumuladoVG]-_backlogVariosGrupos[abVG]
+		formatString: 0
+		lineageTag: 3b0df947-3d41-4ec5-918d-9cab7ab25a11
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cerradas = CALCULATE(COUNTROWS(incident),filter(incident, and(incident[__Util]="Si",and(incident[ParticipacionGrupoAsignacion]="Varios Grupos",and(_backlogVariosGrupos[_myMesAñoInc]=incident[_myMesAñoIncCerrada],incident[Estado]="Cerrado")))))
+		formatString: 0
+		lineageTag: dd135b84-fb30-40db-a1ea-2108a49c5960
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _backlogVariosGrupos-b095c660-5654-46d0-ba88-d454b0e13e39 = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'incident',
+				    incident[_myMesAñoInc],
+				    incident[Fecha Apertura].[NroMes], 
+				    incident[Fecha Apertura].[Año],
+				    "Abiertas", CALCULATE(COUNT(incident[_myMesAñoInc]),FILTER(incident,and(and(incident[__Util]="Si",incident[__EstadoGeneral]="Abierta"),incident[ParticipacionGrupoAsignacion]="Varios Grupos")))
+				    )
+				```
+
+	annotation PBI_Id = 1df6c8c1b05141c5aead48b27c415c0d
+

@@ -1,0 +1,176 @@
+table Backlog_demandas
+	lineageTag: e1abe479-2ab4-4cbb-9269-fc634aecafd1
+
+	measure abiertas_este_mes = COUNTROWS(FILTER(Backlog_demandas, [9 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: 799a4c51-9751-4fad-80c7-970f89637104
+
+	measure cerradas_este_mes = COUNTROWS(FILTER(Backlog_demandas, [9 - Tipo] = "Cerradas"))
+		formatString: 0
+		lineageTag: fedf597b-f358-43bf-9de9-193eb588991c
+
+	measure Backlog_demandas_acumulado = ```
+			
+			VAR MesActual = MAX('Backlog_demandas'[11- Fecha])
+			RETURN
+			    CALCULATE(
+			        COUNTROWS('Backlog_demandas'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_demandas', 'Backlog_demandas'[2 - Estado],'Backlog_demandas'[5 - Porfolio] , Backlog_demandas[6 - Prioridad],Backlog_demandas[7 - Tallaje]),
+			            'Backlog_demandas'[11- Fecha] < MesActual &&
+			            'Backlog_demandas'[9 - Tipo] = "Abiertas"
+			        )
+			    ) - 
+			    CALCULATE(
+			        COUNTROWS('Backlog_demandas'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_demandas', 'Backlog_demandas'[2 - Estado],'Backlog_demandas'[5 - Porfolio] , Backlog_demandas[6 - Prioridad],Backlog_demandas[7 - Tallaje]),
+			            'Backlog_demandas'[11- Fecha] < MesActual &&
+			            'Backlog_demandas'[11- Fecha] >= DATE(2019,12,1) &&
+			            'Backlog_demandas'[9 - Tipo] = "Cerradas"           
+			        )
+			    )
+			```
+		formatString: 0
+		lineageTag: 31f397fa-fe89-4743-b716-cea29922c5bd
+
+	measure XS = COUNTROWS(FILTER(Backlog_demandas, [7 - Tallaje] = "XS" && [9 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: 7a8942fe-1e24-401c-a24b-899c2304c9f8
+
+	measure S = COUNTROWS(FILTER(Backlog_demandas, [7 - Tallaje] = "S" && [9 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: d1ef3167-46d1-4a29-ac48-9bf58b403ffe
+
+	measure M = COUNTROWS(FILTER(Backlog_demandas, [7 - Tallaje] = "M" && [9 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: 1a641284-25b5-46f6-acb8-58ebd8a96e57
+
+	measure L = COUNTROWS(FILTER(Backlog_demandas, [7 - Tallaje] = "L" && [9 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: d5eeb159-5a8c-464a-adb2-898f74ccd071
+
+	measure XL = COUNTROWS(FILTER(Backlog_demandas, [7 - Tallaje] = "XL" && [9 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: 882de172-8312-488b-8a20-c2d469529f67
+
+	measure XXL = COUNTROWS(FILTER(Backlog_demandas, [7 - Tallaje] = "XXL" && [9 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: 64649a74-dff8-49a9-94d2-ec9895f842b8
+
+	measure SIN_TALLA = COUNTROWS(FILTER(Backlog_demandas, [7 - Tallaje] = "" && [9 - Tipo] = "Abiertas"))
+		formatString: 0
+		lineageTag: 24e05b81-d407-4687-bf9a-7c74ca258d0c
+
+	column '1 - Number'
+		lineageTag: 713d0e4c-9252-4766-81ed-e56acc32c7df
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Estado'
+		lineageTag: c949155b-230b-49a0-b3fa-a17b52601840
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[2 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - NroMes'
+		formatString: 0
+		lineageTag: 2d253be1-3b52-4bd0-b6e7-6ac1b0f25d64
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[3 - NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Año'
+		formatString: 0
+		lineageTag: 993dc645-8502-44c7-9aca-d5a193677d1d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[4 - Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Porfolio'
+		lineageTag: 5bf6f370-0846-4cb8-b809-ffdf3a9004b1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[5 - Porfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Prioridad'
+		lineageTag: 3ebe3496-fd5b-4e6d-91c2-a157ef356085
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[6 - Prioridad]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '7 - Tallaje'
+		lineageTag: b7161820-264b-4030-95b6-1ca85ed00448
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[7 - Tallaje]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '8 - Presupuesto'
+		lineageTag: c8c47204-049d-4820-8301-fa68e2d3c3a3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[8 - Presupuesto]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column '9 - Tipo'
+		lineageTag: 54c0ba34-7fb3-468a-8001-2e6d5adb9e5d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[9 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '11- Fecha' = DATE([4 - Año],[3 - NroMes],1)
+		formatString: d-m-yy
+		lineageTag: 554fbe3e-529f-4c1d-8e87-80ad7a85af6e
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 32285b75-d72e-471f-be00-d498986e1c2d
+			defaultHierarchy: LocalDateTable_ef392776-7e67-4186-a67b-5041fd85f361.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column '10 - Unidad tecnológica'
+		lineageTag: 90136c7b-f063-4978-9f96-2b76010554d7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[10 - Unidad tecnológica]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '11 - Aplicación'
+		lineageTag: 79f3abf1-4b0e-4bad-bf76-15876e142727
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_demandas_abierto[11 - Aplicación]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Backlog_demandas = calculated
+		mode: import
+		source = UNION(Backlog_demandas_abierto,Backlog_demandas_cerrado)
+
+	annotation PBI_Id = 104de293f4724b6cbf828773feb532bb
+

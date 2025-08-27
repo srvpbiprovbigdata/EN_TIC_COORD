@@ -1,0 +1,83 @@
+table 'Notas de trabajo'
+	lineageTag: 4cef7022-cb9d-4c92-bff7-bba6fb4b7156
+
+	column element
+		dataType: string
+		lineageTag: f0be65af-1cdc-4234-b974-ee2ff8a4cdff
+		summarizeBy: none
+		sourceColumn: element
+
+		annotation SummarizationSetBy = Automatic
+
+	column element_id
+		dataType: string
+		lineageTag: a5385851-b3f4-417f-9d87-09ff779fdf67
+		summarizeBy: none
+		sourceColumn: element_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 54d807ed-c862-47bb-bf12-2a4a2c92deb6
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_by
+		dataType: string
+		lineageTag: 6108099e-c858-44c5-9523-e9eaee3cdbef
+		summarizeBy: none
+		sourceColumn: sys_created_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: d/m/yy
+		lineageTag: 5557df3b-221c-4f46-84fb-6469eb2e71bb
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: 29902020-c9c1-4ab1-a86b-208aebbf1942
+			defaultHierarchy: LocalDateTable_5c1f5f80-8289-4bf7-91e1-c519ef1fc327.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column sys_id
+		dataType: string
+		lineageTag: 4c16dd25-e89a-4062-997c-544f8bf8f6fe
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: 76652155-5215-435e-90b7-9e41ef4f3741
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Notas de trabajo' = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "dwh"),
+				    SERV_NOW_sys_journal_field = Origen{[Schema="SERV_NOW",Item="sys_journal_field"]}[Data],
+				    #"Filas filtradas" = Table.SelectRows(SERV_NOW_sys_journal_field, each ([element] = "work_notes") and ([name] = "dmn_demand"))
+				in
+				    #"Filas filtradas"
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

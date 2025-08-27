@@ -1,0 +1,43 @@
+table 'SERV_NOW cmdb_ci_appl'
+	lineageTag: 19db452c-769f-4aa5-80b4-08fe81c64620
+
+	column sys_id
+		dataType: string
+		lineageTag: 2d2ca524-a65c-4912-8b26-bba49f7ea631
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_catalog
+		dataType: string
+		lineageTag: e46fd785-7785-4a78-97a6-033c543967c6
+		summarizeBy: none
+		sourceColumn: dv_u_catalog
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_platform
+		dataType: string
+		lineageTag: 1966bfd3-6ef3-49c8-ba66-b11fe1c37da1
+		summarizeBy: none
+		sourceColumn: dv_u_platform
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SERV_NOW cmdb_ci_appl-ca625e63-9b42-4141-b677-3097500ff0c5' = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_cmdb_ci_appl = Origen{[Schema="SERV_NOW",Item="cmdb_ci_appl"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_cmdb_ci_appl,{"asset", "dv_asset", "asset_tag", "assigned", "assigned_to", "dv_assigned_to", "assignment_group", "dv_assignment_group", "attestation_score", "attested", "attested_by", "dv_attested_by", "attested_date", "attributes", "can_print", "category", "dv_category", "change_control", "dv_change_control", "checked_in", "checked_out", "cl_port", "comments", "company", "dv_company", "config_directory", "config_file", "correlation_id", "cost", "cost_cc", "dv_cost_cc", "cost_center", "dv_cost_center", "delivery_date", "department", "dv_department", "discovery_source", "dv_discovery_source", "dns_domain", "due", "due_in", "dv_due_in", "duplicate_of", "dv_duplicate_of", "edition", "environment", "dv_environment", "fault_count", "first_discovered", "fqdn", "gl_account", "install_date", "install_directory", "install_status", "dv_install_status", "invoice_number", "ip_address", "is_clustered", "justification", "last_discovered", "lease_id", "life_cycle_stage", "dv_life_cycle_stage", "life_cycle_stage_status", "dv_life_cycle_stage_status", "location", "dv_location", "mac_address", "maintenance_schedule", "dv_maintenance_schedule", "managed_by", "dv_managed_by", "managed_by_group", "dv_managed_by_group", "managed_domain", "manufacturer", "dv_manufacturer", "model_id", "dv_model_id", "model_number", "monitor", "name", "operational_status", "dv_operational_status", "order_date", "owned_by", "dv_owned_by", "pid", "po_number", "purchase_date", "rp_command_hash", "rp_key_parameters_hash", "running_process_command", "running_process_key_parameters", "schedule", "dv_schedule", "serial_number", "short_description", "skip_sync", "software_install", "dv_software_install", "start_date", "subcategory", "dv_subcategory", "support_group", "dv_support_group", "supported_by", "dv_supported_by", "sys_class_name", "dv_sys_class_name", "sys_class_path", "sys_created_by", "sys_created_on", "sys_domain", "sys_domain_path", "sys_mod_count", "sys_tags", "sys_updated_by", "sys_updated_on", "tcp_port", "u_albaran", "u_approval_for_change_request", "u_availability", "dv_u_availability", "u_backup_frequency", "dv_u_backup_frequency", "u_catalog"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each ([dv_u_catalog] = "Energía") and ([dv_u_platform] = "RPA")),
+				    #"Columnas quitadas1" = Table.RemoveColumns(#"Filas filtradas",{"u_complexity", "dv_u_complexity", "u_contract_number", "dv_u_country", "u_data_source", "dv_u_data_source", "u_date_albaran", "u_date_end_contract", "u_date_start_contract", "u_delivery_address", "u_detail_status", "dv_u_detail_status", "dv_u_environment", "dv_u_functional_responsible_group", "u_label", "u_manual_managed_by", "u_metal", "dv_u_metal", "u_moebius_billable", "u_moebius_cpd", "dv_u_moebius_cpd", "u_moebiusdisclaimer", "u_moebiussupport", "dv_u_owner", "u_price", "u_purchase_request_item", "dv_u_purchase_request_item", "dv_u_responsible_tic",  "dv_u_service", "dv_u_service_provider", "dv_u_service_schedule", "dv_u_status", "dv_u_substatus", "dv_u_type", "u_urmoebius", "u_zone", "dv_u_zone", "unverified", "used_for", "dv_used_for", "vendor", "dv_vendor", "version", "warranty_expiration", "x_avne2_addm_to_se_td_key", "x_tsirm_tio_cmdb_asset_attributes", "dv_x_tsirm_tio_cmdb_asset_attributes"})
+				in
+				    #"Columnas quitadas1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

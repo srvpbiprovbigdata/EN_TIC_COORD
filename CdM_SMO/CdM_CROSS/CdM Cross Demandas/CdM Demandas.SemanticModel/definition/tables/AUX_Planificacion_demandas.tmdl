@@ -1,0 +1,80 @@
+table AUX_Planificacion_demandas
+	lineageTag: 033c7183-fb6f-42cd-84eb-cda1ed1244e8
+
+	column '1 ID'
+		lineageTag: f59ef8e5-67be-49a9-a61a-f00a106d0319
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 Iniciativa_generada'
+		lineageTag: 751e0634-3a21-4257-ab64-31a450a4835d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 Iniciativa_generada]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 Descripcion'
+		lineageTag: 3ebb66da-f854-42ad-a903-e313cd78eac2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 Descripcion]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 Fecha inicio'
+		formatString: General Date
+		lineageTag: 29328264-4838-4a9a-a4e9-66e5ad7596e6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [4 Fecha inicio]
+
+		variation Variación
+			isDefault
+			relationship: 1678ca53-a9dc-43cf-849a-4beed1346dd8
+			defaultHierarchy: LocalDateTable_6773fd9a-ccda-44a8-a401-4a3939e5a15d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 Fecha fin'
+		formatString: General Date
+		lineageTag: 31afda72-33f8-49f9-b380-b76d98860b1c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [5 Fecha fin]
+
+		variation Variación
+			isDefault
+			relationship: 04b55df2-51a9-4c92-9c59-1f57937305ef
+			defaultHierarchy: LocalDateTable_263bb937-aa7c-42f3-8280-dfcbc977abb5.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 Porcentaje completo'
+		lineageTag: 41d2eb2a-27e2-419b-86a9-27ec070f839c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [6 Porcentaje completo]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition AUX_Planificacion_demandas = calculated
+		mode: import
+		source =
+				
+				SELECTCOLUMNS('Proyectos_Evolutivos_generados',
+				 "1 ID", 'Proyectos_Evolutivos_generados'[ID],
+				 "2 Iniciativa_generada", 'Proyectos_Evolutivos_generados'[Iniciativa_generada],
+				 "3 Descripcion", 'Proyectos_Evolutivos_generados'[Descripcion],
+				 "4 Fecha inicio", 'Proyectos_Evolutivos_generados'[Fecha inicio],
+				 "5 Fecha fin", 'Proyectos_Evolutivos_generados'[Fecha fin],
+				 "6 Porcentaje completo", 'Proyectos_Evolutivos_generados'[Porcentaje completado]
+				)
+
+	annotation PBI_Id = e54b397f61944893804b896841a0e1e3
+

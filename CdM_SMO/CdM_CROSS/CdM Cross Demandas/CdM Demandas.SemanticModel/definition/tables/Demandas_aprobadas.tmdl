@@ -1,0 +1,100 @@
+table Demandas_aprobadas
+	lineageTag: 86002b6a-b783-4429-ae4a-0c29561d43bf
+
+	column '1 - Number'
+		lineageTag: 39f8de07-3ef0-4c13-80a1-d69bb5ca3655
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Tipo'
+		lineageTag: 56c30cbc-c546-4faa-912a-3e01c3c6decd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - Fecha'
+		formatString: General Date
+		lineageTag: c3b3370e-fbfe-40d3-8c82-fc1274b9a155
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 - Fecha]
+
+		variation Variación
+			isDefault
+			relationship: 1a2276f8-0ef4-4967-8d11-01afe78bcb8e
+			defaultHierarchy: LocalDateTable_8809c944-f08b-421d-bafa-33ebb852b730.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Año'
+		formatString: 0
+		lineageTag: bfef513c-151f-4d38-93be-22f0d1c8f02f
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [4 - Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Mes'
+		formatString: 0
+		lineageTag: d62b03c4-d8fb-478d-a997-5dd9ecd41711
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [5 - Mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Porfolio'
+		lineageTag: fb9ebbe1-75e0-4ec3-8fc0-a597fcdbe8e8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [6 - Porfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '7 - Estado'
+		lineageTag: d8c54149-f827-448c-b891-037c1d1ca47e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [7 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '8 - Prioridad'
+		lineageTag: b5440472-2f9c-4457-a8db-692323524de1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [8 - Prioridad]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '9 - Tallaje'
+		lineageTag: 56b5e6b7-f783-4499-8ad7-23d4b604c35f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [9 - Tallaje]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Demandas_aprobadas = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS('dmn_demand',
+				"1 - Number", 'dmn_demand'[number],
+				"2 - Tipo", "Aprobada",
+				"3 - Fecha", 'dmn_demand'[u_approved_date - Copia],
+				"4 - Año", 'dmn_demand'[u_approved_date - Copia].[Año],
+				"5 - Mes", 'dmn_demand'[u_approved_date - Copia].[NroMes],
+				"6 - Porfolio", 'dmn_demand'[dv_portfolio],
+				"7 - Estado", dmn_demand[dv_state],
+				"8 - Prioridad", dmn_demand[dv_priority],
+				"9 - Tallaje", dmn_demand[Tallaje]
+				)
+
+	annotation PBI_Id = 87365c18ced34823b6a1e405923c45ed
+

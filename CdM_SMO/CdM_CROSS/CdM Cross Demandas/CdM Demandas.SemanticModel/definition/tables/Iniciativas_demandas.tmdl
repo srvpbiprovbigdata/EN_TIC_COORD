@@ -1,0 +1,92 @@
+table Iniciativas_demandas
+	lineageTag: 59024462-68de-4a24-8798-a3faf07abc8b
+
+	column ID
+		lineageTag: 85cd4a54-a460-4b42-a2e2-0e726ab2a43c
+		summarizeBy: none
+		sourceColumn: AUX_Planificacion_demandas[1 ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Iniciativa_generada
+		lineageTag: c849a074-4668-42ed-8fe0-03d6e16f6c4d
+		summarizeBy: none
+		sourceColumn: AUX_Planificacion_demandas[2 Iniciativa_generada]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripcion
+		lineageTag: ad20c6cb-cce2-4cd9-be0f-50105ebdfd73
+		summarizeBy: none
+		sourceColumn: AUX_Planificacion_demandas[3 Descripcion]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha inicio'
+		formatString: General Date
+		lineageTag: d4fd37ef-bffc-443b-a9fe-d83b8d84914d
+		summarizeBy: none
+		sourceColumn: AUX_Planificacion_demandas[4 Fecha inicio]
+
+		variation Variación
+			isDefault
+			relationship: 8374bc8d-0eb6-4e7a-85a6-e05570941981
+			defaultHierarchy: LocalDateTable_179bb415-51ee-4279-a822-ea8b43780edd.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha fin'
+		formatString: General Date
+		lineageTag: 9bbb9214-60d1-4099-a19a-d88e3663fe1e
+		summarizeBy: none
+		sourceColumn: AUX_Planificacion_demandas[5 Fecha fin]
+
+		variation Variación
+			isDefault
+			relationship: 2863d93c-6c83-4d85-af24-c742396f5b47
+			defaultHierarchy: LocalDateTable_b164dd86-b914-4f77-b0b9-b0c925fdf97d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Porcentaje completo'
+		lineageTag: 86252442-c7f2-4286-8bf1-482bb02a219e
+		summarizeBy: sum
+		sourceColumn: AUX_Planificacion_demandas[6 Porcentaje completo]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Demanda_con_iniciativa = IF(OR([Iniciativa_generada] = "0",[Iniciativa_generada] = ""),FALSE(),TRUE())
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e71a44e2-cca4-4f33-8681-2281ece5482a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Demanda_con_planificación = not(ISBLANK([Fecha inicio]))
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ee82566c-3c3a-4d82-8b71-8065bb950426
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Iniciativa_planificada = IF(AND([Demanda_con_iniciativa]=TRUE(),[Demanda_con_planificación]=TRUE()),TRUE(),FALSE())
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7dfd27f0-85b3-47d8-bc06-4f673ae80a69
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Iniciativa_descripcion = [Iniciativa_generada] & " - " & [Descripcion]
+		lineageTag: 9255552c-78ce-499f-b292-1ee04db048e3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Iniciativas_demandas = calculated
+		mode: import
+		source = UNION(AUX_Planificacion_demandas,AUX1_Planificacion_demandas_tareas,AUX2_Planificacion_demandas_tareas,AUX3_Planificacion_demandas_tareas,AUX4_Planificacion_demandas_tareas)
+
+	annotation PBI_Id = 3f9345428bf54b08997d980d9e003fa4
+

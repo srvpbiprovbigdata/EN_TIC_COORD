@@ -1,0 +1,106 @@
+table Backlog_peticiones
+	lineageTag: eb2c2d48-e00d-4dcd-a5c1-a18dfd2a7e71
+
+	measure abiertas_este_mes = COUNTROWS(FILTER(Backlog_peticiones, [6 - Tipo] = "Abiertas"))
+		formatString: #,0
+		lineageTag: 986715d9-7038-496c-8169-d0d8750007c3
+
+	measure cerradas_este_mes = COUNTROWS(FILTER(Backlog_peticiones, [6 - Tipo] = "Cerrado"))
+		formatString: #,0
+		lineageTag: eb9e360d-d18d-46fc-b35f-d66148fb3f68
+
+	measure Backlog_peticiones_acumulado = ```
+			
+			VAR MesActual = MAX('Backlog_peticiones'[Fecha])
+			RETURN
+			    CALCULATE(
+			        COUNTROWS('Backlog_peticiones'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_peticiones', 'Backlog_peticiones'[2 - Estado],'Backlog_peticiones'[5 - Elemento]),
+			            'Backlog_peticiones'[Fecha] < MesActual &&
+			            'Backlog_peticiones'[6 - Tipo] = "Abiertas"
+			        )
+			    ) - 
+			    CALCULATE(
+			        COUNTROWS('Backlog_peticiones'),
+			        FILTER(
+			            ALLEXCEPT('Backlog_peticiones', 'Backlog_peticiones'[2 - Estado],'Backlog_peticiones'[5 - Elemento]),
+			            'Backlog_peticiones'[Fecha] < MesActual &&
+			            'Backlog_peticiones'[Fecha] >= DATE(2021,12,1) &&
+			            'Backlog_peticiones'[6 - Tipo] = "Cerrado"           
+			        )
+			    )
+			```
+		formatString: #,0
+		lineageTag: 7622a1dc-0b9c-4f38-b710-3b33af2469a8
+
+	column '1 - Number'
+		lineageTag: d17b2f3e-ed13-4679-96b2-9c2899b1d73c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_peticiones_abierto[1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Estado'
+		lineageTag: 7634bf44-8f92-4316-ac35-e079e8d76631
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_peticiones_abierto[2 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - MesAño'
+		formatString: 0
+		lineageTag: 54197aa1-2750-4880-ac35-6bbbed748f45
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Backlog_peticiones_abierto[3 - MesAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - NroMes'
+		formatString: 0
+		lineageTag: 57fb225c-07a7-4273-919c-8c3a876a983e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Backlog_peticiones_abierto[4 - NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Elemento'
+		lineageTag: cc5650e1-a763-4f47-a33f-18557689077e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_peticiones_abierto[5 - Elemento]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Tipo'
+		lineageTag: 6eebee41-a5d0-417e-a80e-2223b896a8f8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Backlog_peticiones_abierto[6 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha = DATE([3 - MesAño],[4 - NroMes],1)
+		formatString: d-m-yy
+		lineageTag: d03016c1-2aae-41e2-af96-d4cfa8fd39a2
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 04a3a4eb-bb78-46af-8826-1af4db32c888
+			defaultHierarchy: LocalDateTable_5b5ec05f-7732-4b4e-a199-31d13f7576f2.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition Backlog_peticiones = calculated
+		mode: import
+		source = UNION(Backlog_peticiones_abierto,Backlog_peticiones_cerrado)
+
+	annotation PBI_Id = 86e141b1b9174f1bbb6fd368339a3cd8
+

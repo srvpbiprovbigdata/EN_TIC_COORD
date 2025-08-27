@@ -1,0 +1,99 @@
+table AUX_Backlog_demandas_CAPEX
+	lineageTag: 603ba147-9d08-4862-81d0-c38db9f587d0
+
+	measure AcumuladoC =
+			
+			CALCULATE(
+			    Sum(AUX_Backlog_demandas_CAPEX[CAPEX abierto este mes]),
+			    FILTER(ALLSELECTED(AUX_Backlog_demandas_CAPEX),AUX_Backlog_demandas_CAPEX[fecha]<=MAX(AUX_Backlog_demandas_CAPEX[fecha])))
+		lineageTag: f7474cf8-595f-4329-b165-9a85d653ce92
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MesAño
+		lineageTag: 197a43c7-5e2a-4ab3-9d18-54d3d54bea1d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: dmn_demand[MesAño]
+
+		annotation SummarizationSetBy = Automatic
+
+	column NroMes
+		formatString: 0
+		lineageTag: d674cde4-ef9b-4683-9ec1-def366219331
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_0943ce9e-af29-4d16-bd81-6a824477449a[NroMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año
+		formatString: 0
+		lineageTag: 8790ee9d-cd77-45a3-b668-dc2516d4c4fb
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: LocalDateTable_0943ce9e-af29-4d16-bd81-6a824477449a[Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abiertas este mes'
+		formatString: 0
+		lineageTag: 8928aebc-7fb4-49d4-8d06-ba27f20597fe
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Abiertas este mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CAPEX abierto este mes'
+		formatString: #,0\ "€";-#,0\ "€";#,0\ "€"
+		lineageTag: b1fd7adc-2599-4a4e-857b-978906792a00
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [CAPEX abierto este mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha = DATE([Año],[NroMes],1)
+		formatString: General Date
+		lineageTag: 87113e9f-9f6a-47c0-8ce8-04c931cf56bb
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 697bc63a-2cc9-4e5e-83b6-6bdfb043bc5b
+			defaultHierarchy: LocalDateTable_70ebb2cd-a051-4b14-872d-554300a09fd8.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CAPEX meses anteriores' = [AcumuladoC]-[CAPEX abierto este mes]
+		lineageTag: 1cfb5148-0435-44f4-8b00-f64cb890eaa8
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Cerradas = CALCULATE(COUNTROWS(dmn_demand),filter(dmn_demand, and(AUX_Backlog_demandas_CAPEX[MesAño]=dmn_demand[MesAñoCerrada],dmn_demand[dv_state]="Completado")))+0
+		formatString: 0
+		lineageTag: 32506ef2-a6b0-464b-9e99-43bf96c323a9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition AUX_Backlog_demandas_CAPEX = calculated
+		mode: import
+		source = ```
+				
+				    SUMMARIZE (
+				    'dmn_demand',
+				    dmn_demand[MesAño],
+				    dmn_demand[opened_at].[NroMes], 
+				    dmn_demand[opened_at].[Año],
+				    "Abiertas este mes", CALCULATE(COUNT(dmn_demand[MesAño]))+0,
+				 "CAPEX abierto este mes", CALCULATE(SUM('dmn_demand'[capital_budget])) + 0
+				    )
+				```
+
+	annotation PBI_Id = 68db68f0f5634c47955780890ab9e258
+

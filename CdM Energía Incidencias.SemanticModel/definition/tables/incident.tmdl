@@ -1,0 +1,1963 @@
+table incident
+	lineageTag: 0836b594-6946-4244-950f-73b37ec28181
+
+	measure 'Total de Incidencias' = COUNT(incident[number])
+		formatString: 0
+		lineageTag: 00566805-7273-4308-aae0-dc34446a976e
+
+		changedProperty = IsHidden
+
+	measure 'Total abiertos' = CALCULATE(incident[Total de Incidencias],incident[Estado]="Nuevo")+CALCULATE(incident[Total de Incidencias],incident[Estado]="En espera")+CALCULATE(incident[Total de Incidencias],incident[Estado]="En Curso")
+		formatString: 0
+		lineageTag: 1ad15405-5a0d-4c86-b4b9-477bd50224ad
+
+		changedProperty = IsHidden
+
+	measure 'Total Cerrados' = CALCULATE(incident[Total de Incidencias],incident[Estado]="Cerrado")+CALCULATE(incident[Total de Incidencias],incident[Estado]="Resuelto")
+		formatString: 0
+		lineageTag: 2a1e8fe4-427a-4e3d-9ebc-f5a2f09f1d4b
+
+		changedProperty = IsHidden
+
+	measure 'Total Backlog' = ```
+			
+			
+			VAR _fechaMaxima = MAX(incident[Fecha Apertura])
+			VAR _acumAbiertos = 
+			        CALCULATE([Total abiertos],
+			                  FILTER(ALLSELECTED(incident),incident[Fecha Apertura] <= _fechaMaxima))
+			VAR _acumCerrados =
+			        CALCULATE([Total Cerrados],
+			                  FILTER(ALLSELECTED(incident),incident[Fecha Apertura] <= _fechaMaxima))
+			
+			RETURN
+			
+			_acumAbiertos - _acumCerrados
+			```
+		formatString: 0
+		lineageTag: 1104c0f2-4a66-4f30-ae6c-731cd704de01
+
+		changedProperty = IsHidden
+
+	measure 'Total Prioridad' = CALCULATE(incident[Total de Incidencias],incident[Prioridad]="1 - Critical")+CALCULATE(incident[Total de Incidencias],incident[Prioridad]="2 - High")
+		formatString: 0
+		lineageTag: fb21e728-6b81-449d-8012-11ce88c0afce
+
+		changedProperty = IsHidden
+
+	measure 'Causadas por Cambios' = CALCULATE(incident[Total de Incidencias],incident[caused_by]<>"")
+		formatString: 0
+		lineageTag: f1359bc1-b674-4349-b707-88bad8d49368
+
+		changedProperty = IsHidden
+
+	measure 'Incidencias que abren Cambios' = CALCULATE(incident[Total de Incidencias],incident[rfc]<>"")
+		formatString: 0
+		lineageTag: 58f0a111-eac8-4842-b0b5-9178ed3a349d
+
+		changedProperty = IsHidden
+
+	measure 'Media Resolución' = if(AVERAGEX(incident,incident[Fecha Cierre]-incident[Fecha Apertura])>0,AVERAGEX(incident,incident[Fecha Cierre]-incident[Fecha Apertura]),if(AVERAGEX(incident,incident[Fecha Resuelta]-incident[Fecha Apertura])>0,AVERAGEX(incident,incident[Fecha Resuelta]-incident[Fecha Apertura]),0))
+		lineageTag: 48cf6804-a586-4285-b24d-447786ebe1e8
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Tiempo Resolución' = DATEDIFF((max(incident[Fecha Apertura])),(max(incident[Fecha Resuelta])),DAY)
+		formatString: 0
+		lineageTag: 682ecc6d-440e-4fd0-b450-0a8f5aaf1eed
+
+		changedProperty = IsHidden
+
+	measure 'Total Espera' = CALCULATE(incident[Total de Incidencias],incident[Estado]="En espera")
+		formatString: 0
+		lineageTag: 02bd1c77-3f65-4818-943e-433018e7fe7b
+
+		changedProperty = IsHidden
+
+	measure 'Total Cancelados' = CALCULATE(incident[Total de Incidencias], incident[Estado] = "Cancelado")
+		formatString: 0
+		lineageTag: f0bc4679-3683-437e-bfdf-d0919ae52160
+
+		changedProperty = IsHidden
+
+	measure 'Total nuevas' = CALCULATE(incident[Total de Incidencias],incident[Estado]="Nuevo")
+		formatString: 0
+		lineageTag: 1c3100b8-4bc7-4e8a-a9e1-83e3d5e99ea5
+
+		changedProperty = IsHidden
+
+	measure 'Total previas' =
+			CALCULATE(incident[Total de Incidencias],incident[Estado]="En espera")+
+			CALCULATE(incident[Total de Incidencias],incident[Estado]="En curso")+
+			CALCULATE(incident[Total de Incidencias],incident[Estado]="Nuevo",incident[Fecha Apertura]<month(today()
+			))
+		formatString: 0
+		lineageTag: 81af3f7f-3bd3-4d0d-a9b0-77274a60284f
+
+		changedProperty = IsHidden
+
+	measure 'Total dias previas' = sum(incident[abierta previas])
+		lineageTag: bd4e8103-e416-43d3-98fd-0e2f38d5526b
+
+		changedProperty = IsHidden
+
+	measure 'Media dias abiertas previas' = [Total dias Backlog]/ [Total abiertos] + 0
+		lineageTag: 14d23280-6464-404f-8545-ce5ca2d96763
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Mes Analizado' = MONTH(TODAY())
+		lineageTag: dcc25232-8e8b-4195-8410-5132eac039e2
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Backlog v2' = CALCULATE([Total Cartera]- incident[Total Cerrados]-incident[Total Cancelados])
+		formatString: 0
+		lineageTag: 8f9fc194-d362-4730-a3b0-ea8aeca6bdaf
+
+		changedProperty = IsHidden
+
+	measure 'Total Cartera' = CALCULATE(incident[Total de Incidencias],incident[Estado]="Nuevo")+CALCULATE(incident[Total de Incidencias],incident[Estado]="En espera")+CALCULATE(incident[Total de Incidencias],incident[Estado]="En Curso")+CALCULATE(incident[Total de Incidencias],incident[Estado]="Cerrado")+CALCULATE(incident[Total de Incidencias],incident[Estado]="Cancelado")+CALCULATE(incident[Total de Incidencias],incident[Estado]="Resuelto")
+		formatString: 0
+		lineageTag: 23a3fadc-cbed-41f7-9d04-6fea105e94e0
+
+		changedProperty = IsHidden
+
+	measure 'Tasa de cierre año' = CALCULATE(incident[Total Cerrados]+incident[Total Cancelados])/CALCULATE(incident[Total Cartera])
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 01d05d30-efa3-4fdc-9e6b-6eeeaff4f17c
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Mes analizado 2' = FORMAT(TODAY(),"Mmmm")
+		lineageTag: 96cf28c3-521e-4b5b-97ff-27d02daf4d8a
+
+		changedProperty = IsHidden
+
+	measure 'Medida max de cierre' = calculate((incident[Total Cerrados]+incident[Total Cancelados])/CALCULATE(incident[Total Cartera]))
+		lineageTag: 2c064d9e-fe87-4eba-b602-39a4e6520f14
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Media de resolución 2' = AVERAGE(incident[time_worked])
+		lineageTag: 5d8be117-e1bc-4afe-8657-0a18be36392b
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Calculo de dias backlog promedio' = AVERAGE(incident[Calculo dias backlog])
+		formatString: 0
+		lineageTag: 354945b9-35b6-44c2-8d86-cd629cdba697
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'tasa de cierre minima' = CALCULATE(incident[Total Cerrados])/CALCULATE(incident[Total Cartera])
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 392fb8f9-9295-403c-bf70-d5a6cb7d452e
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Medida de resolucion 2' = DATEDIFF(incident[Total abiertos],incident[Total Cerrados],DAY)
+		formatString: 0
+		lineageTag: 5bc7f6c9-6ab0-4ee1-8d2c-1fb497da3b1c
+
+		changedProperty = IsHidden
+
+	measure 'Total AbiertasMesCurso' = CALCULATE(incident[Total de Incidencias],and(month(incident[Fecha Apertura])=month(today()),year(incident[Fecha Apertura])=year(today())))
+		formatString: 0
+		lineageTag: 93ccf6f1-4def-4385-8d96-e853a1e38ffb
+
+		changedProperty = IsHidden
+
+	measure 'Año analizado' = FORMAT(TODAY(),"Y")
+		lineageTag: b377c4f8-e85b-4891-b607-a2cc91a79b09
+
+		changedProperty = IsHidden
+
+	measure 'Tiempo ResoluciónH' = (DATEDIFF((max(incident[Fecha Apertura])),(max(incident[Fecha Resuelta])),HOUR))
+		formatString: 0
+		lineageTag: 6b8d3d52-a400-4c85-a823-e4a16d48e83f
+
+		changedProperty = IsHidden
+
+	measure 'Total En curso' = CALCULATE(incident[Total de Incidencias],incident[Estado]="En curso")
+		formatString: 0
+		lineageTag: ab69d6c9-ec47-4d37-bcef-84b86e21be7b
+
+		changedProperty = IsHidden
+
+	measure 'Total AbiertasMesesPasados' =
+			CALCULATE(incident[Total de Incidencias],incident[Estado]<>"Cerrado",
+				incident[Estado]<>"Cancelado",incident[Estado]<>"Resuelto",NOT(AND(YEAR(incident[Fecha Apertura])=year(today()),month(incident[Fecha Apertura])=month(today()))))
+		formatString: 0
+		lineageTag: 7e5694e6-b8f1-41f2-a2c0-32ef5833944b
+
+		changedProperty = IsHidden
+
+	measure 'Tasa de cierre mes' = IF(CALCULATE(incident[Total CerradasMesTotal])/CALCULATE(incident[Total Backlog Mes])<>0, CALCULATE(incident[Total CerradasMesTotal])/CALCULATE(incident[Total Backlog Mes]), 0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 6b8a81c1-7d83-493c-9ed7-5f4a65bebf93
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Total CerradasMes' =
+			CALCULATE(incident[Total de Incidencias],and(MONTH(incident[Fecha cierre])=month(today()),year(incident[Fecha cierre])=year(today()))
+			)
+		formatString: 0
+		lineageTag: 2bb18a32-a309-4e6f-bdc9-630a206a59d0
+
+		changedProperty = IsHidden
+
+	measure 'Total Cartera mes' = incident[Total AbiertasMesCurso]
+		formatString: 0
+		lineageTag: e41f3ce3-4891-413c-a0e5-d85a851d02a4
+
+		changedProperty = IsHidden
+
+	measure 'Total nuevas mes' = CALCULATE(incident[Total de Incidencias],and(month(incident[Fecha Apertura])=month(today()),year(incident[Fecha Apertura])=year(today())))
+		formatString: 0
+		lineageTag: 56b98ee7-4d0c-438d-afe2-77d73f59a5ec
+
+		changedProperty = IsHidden
+
+	measure 'Total Resueltas' =
+			CALCULATE(incident[Total de Incidencias],and(incident[Estado]="Resuelto",and(MONTH(incident[Fecha Resuelta])=month(today()),year(incident[Fecha Resuelta])=year(today()))
+			))
+		formatString: 0
+		lineageTag: 429a0871-f75d-4904-a83c-ee73ee4ef946
+
+		changedProperty = IsHidden
+
+	measure 'Total previasAbiertas' =
+			CALCULATE(incident[Total de Incidencias],incident[Estado]="En espera",month(incident[Fecha Apertura])<month(today()))+
+			CALCULATE(incident[Total de Incidencias],incident[Estado]="En curso",incident[Fecha Apertura])<month(today())+
+			CALCULATE(incident[Total de Incidencias],incident[Estado]="Nuevo",incident[Fecha Apertura])<month(today())
+		formatString: 0
+		lineageTag: 6f812fa1-efe1-4bb9-bc50-e61b32f25728
+
+		changedProperty = IsHidden
+
+	measure 'Total previasCerradas' = ```
+			CALCULATE(incident[Total de Incidencias],incident[Estado]="Cerrado",and(
+				incident[Fecha Apertura]<today(),
+				and(year(incident[Fecha Resuelta])=year(today()),month(incident[Fecha Resuelta])=month(today()))	
+				)
+			)
+			```
+		formatString: 0
+		lineageTag: c845449a-f6ab-4e43-8fbe-be5a630447cb
+
+		changedProperty = IsHidden
+
+	measure 'Total PendientesMesEncurso' = CALCULATE(incident[Total de Incidencias],incident[Estado]<>"Cerrado",incident[Estado]<>"Cancelado",incident[Estado]<>"Resuelto",AND(YEAR(incident[Fecha Apertura])=year(today()),month(incident[Fecha Apertura])=month(today())))
+		formatString: 0
+		lineageTag: a84e21bb-4320-4a12-9662-0a09873b1148
+
+		changedProperty = IsHidden
+
+	measure 'Total dias Backlog' = sum(incident[Calculo dias backlog ptes])
+		formatString: 0
+		lineageTag: 7e1f4a4c-fb49-4fad-8402-ff1f8ac7e5d2
+
+		changedProperty = IsHidden
+
+	measure 'Total Backlog Mes' = CALCULATE(incident[Total CerradasMesTotal])+CALCULATE(incident[Total AbiertasMesesPasados])+CALCULATE(incident[Total PendientesMesEncurso])
+		formatString: 0
+		lineageTag: a8d6b530-d7cd-4071-ade0-6c6b4c8eabf3
+
+		changedProperty = IsHidden
+
+	measure 'Total CerradasMesTotal' = CALCULATE(incident[Total CerradasMes])+CALCULATE(incident[Total Resueltas])
+		formatString: 0
+		lineageTag: 489c9c7d-0f92-4bb5-acd1-59812964d5c1
+
+		changedProperty = IsHidden
+
+	measure MesHoy = FORMAT((today()),"MM")&" "& FORMAT((today()),"yyyy")
+		lineageTag: 28d0ff93-d781-4087-ae9e-9de035167c45
+
+		changedProperty = IsHidden
+
+	measure TesolucionHMax = mAX(incident[TResolucion])
+		formatString: 0
+		lineageTag: ed5189c7-116b-4cb2-a397-0df5587a2f29
+
+		changedProperty = IsHidden
+
+	measure TResolucionHMax = max(incident[TResolucion])
+		formatString: 0
+		lineageTag: 34c1aa30-7278-4c22-96f7-d96b47258926
+
+		changedProperty = IsHidden
+
+	measure _mostRepeatedGeo =
+			
+			VAR T1 =
+			    SUMMARIZE( incident, incident[_geoUsu], "Count", COUNTROWS( incident ) )
+			VAR MostRepeated =
+			    MAXX( T1, [Count] )
+			RETURN
+			    MAXX( T1, IF( [Count] = MostRepeated, incident[_geoUsu] ) )
+		lineageTag: 54d4cf79-6b98-420c-829c-363b143be7ce
+
+	measure __CerradasUltimaSemana = CALCULATE(COUNTROWS(incident)+0,FILTER('incident',and(incident[__EstadoGeneral]="Cerrada",and(incident[__NumSemanaCerrada]=[__SemanaCerrada], incident[__DiaCerrada].[Año]=year(today())))))
+		formatString: 0
+		lineageTag: 3ce45f15-e487-4506-b8ed-0ef3fa64ac8a
+
+	measure __AbiertasUltimaSemana = CALCULATE(COUNTROWS(incident)+0,FILTER('incident',and(incident[__NumSemanaAbierta]=[__SemanaCerrada], incident[__DiaAbierta].[Año]=year(today()))))
+		formatString: 0
+		lineageTag: 8182aecb-e4fa-4262-95b8-fccda18fbbe0
+
+	measure __AbiertasMes = CALCULATE(COUNTROWS(incident)+0,FILTER(incident, and(AND(YEAR(incident[__DiaAbierta].[Date])=year(today()),month(incident[__DiaAbierta].[Date])=month(today())), OR(OR(incident[Estado]="Nueva",incident[Estado]="En espera"), incident[Estado]="En curso"))))
+		formatString: 0
+		lineageTag: 55a3de60-75e1-496b-b47b-95bccc578b29
+
+	measure __TotalAbiertas = CALCULATE(COUNTROWS(incident)+0,FILTER('incident',OR(OR(incident[Estado]="Nuevo",incident[Estado]="En espera"), incident[Estado]="En curso")))
+		formatString: 0
+		lineageTag: 014be438-80ec-4e0f-ac96-6fb79aea0963
+
+	measure __TotalCerradas = COUNTROWS(incident)-[TotalIncidencias]-[__TotalCanceladas]+0
+		formatString: 0
+		lineageTag: dfd129d5-0a6f-4ffc-a133-f56b306c14f7
+
+	measure __AbiertasMesesAnteriores = [__TotalAbiertas]-[__AbiertasMes]+0
+		formatString: 0
+		lineageTag: 20a6b607-a6d4-4adc-8378-434d1a58fd93
+
+	measure __TiempoResolucionUltimaSemana = CALCULATE(AVERAGE(incident[__MiTResolucion])+0,FILTER('incident',incident[__EsSemanaBacklog]="Si"))
+		formatString: 0.0
+		lineageTag: ff8dd338-a8ed-41ef-a476-88f559acc77c
+
+	measure __TiempoResolucionGlobal = CALCULATE(AVERAGE(incident[__MiTResolucion])+0,FILTER('incident',incident[__DiaCerrada].[Date]<TODAY()))
+		formatString: 0.0
+		lineageTag: f2016ed5-0f87-4795-8dfa-a9ff4181b90f
+
+	measure __SemanaCerrada = WEEKNUM(today())
+		formatString: 0
+		lineageTag: 84f81aae-defd-40fd-89c0-12eeb700a10f
+
+	measure __TotalCanceladas = CALCULATE(COUNTROWS(incident)+0,FILTER('incident',incident[Estado]="Cancelado"))
+		formatString: 0
+		lineageTag: 0d426188-df76-4bd9-99fe-f4aadcca79f6
+
+	measure __UltimaActualizacion = today()
+		formatString: dd/mm/yyyy
+		lineageTag: 511a704e-6704-4b54-bc81-5a5d5e62bea5
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	measure 'Media dias abiertas previas Mes' = CALCULATE([Total dias Backlog]/ [Total abiertos],FILTER(incident, and(incident[Fecha Apertura].[NroMes]=MONTH(today()),incident[Fecha Apertura].[Año]=YEAR(today()))))
+		lineageTag: 1dc00c73-a0a4-4530-a6f7-39460cb05040
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure __TiempoResolucionMesCurso = CALCULATE(AVERAGE(incident[__MiTResolucion])+0,FILTER('incident',and(incident[Fecha Apertura].[NroMes]=MONTH(today()), incident[Fecha Apertura].[Año]=YEAR(today()))))
+		lineageTag: e074cde9-ad30-46e1-9a37-0f664724a3be
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Medida
+		lineageTag: ee372a7a-e47e-4104-892d-b2d7308cebd9
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure INCActualAbiertas = CALCULATE(COUNT(incident[number])+0, FILTER(incident, incident[__EstadoGeneral] = "Abierta"))
+		formatString: 0
+		lineageTag: ef6bb867-89fd-4949-8876-fcfb504e9f9a
+
+	column number
+		dataType: string
+		lineageTag: dede72ab-7613-4d87-bdd9-8368d1093c59
+		summarizeBy: none
+		sourceColumn: number
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Apertura'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2fd95f4c-5cd8-426c-9397-ae72a5f0ad2a
+		summarizeBy: none
+		sourceColumn: Fecha Apertura
+
+		variation Variación
+			isDefault
+			relationship: c26db6c5-a530-4877-8d2c-f0568ea7ad41
+			defaultHierarchy: LocalDateTable_aff3165d-b0d1-41f3-8899-50f1e94669e0.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column caused_by
+		dataType: string
+		lineageTag: b608d56f-22ba-45e3-bdf8-514fbfa0cfdd
+		summarizeBy: none
+		sourceColumn: caused_by
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column rfc
+		dataType: string
+		lineageTag: f098f0d5-b61c-4df4-be77-aad15a992d02
+		summarizeBy: none
+		sourceColumn: rfc
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column priority
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e8215d4-9ad3-4ce8-aa6c-c1050d4f3e9b
+		summarizeBy: sum
+		sourceColumn: priority
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: int64
+		formatString: 0
+		lineageTag: 6f61bd6d-a492-4c62-8058-61fb5a791aac
+		summarizeBy: sum
+		sourceColumn: state
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column reopened_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: df6b36dd-dcfc-498b-8fef-440379a774dd
+		summarizeBy: none
+		sourceColumn: reopened_time
+
+		variation Variación
+			isDefault
+			relationship: e09f90f6-bf89-463e-b67b-d85f14a38714
+			defaultHierarchy: LocalDateTable_4f88bc73-f702-45ef-bb1e-b5adf154a6bd.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 02a948f7-60af-420a-a8d9-9945e0957a37
+		summarizeBy: none
+		sourceColumn: active
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_mod_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 3bf386e5-2050-4094-af58-2ab33182eea4
+		summarizeBy: sum
+		sourceColumn: sys_mod_count
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_updated_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1825e17d-78db-4d72-8902-23656f963f01
+		summarizeBy: none
+		sourceColumn: sys_updated_on
+
+		variation Variación
+			isDefault
+			relationship: 3763e4a8-a64d-4337-aa4e-1e3710644b87
+			defaultHierarchy: LocalDateTable_1b1da2a7-fff9-48f9-9f7b-3f6d13d547b5.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_updated_by
+		dataType: string
+		lineageTag: 17fd57fb-d21b-4250-9616-a09ea787ee24
+		summarizeBy: none
+		sourceColumn: sys_updated_by
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column short_description
+		dataType: string
+		lineageTag: 0745930b-eb09-42bb-af11-74a774d2fae0
+		summarizeBy: none
+		sourceColumn: short_description
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Cierre'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 55242185-eda4-451a-86c6-7978b17d97ba
+		summarizeBy: none
+		sourceColumn: Fecha Cierre
+
+		variation Variación
+			isDefault
+			relationship: 22a7cbb8-a750-410e-9131-585e3566a4d4
+			defaultHierarchy: LocalDateTable_209e297f-f793-4dd3-ae5f-2d902a778055.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5d12b22f-eba8-465e-8d0c-0938f1080937
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: fc2c89fd-0bb1-4318-a489-17dc8e5a2f79
+			defaultHierarchy: LocalDateTable_7878bebd-8ac5-413a-857f-2ee593984bee.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_by
+		dataType: string
+		lineageTag: 76ce73da-e8fa-4e8e-8ee5-2d9484e55c78
+		summarizeBy: none
+		sourceColumn: sys_created_by
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Código Cierre'
+		dataType: string
+		lineageTag: fdc9a232-6c15-4ca8-ad6a-a9c997e04202
+		summarizeBy: none
+		sourceColumn: Código Cierre
+
+		changedProperty = SortByColumn
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripción
+		dataType: string
+		lineageTag: 8d3f9e56-b76d-4715-adf1-fac7e8984e44
+		summarizeBy: none
+		sourceColumn: Descripción
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column calendar_duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ca1e7652-f501-4692-946e-dd1212ad07c2
+		summarizeBy: none
+		sourceColumn: calendar_duration
+
+		variation Variación
+			isDefault
+			relationship: 608d852c-9aa1-463d-97ca-6e70e4dd140a
+			defaultHierarchy: LocalDateTable_cdfbff66-608e-4ad7-83ad-4a963468d75c.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_duration
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c3c33868-103e-462a-9cd2-20744ae7aaf2
+		summarizeBy: none
+		sourceColumn: business_duration
+
+		variation Variación
+			isDefault
+			relationship: 16bee740-bda8-4cda-b488-5f01f252902a
+			defaultHierarchy: LocalDateTable_f0a5ecf5-d812-4b11-a5b7-c43db5ef180b.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_oncall_team
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a8288ac9-2ef6-420a-8c85-47534c1d85de
+		summarizeBy: none
+		sourceColumn: u_oncall_team
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column correlation_id
+		dataType: string
+		lineageTag: e00cdf4a-3e8f-418e-9473-f8019978e5af
+		summarizeBy: none
+		sourceColumn: correlation_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column child_incidents
+		dataType: int64
+		formatString: 0
+		lineageTag: 6793f925-3752-48cc-b3f6-852187bd05ed
+		summarizeBy: sum
+		sourceColumn: child_incidents
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column group_list
+		dataType: string
+		lineageTag: 7d17796f-cb27-49a2-9f13-0101138556bc
+		summarizeBy: none
+		sourceColumn: group_list
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Metal
+		dataType: string
+		lineageTag: 74e9e4e3-c0f3-4bbe-8a39-eb62ec86fbd3
+		summarizeBy: none
+		sourceColumn: Metal
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Notas de Cierre'
+		dataType: string
+		lineageTag: 3c30c76d-196b-490a-89d9-becf96363437
+		summarizeBy: none
+		sourceColumn: Notas de Cierre
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Notas de Trabajo'
+		dataType: string
+		lineageTag: 2103354d-a945-4b41-a0e8-bd313b1756ad
+		summarizeBy: none
+		sourceColumn: Notas de Trabajo
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reasignaciones
+		dataType: int64
+		formatString: 0
+		lineageTag: 4bd35710-a0b0-4c15-a1cf-eafedd707535
+		summarizeBy: sum
+		sourceColumn: Reasignaciones
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_effective_number
+		dataType: string
+		lineageTag: 67c081ef-7196-443c-a330-2a4082c66cf9
+		summarizeBy: none
+		sourceColumn: task_effective_number
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comentarios
+		dataType: string
+		lineageTag: a6dfd8b7-1110-4595-86a4-2e6aca4c729a
+		summarizeBy: none
+		sourceColumn: Comentarios
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Notas adicionales'
+		dataType: string
+		lineageTag: b2d2ab45-72fc-407d-967e-9b2e8cc88a31
+		summarizeBy: none
+		sourceColumn: Notas adicionales
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_responded
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1b6520be-0292-4072-8854-d85e200c01d8
+		summarizeBy: none
+		sourceColumn: u_responded
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Resuelta'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 29ad63a4-911c-40bd-90a8-534cd5cf8cea
+		summarizeBy: none
+		sourceColumn: Fecha Resuelta
+
+		variation Variación
+			isDefault
+			relationship: dc982bf4-7579-49ed-9f4f-6c7f51783a20
+			defaultHierarchy: LocalDateTable_2175eecc-a59c-487d-b9af-28000efe4c3d.'Jerarquía de fechas'
+
+		changedProperty = SortByColumn
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column made_sla
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 3339b535-1755-42d9-a52f-49deb8a6098e
+		summarizeBy: none
+		sourceColumn: made_sla
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_phone
+		dataType: string
+		lineageTag: cdc055f3-5dcf-4719-8619-3a8ea5df0773
+		summarizeBy: none
+		sourceColumn: u_phone
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column calendar_stc
+		dataType: int64
+		formatString: 0
+		lineageTag: 6b1265e2-c74a-4851-ab71-53b9e8041cd3
+		summarizeBy: sum
+		sourceColumn: calendar_stc
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_stc
+		dataType: int64
+		formatString: 0
+		lineageTag: 1c3ef300-7917-44bd-acd8-30ad46f588ee
+		summarizeBy: sum
+		sourceColumn: business_stc
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column time_worked
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ee660a8e-74d6-49f5-beeb-e006b457024d
+		summarizeBy: none
+		sourceColumn: time_worked
+
+		variation Variación
+			isDefault
+			relationship: 930b34de-7394-4c32-9962-5c8eaca2d556
+			defaultHierarchy: LocalDateTable_966bdcca-9bc7-4a70-8143-6e6336878d79.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo Contacto'
+		dataType: string
+		lineageTag: 3929c9db-4c64-4f6d-b0a0-7c2013e9ae8b
+		summarizeBy: none
+		sourceColumn: Tipo Contacto
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column watch_list
+		dataType: string
+		lineageTag: aa73fd60-9e41-4101-bb71-65d1905ab245
+		summarizeBy: none
+		sourceColumn: watch_list
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column activity_due
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 81833d55-adc5-441b-bc56-778c6ad72dbf
+		summarizeBy: none
+		sourceColumn: activity_due
+
+		variation Variación
+			isDefault
+			relationship: 10af33bd-8465-4e4e-ba8b-72b731061fb3
+			defaultHierarchy: LocalDateTable_5f67973d-7cf4-493e-bd23-faab43fda4ff.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column correlation_display
+		dataType: string
+		lineageTag: f292929e-cdc4-46bc-b359-d39595faa72f
+		summarizeBy: none
+		sourceColumn: correlation_display
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column reopen_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 2160c04e-2e54-4518-86cf-5078cc0d129e
+		summarizeBy: sum
+		sourceColumn: reopen_count
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_csc_area
+		dataType: string
+		lineageTag: 5aefa358-f0af-4865-b676-5b33439eb691
+		summarizeBy: none
+		sourceColumn: u_csc_area
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'URL INCIDENCIA' = CONCATENATE("https://acciona.service-now.com/incident.do?sysparm_query=number%3d", incident[number])
+		lineageTag: bd623e98-05c1-43bc-815f-c819aff4f4b3
+		summarizeBy: none
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Antiguedad = DATEDIFF(incident[Fecha Cierre].[Día],incident[Fecha Apertura].[Día],DAY)
+		formatString: 0
+		lineageTag: 0a875c7b-dfe3-4a95-94a1-79fea5e5413b
+		summarizeBy: sum
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'abierta previas' =
+			if(
+			or(or(incident[Estado]="En curso",incident[Estado]="En espera"),incident[Estado]="Nuevo")
+			,MAX(incident[Fecha Apertura])-incident[Fecha Apertura],0)
+		lineageTag: bd9b6a9a-1e70-49a3-8306-d3684a418a87
+		summarizeBy: sum
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Mes de apertura Nombre'
+		dataType: string
+		lineageTag: 1d61f9a6-8300-40a9-b8ea-d9b4fa415766
+		summarizeBy: none
+		sourceColumn: Mes de apertura Nombre
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mes de cierre'
+		dataType: string
+		lineageTag: eb2dafb0-85e3-4f07-928c-8700dfd31d9e
+		summarizeBy: none
+		sourceColumn: Mes de cierre
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mes de cierre Nombre'
+		dataType: string
+		lineageTag: 00fad38d-379f-475e-95d1-02d49020af4d
+		summarizeBy: none
+		sourceColumn: Mes de cierre Nombre
+
+		changedProperty = SortByColumn
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Calculo dias backlog' = DATEDIFF(incident[Fecha Apertura],TODAY(),DAY)
+		formatString: 0
+		lineageTag: 34840f38-2501-4bdd-aaf5-1bdcb1ef9f5d
+		summarizeBy: sum
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Causada por'
+		dataType: string
+		lineageTag: 0b0bf894-2597-43e9-bb83-0a9743c052ca
+		summarizeBy: none
+		sourceColumn: Causada por
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Solicita Cambio'
+		dataType: string
+		lineageTag: 576eebd8-206c-4669-89fc-5eeda759544f
+		summarizeBy: none
+		sourceColumn: Solicita Cambio
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Abierta Por'
+		dataType: string
+		lineageTag: 5d30ecc1-7834-44c3-85e2-9f8fa36a2845
+		summarizeBy: none
+		sourceColumn: Abierta Por
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categoría
+		dataType: string
+		lineageTag: 48eeac02-6361-4d2e-b36f-998dce993760
+		summarizeBy: none
+		sourceColumn: Categoría
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subcategoría
+		dataType: string
+		lineageTag: f0178742-f232-4fde-8787-add01d939710
+		summarizeBy: none
+		sourceColumn: Subcategoría
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: e0dd889e-543a-4009-9a5a-55a2ee18a30b
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column EstadoE
+		dataType: string
+		lineageTag: 535927f8-8d72-4f7b-a826-a0eb9099d096
+		summarizeBy: none
+		sourceColumn: EstadoE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo de Asignación'
+		dataType: string
+		lineageTag: e00bac1f-be49-4cbc-beca-3f39df02e8be
+		summarizeBy: none
+		sourceColumn: Grupo de Asignación
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asignado a'
+		dataType: string
+		lineageTag: 9ce26a17-7dca-47f5-8b1b-e935cf43af56
+		summarizeBy: none
+		sourceColumn: Asignado a
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_opened_by
+		dataType: string
+		lineageTag: a488c79f-26f8-43db-9b37-cd617355414b
+		summarizeBy: none
+		sourceColumn: dv_opened_by
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Negocio
+		dataType: string
+		lineageTag: 83c7c9c1-d0c6-40f5-8ab5-d528d8959442
+		summarizeBy: none
+		sourceColumn: Negocio
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cerrada por'
+		dataType: string
+		lineageTag: e59be502-28f8-4b31-bd82-9d77a5ef44e6
+		summarizeBy: none
+		sourceColumn: Cerrada por
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Área de Negocio'
+		dataType: string
+		lineageTag: 16f63968-1597-4694-ad78-d3bf18692f18
+		summarizeBy: none
+		sourceColumn: Área de Negocio
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Diagnóstico
+		dataType: string
+		lineageTag: acbd8181-e801-4a7f-887e-51ecff9d8da9
+		summarizeBy: none
+		sourceColumn: Diagnóstico
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Elemento Configuración'
+		dataType: string
+		lineageTag: 0bae3809-8025-44d3-9f77-3359aeecaf96
+		summarizeBy: none
+		sourceColumn: Elemento Configuración
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Empresa
+		dataType: string
+		lineageTag: 96b7d1e7-0391-43f2-a49b-486616adff76
+		summarizeBy: none
+		sourceColumn: Empresa
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_incident_state
+		dataType: string
+		lineageTag: fcd64fac-163c-4c42-9bc8-12976913fd4b
+		summarizeBy: none
+		sourceColumn: dv_incident_state
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_due
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: dd2e2cb7-1023-4253-9f1a-bf1856b519d7
+		summarizeBy: none
+		sourceColumn: sla_due
+
+		variation Variación
+			isDefault
+			relationship: e83177a3-32b7-4493-a5e8-89e901c9a393
+			defaultHierarchy: LocalDateTable_504e13fb-7b05-4d69-956e-d0dfab22d4a5.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Impacto
+		dataType: string
+		lineageTag: e3d178a0-223b-4f14-9509-c0e6cfecffb5
+		summarizeBy: none
+		sourceColumn: Impacto
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_parent_incident
+		dataType: string
+		lineageTag: c4f3c46a-4af0-42b0-9d37-fb881de0fa33
+		summarizeBy: none
+		sourceColumn: dv_parent_incident
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Linea de Negocio'
+		dataType: string
+		lineageTag: 86a4db0a-9ae8-43be-9879-8c8e7337b7ef
+		summarizeBy: none
+		sourceColumn: Linea de Negocio
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pendiente_Causa
+		dataType: string
+		lineageTag: 4588720f-09b1-4ff8-8740-19fd5adc353c
+		summarizeBy: none
+		sourceColumn: Pendiente_Causa
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Modulo_Subcategoría
+		dataType: string
+		lineageTag: b6805113-49b9-4420-ad7a-1212effdacfd
+		summarizeBy: none
+		sourceColumn: Modulo_Subcategoría
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column País
+		dataType: string
+		lineageTag: 489ad781-ec7f-4c36-9b47-c74ce750e1e1
+		summarizeBy: none
+		sourceColumn: País
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_parent
+		dataType: string
+		lineageTag: 2985babd-2fea-4484-88ea-017007e36de5
+		summarizeBy: none
+		sourceColumn: dv_parent
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resuelto por'
+		dataType: string
+		lineageTag: 8179bc09-8e61-44d1-8c4d-7e70c0717e0b
+		summarizeBy: none
+		sourceColumn: Resuelto por
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_task_for
+		dataType: string
+		lineageTag: ceda8b83-1938-4f44-895a-eabd6ae9438e
+		summarizeBy: none
+		sourceColumn: dv_task_for
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tipo Solución'
+		dataType: string
+		lineageTag: b4d225a3-4472-4f46-9a33-e4cbd14356ed
+		summarizeBy: none
+		sourceColumn: Tipo Solución
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ubicación
+		dataType: string
+		lineageTag: 0b06790d-0985-4ecf-80a3-0a7e55965a5c
+		summarizeBy: none
+		sourceColumn: Ubicación
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_urgency
+		dataType: string
+		lineageTag: 2c2ecddf-cb95-455d-9a9a-51f49d221041
+		summarizeBy: none
+		sourceColumn: dv_urgency
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_reopened_by
+		dataType: string
+		lineageTag: 97c75a6e-d382-4250-a964-c01ac456cbd9
+		summarizeBy: none
+		sourceColumn: dv_reopened_by
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: b36c8ef5-2a1b-47aa-a7a3-7349a43feb16
+		summarizeBy: none
+		sourceColumn: Estado
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo Asignación' = IF(incident[paisGrupo]=incident[paisusu],incident[Grupo de Asignación], "GRUPO CORPORACIÓN")
+		lineageTag: d98c763e-7321-4ee5-9090-9edf3c55c133
+		summarizeBy: none
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column PrioridadRedu = ```
+			SWITCH(incident[priority], 1, "P1", 2, "P2", 3, "P3", 4, "P4", 5, "P5") 
+			```
+		dataType: string
+		lineageTag: aa73d28c-ef9c-4db2-8fef-9359b2fd4cba
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Calculo dias backlog ptes' = if(or(incident[Estado]="En espera",or(incident[Estado]="En curso",incident[Estado]="Nuevo")),DATEDIFF(incident[Fecha Apertura],TODAY(),DAY))
+		formatString: 0
+		lineageTag: e6f203bd-d790-4b45-afa0-1c31d4bc9b82
+		summarizeBy: sum
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Apertura formato' = incident[Fecha Apertura]
+		formatString: dd/mm/yyyy
+		lineageTag: 24dc3d71-f129-4bcc-bbcd-0d4f2b8ac3ad
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 8bdbee72-0e90-4599-90f0-9f97a3b4eb1a
+			defaultHierarchy: LocalDateTable_e80366e5-a82e-4ea0-83cf-b2fa02dbdcd1.'Jerarquía de fechas'
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column AñoMesFApertura = YEAR('incident'[Fecha Apertura])*100+MONTH(incident[Fecha Apertura])
+		dataType: int64
+		formatString: 0
+		lineageTag: ff9ac548-e2eb-48d0-84c5-4ad1fc14ca9f
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column AñoCierre = year(incident[Fecha Resuelta])
+		dataType: string
+		lineageTag: 8435e7f1-b25f-4f33-b178-2e8ab98fbc74
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesCierre = MONTH(incident[Fecha Resuelta])
+		formatString: 0
+		lineageTag: e075176a-9f31-4533-9be5-145c328b9268
+		summarizeBy: sum
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fecha Cierre formato' = incident[Fecha Resuelta]
+		formatString: dd/mm/yyyy
+		lineageTag: 210ea313-68f8-4710-8e3d-d19ac3955337
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 3bd7dd1c-967f-4227-b419-edf7b2152efc
+			defaultHierarchy: LocalDateTable_f4acda2c-01ff-4db9-93f1-427caf8d7fab.'Jerarquía de fechas'
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column OrdenFC = incident[AñoCierre]&"-"&incident[MesCierre]
+		dataType: string
+		lineageTag: d60c3d4b-69cc-4447-b6c2-6c7b826a58f4
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrdenFApertura = incident[Fecha Apertura]
+		dataType: dateTime
+		formatString: mmmm" de "yyyy
+		lineageTag: 38712481-3150-49cc-9518-3484c5837a51
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 51f14ae4-db72-4e3e-9375-179b153e1088
+			defaultHierarchy: LocalDateTable_2e4aad6d-25dc-4fd6-a8d7-ecaee49e0617.'Jerarquía de fechas'
+
+		changedProperty = DataType
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column OrdenFCierre = incident[Fecha Resuelta]
+		dataType: dateTime
+		formatString: mmmm" de "yyyy
+		lineageTag: f93ea7dd-1933-43d9-a4d1-0680a7bcdbdb
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: d2ec685b-c2ef-41ab-99fe-40f8e8d7e72a
+			defaultHierarchy: LocalDateTable_60828a1a-0666-48ad-906d-d2d5f99628ec.'Jerarquía de fechas'
+
+		changedProperty = DataType
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column TResolucion
+		dataType: int64
+		formatString: 0
+		lineageTag: 7523741b-3fb1-456e-bb8e-092ec6640389
+		summarizeBy: sum
+		sourceColumn: TResolucion
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column TResolucionD = if(incident[TResolucion]<>BLANK(),DIVIDE( incident[TResolucion],24),0)
+		formatString: 0.00
+		lineageTag: 193ba735-70bc-4404-802e-eef00ddc571c
+		summarizeBy: sum
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column paisusu
+		dataType: string
+		lineageTag: b336f77a-e6f6-4b3d-be8f-be6da725ce93
+		summarizeBy: none
+		sourceColumn: paisusu
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column locationusuario
+		dataType: string
+		lineageTag: 98d3e9df-c541-432e-b6f2-8e7802fd01f0
+		summarizeBy: none
+		sourceColumn: locationusuario
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column paisIncidencia
+		dataType: string
+		lineageTag: 0659b6ad-67a9-43ba-a01e-7d6222c89024
+		summarizeBy: none
+		sourceColumn: paisIncidencia
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column paisGrupo
+		dataType: string
+		lineageTag: 27bf730b-5a1d-4938-a687-52f3271d371f
+		summarizeBy: none
+		sourceColumn: paisGrupo
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column AñoMesPaisFApertura = CONCATENATE(YEAR('incident'[Fecha Apertura])*100+MONTH(incident[Fecha Apertura]),incident[paisusu])
+		lineageTag: 4ad208bc-25bd-4c66-a7ee-21795cca16ab
+		summarizeBy: none
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column assignment_group
+		dataType: string
+		lineageTag: 112725ce-f75b-4925-8913-8e98cce6f2ab
+		summarizeBy: none
+		sourceColumn: assignment_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Poner En Mayúsculas Cada Palabra'
+		dataType: string
+		lineageTag: 8d1ef253-c1fa-41f7-8dd0-58cff4c40f68
+		summarizeBy: none
+		sourceColumn: Poner En Mayúsculas Cada Palabra
+
+		annotation SummarizationSetBy = Automatic
+
+	column gruposParticipantes = if(len(incident[group_list])>32,mid(incident[group_list],1,len(incident[group_list])-33))
+		lineageTag: b0d56b5e-58ab-43ba-af3a-b095d3810958
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupodeasignación
+		dataType: string
+		lineageTag: 09fd4d71-43ee-4219-80d1-e5f101fe2ea8
+		summarizeBy: none
+		sourceColumn: grupodeasignación
+
+		annotation SummarizationSetBy = Automatic
+
+	column ParticipacionGrupoAsignacion = if(incident[Reasignaciones]=0,"Grupo único","Varios grupos")
+		lineageTag: 4847a0fb-55f9-4814-8eaa-58070067b150
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _GAFinal =
+			IF((incident[_geoGrupo]=[_mostRepeatedGeo]&&incident[_geoUsu]=[_mostRepeatedGeo])
+			||(incident[Grupo de Asignación]="SERVICEDESK"&&incident[_geoUsu]=[_mostRepeatedGeo])
+			,incident[Grupo de Asignación], "Grupo Corporación")
+		lineageTag: b3da61d7-f004-4588-8eb0-d537532e5da3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _geoUsu = ```
+			SWITCH(incident[paisusu],"Chile", "ChiPeAr", "Peru", "ChiPeAr", "Argentina", "ChiPeAr",
+			                "Mexico", "Mexico", "Dominican republic", "Mexico", "Ecuador", "Mexico",
+			                "Panama", "Mexico", "Costa Rica", "Mexico", "Colombia", "Mexico", incident[paisusu]) 
+			```
+		lineageTag: bb3856ea-42f6-4ea0-9e35-61fcca680e81
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _geoGrupo = ```
+			SWITCH(incident[paisGrupo],"Chile", "ChiPeAr", "Peru", "ChiPeAr", "Argentina", "ChiPeAr",
+			                "Mexico", "Mexico", "Dominican republic", "Mexico", "Ecuador", "Mexico",
+			                "Panama", "Mexico", "Costa Rica", "Mexico", "Colombia", "Mexico", incident[paisGrupo]) 
+			```
+		lineageTag: e6ebb6f4-0908-41f7-a427-2eba99663897
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Dept = if(incident[sys_created_by]=related(_EmpleadosPedidos[ID de usuario]), RELATED(_EmpleadosPedidos[Departamento]), "Vacio")
+		lineageTag: 200dcac1-e0b9-44d3-8746-38baf7f909bb
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Empleado = if(incident[sys_created_by]=related(_EmpleadosPedidos[ID de usuario]), RELATED(_EmpleadosPedidos[Nombre completo]), "Vacio")
+		lineageTag: 0fc9a2ca-493c-4df9-a10c-d3c194729193
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _SubcategoriaAUX = if(incident[Subcategoría]=related(_Subcategorias[Subcat_BD]), RELATED(_Subcategorias[Aplicacion]), "Vacio")
+		lineageTag: d38cd0b3-70f6-4ac8-8e00-6b062116a71c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _SubcategoriaFinal = if(incident[_SubcategoriaAUX]="Vacio"&&incident[Elemento Configuración]="SCS", "SCS", incident[_SubcategoriaAUX])
+		lineageTag: 968721e4-6785-4937-8df0-5926f6c8b65d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column __DiaAbierta = incident[Fecha Apertura].[Date]
+		formatString: Short Date
+		lineageTag: 49f95642-d8e2-4f93-8d40-b0c56396ca3d
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 8aa4dba0-fa1e-48c8-bb36-78ba729e44d5
+			defaultHierarchy: LocalDateTable_36d9b0ef-9f21-46b2-b214-deaa67102327.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column __DiaCerrada = incident[Fecha Cierre].[Date]
+		formatString: General Date
+		lineageTag: c7dcce91-8464-40a7-a3e0-2900d3626ee1
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: b6dafeff-f10e-4624-adbc-6a27b4ca6625
+			defaultHierarchy: LocalDateTable_98b63ee7-e0df-4532-92c3-305431755924.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column __AbiertaCerradaMismoMes = if(or(and(incident[Fecha Apertura].[NroMes]=incident[Fecha Cierre].[NroMes], incident[Fecha Apertura].[Año]=incident[Fecha Cierre].[Año]),and(incident[Fecha Apertura].[NroMes]=MONTH(today())-1, incident[Fecha Apertura].[Año]=year(today()))), "Abierta Mes", "Abierta Mes pasado")
+		lineageTag: f58a85e7-665d-49fc-a623-32ddcf5e0082
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column __CerradasMes = CALCULATE(COUNTROWS(incident),filter(incident,and(incident[__EstadoGeneral]="Cerrada", incident[__Util]="Si")))
+		formatString: 0
+		lineageTag: 05008035-c50a-4e09-b590-dd3cfc5a3897
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column __TiempoIncsAbiertas = DATEDIFF(incident[__DiaAbierta].[Date],TODAY(),DAY)
+		formatString: 0
+		lineageTag: dedb639a-723d-443e-9cdc-ed7bb8790a21
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column __TIncsAbiertasMax = max(incident[__TiempoIncsAbiertas])
+		formatString: 0
+		lineageTag: f19589d1-ae31-4a8b-895a-d293de131c3e
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column __TiempoMedioIncsAbiertas = AVERAGE(incident[__TiempoIncsAbiertas])
+		lineageTag: d6c3945f-3f3c-43e8-b309-3ce0c605e235
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _DeptEmpleado = if(incident[sys_created_by]=related(_Usuarios[u_digital_id]), RELATED(_Usuarios[DepartamentoID]), "Vacio")
+		lineageTag: 0a2c30a0-979e-4d2d-9010-6813db799864
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _EsFinanciero = if(CONTAINS(_DepartamentosFinancieros, _DepartamentosFinancieros[ID], incident[_DeptEmpleado]), "Si", "No")
+		lineageTag: 476bd231-e9be-4f19-b862-6789f7f66853
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column __NumSemanaAbierta = WEEKNUM(incident[__DiaAbierta].[Date])
+		formatString: 0
+		lineageTag: 7acf4f70-7823-4207-a678-604b08bb46cc
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column __NumSemanaCerrada = WEEKNUM(incident[__DiaCerrada].[Date])
+		formatString: 0
+		lineageTag: 980ce19e-a88f-4e17-a98f-8ce86f1eb7e2
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column __EsSemanaBacklog = if(and(incident[__NumSemanaCerrada]=[__SemanaCerrada], incident[__DiaCerrada].[Año]=year(today())), "Si", "No")
+		lineageTag: dc6b2bd6-b021-4c93-9fd9-1fad5d86f0e6
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column __MiTResolucion = DATEDIFF(incident[__DiaAbierta],incident[Fecha Resuelta],HOUR)
+		formatString: 0
+		lineageTag: d391b2b3-97f4-4dd0-9574-ab3af658e59c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column __DiaAbiertaFormato = incident[__DiaAbierta].[Date]
+		formatString: dd/mm/yy
+		lineageTag: 226a779b-9836-4da0-aaa7-6c2e1c4e880c
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 38993c3d-c837-4e01-b1ce-11e0cc965377
+			defaultHierarchy: LocalDateTable_c7f07a7c-4703-41c5-99ac-12deb0c75a67.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column __DiaCerradaFormato = incident[__DiaCerrada].[Date]
+		formatString: dd/mm/yy
+		lineageTag: 7c7c4200-f2d4-4459-941a-d4c25f94e47c
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 1c009365-01d0-4bff-a805-109d1dd2dc7b
+			defaultHierarchy: LocalDateTable_bbee7bc8-6647-40f3-99d3-c6a2d30e81de.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column _myMesAñoInc = FORMAT(incident[__DiaAbierta],"YYYY MMM")
+		lineageTag: 475b533a-f444-4a99-929c-88742fa4ca87
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column __Util = if(and(and(NOT(incident[_SubcategoriaFinal]="Vacio"),incident[Linea de Negocio]="Energía"),incident[_EsFinanciero]="No"), "Si", "No")
+		lineageTag: 8b2c40a0-15b7-4037-a105-8e2da3fb1105
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column __NumAbiertasMes =
+			CALCULATE(
+			    COUNT([_myMesAñoInc]),
+			    FILTER(incident, and(and([_myMesAñoInc] = EARLIER(incident[_myMesAñoInc]), incident[__Util]="Si"),incident[__EstadoGeneral]="Abierta")))
+		formatString: 0
+		lineageTag: ad892524-3cff-4323-ad4c-a0b749a56807
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column __EstadoGeneral = if(OR(OR(incident[Estado]="Nuevo",incident[Estado]="En espera"), incident[Estado]="En curso"), "Abierta", "Cerrada")
+		lineageTag: 9f6ee0a0-13a2-40ac-9699-91cf0328cdbf
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column __NumCerradasMes =
+			CALCULATE(
+			    COUNT([_myMesAñoInc]),
+			    FILTER(incident, and(and([_myMesAñoInc] = EARLIER(incident[_myMesAñoInc]), incident[__Util]="Si"),incident[__EstadoGeneral]="Cerrada")))
+		formatString: 0
+		lineageTag: 46922aab-2c97-4d9e-ada4-de6a1aa930e3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column __MiTResolucionDias = if(incident[__EstadoGeneral]="Abierta", DATEDIFF(incident[__DiaAbierta],today(),DAY),DATEDIFF(incident[__DiaAbierta],incident[Fecha Resuelta],DAY))
+		formatString: 0
+		lineageTag: 1a1093e3-1110-4f3a-acbb-da62aa539d19
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column zRangeAux = if(incident[__MiTResolucionDias]<=5, "1: Días<5", " ")
+		lineageTag: 73173ee4-468f-40a2-a6a3-b357afa6c8d3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column zRangeAux2 = if(and(incident[__MiTResolucionDias]>5, incident[__MiTResolucionDias]<=10), "2: 5<Días<=10", incident[zRangeAux])
+		lineageTag: 514eae86-1ebd-4d79-8ca2-9e3a70b62463
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column zRangeAux3 = if(and(incident[__MiTResolucionDias]>10, incident[__MiTResolucionDias]<=15),"3: 10<Días<=15", incident[zRangeAux2])
+		lineageTag: 19e00b23-ba5e-41a8-b8b9-6d71941d0f06
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column zRangeAux4 = if(and(incident[__MiTResolucionDias]>15, incident[__MiTResolucionDias]<=25),"4: 15<Días<=25", incident[zRangeAux3])
+		lineageTag: fdcd797f-9864-428d-a962-a0841ce00c21
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column zRangeAux5 = if(incident[__MiTResolucionDias]>25, "5: Días>25", incident[zRangeAux4])
+		lineageTag: c7906ac6-01fa-4f13-9d0d-05f10bdd5cfd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column __EsCerradaMes = if(or(and(incident[Fecha Resuelta].[NroMes]=MONTH(TODAY()),incident[Fecha Resuelta].[Año]=YEAR(TODAY())),and(incident[Fecha Cierre].[NroMes]=MONTH(TODAY()),incident[Fecha Cierre].[Año]=YEAR(TODAY()))), "Si", "No")
+		lineageTag: 1c9ecad3-0a4d-459b-9ab2-75a66a367580
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _myMesAñoIncCerrada = FORMAT(incident[__DiaCerrada],"YYYY MMM")
+		lineageTag: 563f3a22-7165-45ed-8a13-36a15d480330
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_tags
+		dataType: string
+		lineageTag: e251ec43-2be5-4595-a9ce-56bbae26b71c
+		summarizeBy: none
+		sourceColumn: sys_tags
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_external_vendor
+		dataType: string
+		lineageTag: 8c2f2f51-4d1f-4981-94a9-7182b086358a
+		summarizeBy: none
+		sourceColumn: u_external_vendor
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: ceb5bfb1-5f32-413f-9919-d0576aee6f7f
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_external_vendor
+		dataType: string
+		lineageTag: 53ce37d0-a00d-4884-b869-464c51e4b462
+		summarizeBy: none
+		sourceColumn: dv_u_external_vendor
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Cerrada Jerarquía'
+		lineageTag: 5b64727c-1084-4f56-9954-7126f04c1b50
+
+		level 'Fecha Cierre'
+			lineageTag: 05ba6648-0287-415b-ad52-47b77894d95c
+			column: 'Fecha Cierre'
+
+		changedProperty = IsHidden
+
+	hierarchy 'Fecha Apertura Jerarquía'
+		lineageTag: ca89054f-6c1a-4f31-9924-171686bf3eb6
+
+		level 'Fecha Apertura'
+			lineageTag: f6279f8a-2441-45b6-beb9-a0f2124509ca
+			column: 'Fecha Apertura'
+
+		changedProperty = IsHidden
+
+	hierarchy 'Fecha Cierre Jerarquía'
+		lineageTag: c7c3f014-a27b-4f99-aa30-d1ae1d308f63
+
+		level 'Fecha Resuelta'
+			lineageTag: c8b4f7c5-5b8a-400e-a615-5f51a54808dc
+			column: 'Fecha Resuelta'
+
+		changedProperty = IsHidden
+
+	partition incident-7e63c1be-552b-4333-97d0-55c3c2de6042 = m
+		mode: import
+		source = ```
+				let
+				Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH", [Query="select number, INC.sys_id,dv_u_external_vendor,opened_at,caused_by,dv_caused_by,dv_rfc,dv_caller_id,
+				  dv_u_category,dv_u_subcategory,dv_priority,dv_state,dv_assignment_group,assignment_group,dv_assigned_to,u_progress,dv_opened_by,reopened_time,
+				  actions_taken,INC.active,INC.sys_mod_count,INC.sys_updated_on,INC.sys_updated_by,cmdb_ci_business_app,approval,short_description,INC.dv_u_catalog,cause,closed_at,
+				  dv_closed_by,knowledge,INC.sys_created_on,INC.sys_created_by, close_code,dv_u_department,description,upon_approval,upon_reject,dv_u_incident_diagnostic,sys_domain,
+				  calendar_duration,business_duration,dv_cmdb_ci,INC.dv_company,user_input,u_oncall_team,escalation,dv_incident_state,major_incident_state,u_size,INC.sys_tags,
+				  u_date_unavailability,approval_set,u_state_date,due_date,sla_due,work_end,timeline,severity,u_previous_groups,skills,approval_history,correlation_id,
+				  dv_impact,business_impact,dv_parent_incident,child_incidents,expected_start,work_start,additional_assignee_list,group_list,work_notes_list,INC.dv_u_business_line,
+				  INC.u_metal,dv_hold_reason,dv_u_subcategory_module,close_notes,work_notes,notify,reassignment_count,comments,comments_and_work_notes,service_offering,
+				  u_parent_hold_reason,dv_u_ref_country,delivery_plan,dv_parent,u_acciona_priority,problem_id,promoted_on,promoted_by,proposed_on,proposed_by,
+				  u_external_vendor,trigger_rule,u_responded,resolved_at,dv_resolved_by,lessons_learned,overview,INC.sys_domain_path,made_sla,follow_up,business_service,
+				  subcategory,delivery_task,dv_task_for,u_phone,u_vendor_type,calendar_stc,business_stc,time_worked,dv_u_solution_type,contact_type,INC.sys_class_name,INC.dv_location,
+				  dv_urgency,watch_list,activity_due,correlation_display,reopen_count,dv_reopened_by,u_csc_area,number as task_effective_number, INC.state,rfc,priority, 
+				   iif(g.dv_g_u_country=u.dv_u_country,dv_assignment_group ,'GRUPO CORPORACIÓN') as grupodeasignación ,
+				   case when dv_state like 'Resolved' then 
+				  datediff(hour,opened_at,resolved_at)  else datediff(hour,opened_at,closed_at) end as TResolucion,u.dv_u_country paisusu,u.dv_location as locationusuario,
+				  case when dv_state like 'Closed' then 'Cerrado'
+				 when dv_state like 'Canceled' then 'Cancelado' when dv_state like 'In progress'then 'En curso' when dv_state like 'New' then 'Nuevo' when dv_state like 'On hold' then 'En espera'
+				 when dv_state like 'Resolved' then 'Resuelto' end as Estado, INC.dv_u_ref_country paisIncidencia, g.dv_g_u_country as paisGrupo
+				 from DWH.SERV_NOW.incident INC left join DWH.SERV_NOW.sys_user U on INC.opened_by=U.sys_id left join DWH.SERV_NOW.u_groups G on inc.assignment_group=g.g_sys_id
+				  where (INC.opened_at BETWEEN '20220101 00:00:00' and getdate())"]),
+				   #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"opened_at", "Abierta"}, {"dv_caused_by", "Causada por"}, {"dv_rfc", "Solicita Cambio"}, {"dv_caller_id", "Abierta Por"}, {"dv_u_category", "Categoría"}, {"dv_u_subcategory", "Subcategoría"}, {"dv_priority", "Prioridad"}, {"dv_state", "EstadoE"}, {"dv_assignment_group", "Grupo de Asignación"}, {"dv_assigned_to", "Asignado a"}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado",{"u_progress"}),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Columnas quitadas",{{"reopened_time", type datetime}}),
+				    #"Columnas quitadas1" = Table.RemoveColumns(#"Tipo cambiado1",{"actions_taken", "cmdb_ci_business_app", "approval"}),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas quitadas1",{{"dv_u_catalog", "Negocio"}}),
+				    #"Columnas quitadas2" = Table.RemoveColumns(#"Columnas con nombre cambiado1",{"cause"}),
+				    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columnas quitadas2",{{"closed_at", "Fecha Cierre"}, {"dv_closed_by", "Cerrada por"}}),
+				    #"Columnas quitadas3" = Table.RemoveColumns(#"Columnas con nombre cambiado2",{"knowledge"}),
+				    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Columnas quitadas3",{{"close_code", "Código Cierre"}, {"dv_u_department", "Área de Negocio"}, {"description", "Descripción"}}),
+				    #"Columnas quitadas4" = Table.RemoveColumns(#"Columnas con nombre cambiado3",{"upon_approval", "upon_reject"}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas quitadas4","No es un error","No es error",Replacer.ReplaceText,{"dv_u_incident_diagnostic"}),
+				    #"Columnas con nombre cambiado4" = Table.RenameColumns(#"Valor reemplazado",{{"dv_u_incident_diagnostic", "Diagnóstico"}}),
+				    #"Columnas quitadas5" = Table.RemoveColumns(#"Columnas con nombre cambiado4",{"sys_domain"}),
+				    #"Columnas con nombre cambiado5" = Table.RenameColumns(#"Columnas quitadas5",{{"dv_cmdb_ci", "Elemento Configuración"}, {"dv_company", "Empresa"}}),
+				    #"Columnas quitadas6" = Table.RemoveColumns(#"Columnas con nombre cambiado5",{"user_input", "escalation"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas6", each true),
+				    #"Columnas quitadas7" = Table.RemoveColumns(#"Filas filtradas",{"major_incident_state", "u_size", "u_date_unavailability", "approval_set", "u_state_date", "due_date",  "work_end", "timeline"}),
+				    #"Columnas con nombre cambiado6" = Table.RenameColumns(#"Columnas quitadas7",{{"severity", "Criticidad"}}),
+				    #"Columnas quitadas8" = Table.RemoveColumns(#"Columnas con nombre cambiado6",{"Criticidad", "u_previous_groups", "skills", "approval_history"}),
+				    #"Columnas con nombre cambiado7" = Table.RenameColumns(#"Columnas quitadas8",{{"dv_impact", "Impacto"}}),
+				    #"Columnas quitadas9" = Table.RemoveColumns(#"Columnas con nombre cambiado7",{"business_impact", "expected_start", "work_start", "additional_assignee_list", "work_notes_list"}),
+				    #"Columnas con nombre cambiado8" = Table.RenameColumns(#"Columnas quitadas9",{{"dv_u_business_line", "Linea de Negocio"}, {"u_metal", "Metal"}, {"dv_hold_reason", "Pendiente_Causa"}}),
+				    #"Columnas quitadas10" = Table.RemoveColumns(#"Columnas con nombre cambiado8",{}),
+				    #"Columnas con nombre cambiado9" = Table.RenameColumns(#"Columnas quitadas10",{{"dv_u_subcategory_module", "Modulo_Subcategoría"}, {"close_notes", "Notas de Cierre"}, {"work_notes", "Notas de Trabajo"}}),
+				    #"Columnas quitadas11" = Table.RemoveColumns(#"Columnas con nombre cambiado9",{"notify"}),
+				    #"Columnas con nombre cambiado10" = Table.RenameColumns(#"Columnas quitadas11",{{"reassignment_count", "Reasignaciones"}, {"comments", "Comentarios"}, {"comments_and_work_notes", "Notas adicionales"}}),
+				    #"Columnas quitadas12" = Table.RemoveColumns(#"Columnas con nombre cambiado10",{"service_offering",  "u_parent_hold_reason"}),
+				    #"Columnas con nombre cambiado11" = Table.RenameColumns(#"Columnas quitadas12",{{"dv_u_ref_country", "País"}}),
+				    #"Columnas quitadas13" = Table.RemoveColumns(#"Columnas con nombre cambiado11",{"delivery_plan", "u_acciona_priority", "problem_id", "promoted_on", "promoted_by", "proposed_on", "proposed_by", "trigger_rule"}),
+				    #"Columnas con nombre cambiado12" = Table.RenameColumns(#"Columnas quitadas13",{{"resolved_at", "Fecha Resuelta"}, {"Abierta", "Fecha Apertura"}, {"dv_resolved_by", "Resuelto por"}}),
+				    #"Columnas quitadas14" = Table.RemoveColumns(#"Columnas con nombre cambiado12",{"lessons_learned", "overview", "sys_domain_path", "follow_up", "business_service", "subcategory", "delivery_task", "u_vendor_type"}),
+				    #"Columnas con nombre cambiado13" = Table.RenameColumns(#"Columnas quitadas14",{{"dv_u_solution_type", "Tipo Solución"}, {"contact_type", "Tipo Contacto"}}),
+				    #"Columnas quitadas15" = Table.RemoveColumns(#"Columnas con nombre cambiado13",{"sys_class_name"}),
+				    #"Columnas con nombre cambiado14" = Table.RenameColumns(#"Columnas quitadas15",{{"dv_location", "Ubicación"}}),
+				    #"Columnas quitadas16" = Table.RemoveColumns(#"Columnas con nombre cambiado14",{}),
+				    #"Columnas con nombre cambiado15" = Table.RenameColumns(#"Columnas quitadas16",{{"dv_urgency", "Urgencia"}, {"reopen_count", "Reabierta"}, {"dv_reopened_by", "Reabierta por"}, {"number", "ID_INC"}, {"short_description", "Breve Descripción"}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado15", "Tiempo Resolución", each [Fecha Cierre]-[Fecha Apertura]),
+				    #"Personalizada agregada1" = Table.AddColumn(#"Columnas quitadas16", "Mes de apertura", each [Fecha Apertura]),
+				    #"Mes insertado" = Table.AddColumn(#"Personalizada agregada1", "Mes", each Date.Month([Mes de apertura]), Int64.Type),
+				    #"Columnas quitadas17" = Table.RemoveColumns(#"Mes insertado",{"Mes"}),
+				    #"Nombre del mes extraído" = Table.TransformColumns(#"Columnas quitadas17", {{"Mes de apertura", each Date.MonthName(_), type text}}),
+				    #"Poner En Mayúsculas Cada Palabra" = Table.TransformColumns(#"Nombre del mes extraído",{{"Mes de apertura", Text.Proper, type text}}),
+				    #"Personalizada agregada2" = Table.AddColumn(#"Poner En Mayúsculas Cada Palabra", "Mes de cierre", each [Fecha Cierre]),
+				    #"Nombre del mes insertado" = Table.AddColumn(#"Personalizada agregada2", "Nombre del mes", each Date.MonthName([Mes de cierre]), type text),
+				    #"Columnas con nombre cambiado16" = Table.RenameColumns(#"Nombre del mes insertado",{{"Nombre del mes", "Mes de cierre Nombre"}, {"Mes de apertura", "Mes de apertura Nombre"}}),
+				    #"Poner en mayúsculas cada palabra insertada" = Table.AddColumn(#"Columnas con nombre cambiado16", "Poner En Mayúsculas Cada Palabra", each Text.Proper([Mes de cierre Nombre]), type text),
+				    #"Filas filtradas1" = Table.SelectRows(#"Poner en mayúsculas cada palabra insertada", each true)
+				 
+				in
+				    #"Filas filtradas1"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

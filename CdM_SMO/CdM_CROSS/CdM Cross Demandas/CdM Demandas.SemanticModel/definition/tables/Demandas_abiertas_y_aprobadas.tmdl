@@ -1,0 +1,111 @@
+table Demandas_abiertas_y_aprobadas
+	lineageTag: 8f17db5c-a07d-4d03-bbb3-a04ccf08d911
+
+	measure Demandas_abiertas = COUNTROWS(FILTER(Demandas_abiertas_y_aprobadas, [2 - Tipo] = "Abierta"))
+		formatString: 0
+		lineageTag: 6bd80752-4ff2-4edc-9929-1f6983d648ca
+
+	measure Demandas_aprobadas = COUNTROWS(FILTER(Demandas_abiertas_y_aprobadas, [2 - Tipo] = "Aprobada"))
+		formatString: 0
+		lineageTag: 6b7848b5-869e-4182-a3e7-64e6d206d453
+
+	column '1 - Number'
+		lineageTag: fb15fa53-00e9-4bf6-98d3-ed960407789a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Demandas_abiertas[1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Tipo'
+		lineageTag: 4ea3e0e1-a236-4e78-959e-a7aab295aaa1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Demandas_abiertas[2 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - Fecha'
+		formatString: General Date
+		lineageTag: 6a8856d2-6b58-46f8-bf85-0add9dd587b8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Demandas_abiertas[3 - Fecha]
+
+		variation Variación
+			isDefault
+			relationship: 86922fd5-2ca9-4c8c-b956-43e06a4b1f23
+			defaultHierarchy: LocalDateTable_761cf221-a406-471a-997b-8f0bef428e54.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Año'
+		formatString: 0
+		lineageTag: 9196f786-180e-4332-87ea-7bd8845541af
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Demandas_abiertas[4 - Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Mes'
+		formatString: 0
+		lineageTag: f53a9e6b-bb04-4746-86ab-d6cafc8e3919
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: Demandas_abiertas[5 - Mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Porfolio'
+		lineageTag: 0ba93cca-b780-4147-a69f-dbe1479d3c2e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Demandas_abiertas[6 - Porfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '7 - Estado'
+		lineageTag: a522b4fd-a340-4970-828d-1d14d3826429
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Demandas_abiertas[7 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '8 - Prioridad'
+		lineageTag: 70e3f850-4126-4c9e-b597-3ea5baf23415
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Demandas_abiertas[8 - Prioridad]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '9 - Tallaje'
+		lineageTag: 08fafaeb-6a96-45fb-ae29-8773401e56e6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Demandas_abiertas[9 - Tallaje]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '10 - DATE' = DATE([4 - Año],[5 - Mes],1)
+		formatString: d-m-yy
+		lineageTag: db3af6f3-4f5d-408c-b911-98761c38e4b8
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 9f43a34e-a853-4455-8654-92d1f7529d52
+			defaultHierarchy: LocalDateTable_dc9d2625-0b39-4511-9f5a-806fabe65e8d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition Demandas_abiertas_y_aprobadas = calculated
+		mode: import
+		source = UNION(Demandas_abiertas,Demandas_aprobadas)
+
+	annotation PBI_Id = 714682ee0bcf4aeb9c69d45cf965c990
+

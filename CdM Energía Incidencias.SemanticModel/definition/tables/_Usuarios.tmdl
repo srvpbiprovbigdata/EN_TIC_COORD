@@ -1,0 +1,127 @@
+table _Usuarios
+	lineageTag: 75f664f9-46d0-4710-8c06-541baf00889e
+
+	column dv_department
+		dataType: string
+		lineageTag: d9c5546d-59a2-4469-8781-c78e7a91ff1e
+		summarizeBy: none
+		sourceColumn: dv_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_number
+		dataType: string
+		lineageTag: 6a5e937c-e57c-404f-9424-699af888b60a
+		summarizeBy: none
+		sourceColumn: employee_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 8d95992d-2b11-4cae-8596-7f9d542b44d7
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_id
+		dataType: string
+		lineageTag: f94747b1-3524-428d-abbc-f64f4ec5c834
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_business_line
+		dataType: string
+		lineageTag: 1bca67fb-814f-48a6-b993-3ec8bdad7252
+		summarizeBy: none
+		sourceColumn: dv_u_business_line
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_catalog
+		dataType: string
+		lineageTag: bfc46844-5b17-4202-b813-499341f9f930
+		summarizeBy: none
+		sourceColumn: dv_u_catalog
+
+		annotation SummarizationSetBy = Automatic
+
+	column dv_u_country
+		dataType: string
+		lineageTag: 47776b59-9519-4e9a-b998-6e00d618cd53
+		summarizeBy: none
+		sourceColumn: dv_u_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_digital_id
+		dataType: string
+		lineageTag: ed23d848-2c61-4e27-be8e-4252366cbee9
+		summarizeBy: none
+		sourceColumn: u_digital_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_gdi_id
+		dataType: string
+		lineageTag: cbac8dd5-bea9-45f5-9b2f-2f09c6873b35
+		summarizeBy: none
+		sourceColumn: u_gdi_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_name
+		dataType: string
+		lineageTag: 2b08efe4-b6f1-4e4b-aef5-f9382bc72263
+		summarizeBy: none
+		sourceColumn: user_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_metal
+		dataType: string
+		lineageTag: 8e288d8e-041d-4034-80a9-0bcda934bc35
+		summarizeBy: none
+		sourceColumn: u_metal
+
+		annotation SummarizationSetBy = Automatic
+
+	column DepartamentoID = if(RELATED(_Departamento[name])=_Usuarios[dv_department], RELATED(_Departamento[id]), "Vacio")
+		lineageTag: d343f2b9-7301-41fc-b618-21a3e63013fd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column u_selfapprover
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 13313c4b-0fe5-4402-8c1b-70394cf00367
+		summarizeBy: none
+		sourceColumn: u_selfapprover
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Usuarios-b4282b5f-2e7e-45c5-acef-11f51c5c4474 = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Databases("QECCDWH.acciona.int,60001"),
+				    DWH = Origen{[Name="DWH"]}[Data],
+				    SERV_NOW_sys_user = DWH{[Schema="SERV_NOW",Item="sys_user"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_sys_user,{"agent_status", "dv_agent_status", "avatar", "average_daily_fte", "building", "dv_building", "business_criticality", "dv_business_criticality", "calendar_integration", "dv_calendar_integration", "city", "company", "dv_company", "cost_center", "dv_cost_center", "country", "dv_country", "date_format", "dv_date_format", "default_perspective", "dv_default_perspective", "edu_status", "dv_edu_status", "email", "enable_multifactor_authn", "failed_attempts", "first_name", "gender", "dv_gender", "geolocation_tracked", "home_phone", "internal_integration_user", "introduction", "dv_introduction", "last_login", "last_login_device", "last_login_time", "last_name", "last_password", "last_position_update", "latitude", "ldap_server", "dv_ldap_server", "location", "dv_location", "longitude", "manager", "dv_manager", "middle_name", "mobile_phone", "notification", "dv_notification", "on_schedule", "dv_on_schedule", "phone", "photo", "preferred_language", "dv_preferred_language", "roles", "schedule", "dv_schedule", "source", "sso_source", "state", "street", "sys_class_name", "dv_sys_class_name", "sys_created_by", "sys_created_on", "sys_domain_path", "sys_mod_count", "sys_tags", "sys_updated_by", "sys_updated_on", "time_format", "dv_time_format", "time_sheet_policy", "dv_time_sheet_policy", "time_zone", "dv_time_zone", "u_business_line", "u_catalog", "u_catalog_visibility", "dv_u_catalog_visibility", "u_correlation_id", "u_country", "u_csc_profile", "dv_u_csc_profile", "u_deliveryaddress", "u_expatriate", "u_generic_user", "u_last_update_from_workday", "u_manual_business_line", "u_property_code", "dv_u_property_code", "u_secretary", "u_send_gdi", "u_trusted_user", "u_type", "dv_u_type", "u_upn", "u_user_profile", "dv_u_user_profile", "vip", "web_service_access_only", "zip", "active", "department"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each ([dv_department] <> "") and ([employee_number] <> "")),
+				    #"Texto en mayúsculas" = Table.TransformColumns(#"Filas filtradas",{{"dv_department", Text.Upper, type text}}),
+				    #"Columnas quitadas1" = Table.RemoveColumns(#"Texto en mayúsculas",{"u_manual_catalog", "u_manual_country"}),
+				    #"Filas filtradas1" = Table.SelectRows(#"Columnas quitadas1", each true),
+				    #"Duplicados quitados" = Table.Distinct(#"Filas filtradas1", {"u_digital_id"}),
+				    #"Filas filtradas2" = Table.SelectRows(#"Duplicados quitados", each ([u_digital_id] <> null and [u_digital_id] <> ""))
+				in
+				    #"Filas filtradas2"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

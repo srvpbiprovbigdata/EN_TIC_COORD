@@ -1,0 +1,40 @@
+table _Navegacion
+	lineageTag: 4f91ee15-cfe5-4032-8934-db905d811480
+
+	column Pais
+		dataType: string
+		lineageTag: 33909a9c-305f-4ba1-be99-08aa9cbc2661
+		summarizeBy: none
+		sourceColumn: Pais
+
+		annotation SummarizationSetBy = Automatic
+
+	column Path
+		dataType: string
+		lineageTag: 8e40e955-e94f-4361-b3a3-3b3c28deefcc
+		summarizeBy: none
+		sourceColumn: Path
+
+		annotation SummarizationSetBy = Automatic
+
+	column Descripcion
+		dataType: string
+		lineageTag: fce26260-0141-4522-ba28-8d1e53f6ebbb
+		summarizeBy: none
+		sourceColumn: Descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Navegacion-852c2bda-fc74-41c5-aea7-24e7672a8e68 = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("tZFNasMwEIWvEryOYkuWf9Sd42TRhamJlyGE0V8isC0j27T0Rj1HL1YlpODSbQuaxbzHoO/NHI9B4S6qn0wPwTrwrzH9yvTauk4Fp7W353Fy0JqHfde2Dt5N67vrNA3jUxjCMGwG+6ocNxthu/Di7DyMYYTzNAfOUCwShajUHOWcpiiNcp7GFGOd4dCpwbppDAkBKROmkEgjjaigEWJK+rEEMx7LOBM081+Wu+r8XNWHfdMUL/9HI6VkzBfiIDmieYoRYyCQirNUUQ6KZ/CgKarm3BT1Fp89yehJblDl1bRqsbLStrbjP7ZY2nGC1cGIpbiznem91K8Oaph5a8TC3IsZpHULpVJvRtg/zp7EREqtCaJM+0tEmUTAtUQEZzklBEsi8K/s1efHHeVGVUMP3TJVrdz83Z6+AA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Pais = _t, Path = _t, Descripcion = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Pais", type text}, {"Path", type text}, {"Descripcion", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

@@ -1,0 +1,81 @@
+table 'SERV_NOW sys_journal_field'
+	lineageTag: 76743855-ecb6-43ee-ab68-8aecaa5fbdb5
+
+	column element
+		dataType: string
+		lineageTag: 386f5c32-4ea9-48a1-9612-aac1e1f4acec
+		summarizeBy: none
+		sourceColumn: element
+
+		annotation SummarizationSetBy = Automatic
+
+	column element_id
+		dataType: string
+		lineageTag: 8a2bb31b-581e-426e-a7da-c72958a64d82
+		summarizeBy: none
+		sourceColumn: element_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 6eba1842-6ffb-4df9-8fee-818f1af2f6ab
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_by
+		dataType: string
+		lineageTag: 676459c7-7725-439e-a711-572bdc89798c
+		summarizeBy: none
+		sourceColumn: sys_created_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column sys_created_on
+		dataType: dateTime
+		formatString: d/m/yy
+		lineageTag: d013b174-1213-4796-8cab-99a7cc48c112
+		summarizeBy: none
+		sourceColumn: sys_created_on
+
+		variation Variación
+			isDefault
+			relationship: cf0bd1cd-2333-4334-afa3-75e6d7b079f8
+			defaultHierarchy: LocalDateTable_3b340189-c2d5-4157-8be9-2a9f9489e272.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column sys_id
+		dataType: string
+		lineageTag: 25bf8615-0e61-403e-b910-f9cfe49c9fc4
+		summarizeBy: none
+		sourceColumn: sys_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: 317b9fca-e9c7-4a38-a978-abd8c993429b
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SERV_NOW sys_journal_field' = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database("QECCDWH.acciona.int,60001", "DWH"),
+				    SERV_NOW_sys_journal_field = Origen{[Schema="SERV_NOW",Item="sys_journal_field"]}[Data],
+				    #"Filas filtradas" = Table.SelectRows(SERV_NOW_sys_journal_field, each ([element] = "comments" or [element] = "work_notes") and ([name] = "incident"))
+				in
+				    #"Filas filtradas"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

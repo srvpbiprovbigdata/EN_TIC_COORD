@@ -1,0 +1,47 @@
+table _Departamento
+	lineageTag: f0bdcbf9-5179-46b1-a7e4-dfb824a2224a
+
+	column name
+		dataType: string
+		lineageTag: 7aa6132d-cca7-47d7-9756-b1956c3b8b3c
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column id
+		dataType: string
+		lineageTag: 8a0fdd7e-7d41-4d96-8a80-9f4b50e31b77
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Departamento-7bfe91d3-2fd2-49cd-9539-ae6950c64255 = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Databases("QECCDWH.acciona.int,60001"),
+				    DWH = Origen{[Name="DWH"]}[Data],
+				    SERV_NOW_cmn_department = DWH{[Schema="SERV_NOW",Item="cmn_department"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(SERV_NOW_cmn_department,{"business_unit", "dv_business_unit", "code", "company", "dv_company", "cost_center", "dv_cost_center", "dept_head", "dv_dept_head", "description", "head_count", "managed_domain", "parent", "dv_parent", "primary_contact", "dv_primary_contact", "sys_created_by", "sys_created_on", "sys_domain", "sys_domain_path", "sys_id", "sys_mod_count", "sys_tags", "sys_updated_by", "sys_updated_on", "u_active", "u_catalog", "dv_u_catalog", "u_catalog_department", "u_cmdb", "u_type", "dv_u_type"}),
+				    #"Duplicados quitados" = Table.Distinct(#"Columnas quitadas", {"name"}),
+				    #"Duplicados quitados1" = Table.Distinct(#"Duplicados quitados", {"id"}),
+				    #"Filas en blanco eliminadas" = Table.SelectRows(#"Duplicados quitados1", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+				    #"Duplicados quitados2" = Table.Distinct(#"Filas en blanco eliminadas", {"name"}),
+				    #"Duplicados quitados3" = Table.Distinct(#"Duplicados quitados2", {"id"}),
+				    #"Dividir columna por delimitador" = Table.SplitColumn(#"Duplicados quitados3", "id", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"id.1", "id.2"}),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Dividir columna por delimitador",{{"id.1", type text}, {"id.2", type text}}),
+				    #"Columnas quitadas1" = Table.RemoveColumns(#"Tipo cambiado",{"id.2"}),
+				    #"Duplicados quitados4" = Table.Distinct(#"Columnas quitadas1", {"id.1"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Duplicados quitados4",{{"id.1", "id"}}),
+				    #"Duplicados quitados5" = Table.Distinct(#"Columnas con nombre cambiado", {"name"}),
+				    #"Texto en mayúsculas" = Table.TransformColumns(#"Duplicados quitados5",{{"name", Text.Upper, type text}}),
+				    #"Duplicados quitados6" = Table.Distinct(#"Texto en mayúsculas", {"name"})
+				in
+				    #"Duplicados quitados6"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

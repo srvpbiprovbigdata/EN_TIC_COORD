@@ -1,0 +1,121 @@
+table ESTADO_Evolutivos
+	lineageTag: c7472a2e-d510-45c5-9c44-e7424d37baf6
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: d67c02e4-a255-4fa9-8195-6f4416d74e67
+		summarizeBy: none
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	column TABLA
+		dataType: string
+		lineageTag: 4a722769-ea79-4fb5-9e3a-255914d6517b
+		summarizeBy: none
+		sourceColumn: TABLA
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_en
+		dataType: string
+		lineageTag: 7c7cc3ce-b09b-49df-b643-525294d4ab9e
+		summarizeBy: none
+		sourceColumn: Estado_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_es_ticket
+		dataType: string
+		lineageTag: 53b9181f-7220-4be2-959d-3a48874c4a99
+		summarizeBy: none
+		sourceColumn: Estado_es_ticket
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_es
+		dataType: string
+		lineageTag: 70b4ad2b-b059-48ae-8651-87a19546e29f
+		summarizeBy: none
+		sourceColumn: Estado_es
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Generico
+		dataType: string
+		lineageTag: a2623a85-98bc-40a5-af49-0bec280ae91e
+		summarizeBy: none
+		sourceColumn: Estado_Generico
+
+		annotation SummarizationSetBy = Automatic
+
+	column BackLOG_EstadoGeneral
+		dataType: string
+		lineageTag: 684dd0a4-9f8b-428e-97f0-5ba2d626ca4b
+		summarizeBy: none
+		sourceColumn: BackLOG_EstadoGeneral
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ESTADO_Evolutivos-4205a078-41c4-4bc7-b328-027ada89bdc0 = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("ZZJLboMwEIavYnmdKCV9LylESqqqoQ+pC8TCwVNqxdiWDZVynJ6lF6sxxFC8sWZ+5vOYfybPcYQXOHt9tOdegegTtETxgYFupM0fpNaESo2LRY7XvvpD6iNiAmVaVhqM8eRGoLLVpkNtmLiwQy89moGgTFSecDmIBubItUcSLg1QtBOlrBUHV9rDCbjn2acMn4LGN/Nb3o5MKaDBFbJmDaMBf9sJz1t7ppp8Nn1mMW/MzKM7X78TKBaEnwwzntp02u8PZ4M47XQ/JVP4Bi5VbY2ZwkrLEkJ3owvPvoNprL2rl/g/18KBBC2jaPw7UFyeVk+kFeWXR1MwijOo2mA60dqje4G2ktNpP4uBJgFz5ZmEiBI4h5HqFeImMMYOGzZhOaD9HJNxF84jnOzAIOGi+AM=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t, Columna2 = _t, Columna3 = _t, Columna4 = _t, Columna5 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", Int64.Type}, {"Columna2", type text}, {"Columna3", type text}, {"Columna4", type text}, {"Columna5", type text}}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Columna1", "Index"}, {"Columna2", "TABLA"}, {"Columna3", "Estado_en"}, {"Columna4", "Estado_es"}, {"Columna5", "Estado_Generico"}}),
+				    #"Columna duplicada" = Table.DuplicateColumn(#"Columnas con nombre cambiado", "Estado_es", "Estado_es - Copia"),
+				    #"Dividir columna por delimitador" = Table.SplitColumn(#"Columna duplicada", "Estado_es - Copia", Splitter.SplitTextByDelimiter("- ", QuoteStyle.Csv), {"Estado_es - Copia.1", "Estado_es - Copia.2"}),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Dividir columna por delimitador",{{"Estado_es - Copia.1", type text}, {"Estado_es - Copia.2", type text}}),
+				    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado1",null,"Cerrado completo",Replacer.ReplaceValue,{"Estado_es - Copia.2"}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Valor reemplazado",{"Estado_es - Copia.1"}),
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas quitadas",{{"Estado_es", "Estado_es_ticket"}, {"Estado_es - Copia.2", "Estado_es"}}),
+				    #"Columna duplicada1" = Table.DuplicateColumn(#"Columnas con nombre cambiado1", "Estado_es_ticket", "Estado_es_ticket - Copia"),
+				    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columna duplicada1",{{"Estado_es_ticket - Copia", "Estado_Generico_2"}}),
+				    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas con nombre cambiado2","PRJ - Abierto","Borrador",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","ENH - Borrador","Borrador",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","PRJ - En curso","En curso",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","PRJ - Pendiente","En curso",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado4","PRJ - Cerrado incompleto","Cerrado",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","PRJ - Cerrado omitido","Cerrado",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","ENH - En Análisis","En curso",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado7","ENH - En proceso","En curso",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado9" = Table.ReplaceValue(#"Valor reemplazado8","ENH - En pruebas","En curso",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado10" = Table.ReplaceValue(#"Valor reemplazado9","ENH - Despliegue","En curso",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado11" = Table.ReplaceValue(#"Valor reemplazado10","ENH - En espera","En curso",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado12" = Table.ReplaceValue(#"Valor reemplazado11","ENH - Cancelado","Cancelado",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Valor reemplazado13" = Table.ReplaceValue(#"Valor reemplazado12","Cerrado completo","Cerrado",Replacer.ReplaceText,{"Estado_Generico_2"}),
+				    #"Columnas quitadas1" = Table.RemoveColumns(#"Valor reemplazado13",{"Estado_Generico"}),
+				    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Columnas quitadas1",{{"Estado_Generico_2", "Estado_Generico"}}),
+				    #"Valor reemplazado14" = Table.ReplaceValue(#"Columnas con nombre cambiado3","PRJ - Abierto","Abierto",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado15" = Table.ReplaceValue(#"Valor reemplazado14","PRJ - En curso","En curso",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado16" = Table.ReplaceValue(#"Valor reemplazado15","PRJ - Pendiente","En espera",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado17" = Table.ReplaceValue(#"Valor reemplazado16","PRJ - Cerrado incompleto","Cerrado incompleto",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado18" = Table.ReplaceValue(#"Valor reemplazado17","PRJ - Cerrado omitido","Cerrado omitido",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado19" = Table.ReplaceValue(#"Valor reemplazado18","ENH - Borrador","Abierto",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado20" = Table.ReplaceValue(#"Valor reemplazado19","ENH - En Análisis","En curso",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado21" = Table.ReplaceValue(#"Valor reemplazado20","ENH - En proceso","En curso",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado22" = Table.ReplaceValue(#"Valor reemplazado21","ENH - En pruebas","En curso",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado23" = Table.ReplaceValue(#"Valor reemplazado22","ENH - Despliegue","En curso",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado24" = Table.ReplaceValue(#"Valor reemplazado23","ENH - En espera","En espera",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Valor reemplazado25" = Table.ReplaceValue(#"Valor reemplazado24","ENH - Cancelado","Cancelado",Replacer.ReplaceText,{"Estado_es_ticket"}),
+				    #"Columna duplicada2" = Table.DuplicateColumn(#"Valor reemplazado25", "Estado_es", "Estado_es - Copia"),
+				    #"Columnas con nombre cambiado4" = Table.RenameColumns(#"Columna duplicada2",{{"Estado_es - Copia", "BackLOG_EstadoGeneral"}}),
+				    #"Valor reemplazado26" = Table.ReplaceValue(#"Columnas con nombre cambiado4","En curso","Abierto",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado27" = Table.ReplaceValue(#"Valor reemplazado26","Pendiente","Abierto",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado28" = Table.ReplaceValue(#"Valor reemplazado27","Borrador","Abierto",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado29" = Table.ReplaceValue(#"Valor reemplazado28","En Análisis","Abierto",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado30" = Table.ReplaceValue(#"Valor reemplazado29","En proceso","Abierto",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado31" = Table.ReplaceValue(#"Valor reemplazado30","En pruebas","Abierto",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado32" = Table.ReplaceValue(#"Valor reemplazado31","Despliegue","Abierto",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado33" = Table.ReplaceValue(#"Valor reemplazado32","En espera","Abierto",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado34" = Table.ReplaceValue(#"Valor reemplazado33","Cerrado incompleto","Cerrado",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado35" = Table.ReplaceValue(#"Valor reemplazado34","Cerrado omitido","Cerrado",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado36" = Table.ReplaceValue(#"Valor reemplazado35","Cancelado","Cerrado",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"}),
+				    #"Valor reemplazado37" = Table.ReplaceValue(#"Valor reemplazado36","Cerrado completo","Cerrado",Replacer.ReplaceText,{"BackLOG_EstadoGeneral"})
+				in
+				    #"Valor reemplazado37"
+
+	annotation PBI_ResultType = Table
+

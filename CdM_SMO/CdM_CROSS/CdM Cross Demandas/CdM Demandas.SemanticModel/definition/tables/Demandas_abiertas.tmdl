@@ -1,0 +1,100 @@
+table Demandas_abiertas
+	lineageTag: 40fbb02e-a4f0-4343-80a7-4d873e1e4fd8
+
+	column '1 - Number'
+		lineageTag: bfb7b978-4dab-4ca6-b13d-cc390d2f1ceb
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [1 - Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '2 - Tipo'
+		lineageTag: 1b589ac2-27a7-4ff3-aabc-f696018c49e0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [2 - Tipo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '3 - Fecha'
+		formatString: General Date
+		lineageTag: b10d8df6-6f4e-4ed3-be72-ef0bf292755d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [3 - Fecha]
+
+		variation Variación
+			isDefault
+			relationship: 626855df-1726-402b-bf5b-b8e263944fac
+			defaultHierarchy: LocalDateTable_f9cbeb9a-5108-4cf0-9e34-ff17d319c8ea.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column '4 - Año'
+		formatString: 0
+		lineageTag: 62a397ad-0e84-4908-9da5-61334f05b66b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [4 - Año]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '5 - Mes'
+		formatString: 0
+		lineageTag: 5368ada2-7f45-4de1-9ab7-cccf43681c48
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [5 - Mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '6 - Porfolio'
+		lineageTag: f5517716-1b95-42af-afdc-ddb81b788efe
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [6 - Porfolio]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '7 - Estado'
+		lineageTag: e3239f9b-b449-409d-a128-50462f4a5fb4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [7 - Estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '8 - Prioridad'
+		lineageTag: b6181b96-48ce-489d-8552-bd94e410a254
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [8 - Prioridad]
+
+		annotation SummarizationSetBy = Automatic
+
+	column '9 - Tallaje'
+		lineageTag: 6345675d-82ba-4588-980c-7fcbc4f75632
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [9 - Tallaje]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Demandas_abiertas = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS('dmn_demand',
+				"1 - Number", 'dmn_demand'[number],
+				"2 - Tipo", "Abierta",
+				"3 - Fecha", 'dmn_demand'[opened_at],
+				"4 - Año", 'dmn_demand'[opened_at].[Año],
+				"5 - Mes", 'dmn_demand'[opened_at].[NroMes],
+				"6 - Porfolio", 'dmn_demand'[dv_portfolio],
+				"7 - Estado", dmn_demand[dv_state],
+				"8 - Prioridad", dmn_demand[dv_priority],
+				"9 - Tallaje", dmn_demand[Tallaje]
+				)
+
+	annotation PBI_Id = 44f43d3f7a0c4dd186aa60f3db59f916
+
